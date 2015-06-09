@@ -27,7 +27,7 @@
 extern crate libc;
 
 use std::ffi::CString;
-use libc::{c_uint, size_t, c_double};
+use libc::{c_uint, size_t, c_double, c_void};
 use filters::FilterType;
 
 mod bindings;
@@ -59,10 +59,19 @@ impl MagickWand {
         }
     }
 
-    // TODO: make a Rustic wrapper for reading a blob from bytes
-    // pub fn MagickReadImageBlob(arg1: *mut MagickWand,
-    //                            arg2: *const ::libc::c_void, arg3: size_t)
-    //  -> MagickBooleanType;
+    /// Read the image data from the vector of bytes.
+    pub fn read_image_blob(&self, data: Vec<u8>) -> Result<(), &'static str> {
+        let int_slice = &data[..];
+        let size = data.len();
+        let result = unsafe {
+            bindings::MagickReadImageBlob(
+                self.wand, int_slice.as_ptr() as *const c_void, size as u64)
+        };
+        match result {
+            bindings::MagickTrue => Ok(()),
+            _ => Err("failed to read image")
+        }
+    }
 
     /// Retrieve the width of the image.
     pub fn get_image_width(&self) -> usize {

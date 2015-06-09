@@ -19,6 +19,10 @@ extern crate magick_rust;
 use magick_rust::{MagickWand, magick_wand_genesis};
 use magick_rust::filters::{FilterType};
 
+use std::error::Error;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
 use std::sync::{Once, ONCE_INIT};
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
@@ -53,4 +57,26 @@ fn test_resize_image() {
     wand.resize_image(halfwidth, halfheight, FilterType::LanczosFilter, 1.0);
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
+}
+
+#[test]
+fn test_read_from_blob() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+
+    let path = Path::new("tests/data/IMG_5745.JPG");
+    let mut file = match File::open(&path) {
+        Err(why) => panic!("couldn't open file: {}", Error::description(&why)),
+        Ok(file) => file
+    };
+    let mut data: Vec<u8> = Vec::new();
+    match file.read_to_end(&mut data) {
+        Err(why) => panic!("couldn't read file: {}", Error::description(&why)),
+        Ok(_) => ()
+    };
+    assert!(wand.read_image_blob(data).is_ok());
+    assert_eq!(512, wand.get_image_width());
+    assert_eq!(384, wand.get_image_height());
 }
