@@ -12,9 +12,9 @@ A "safe" Rust interface to the [ImageMagick](http://www.imagemagick.org/) system
 1. Write unit tests
 1. Test it on lots of images in batches to stress test it; should not crash
 
-## Building the Bindings
+## Generating Bindings
 
-To build the ImageMagick bindings, we use [rust-bindgen](https://github.com/crabtw/rust-bindgen), which reads the C header files and produces a suitable wrapper in Rust.
+To generate the ImageMagick bindings, we use [rust-bindgen](https://github.com/crabtw/rust-bindgen), which reads the C header files and produces a suitable wrapper in Rust.
 
 This example is using the [Homebrew](http://brew.sh) installed version of ImageMagick, and the LLVM compiler suite provided in the Command Line Tools from Apple. The only real difference for Mac OS X is the `DYLD_LIBRARY_PATH` that is needed to work around [issue #89](https://github.com/crabtw/rust-bindgen/issues/89) in rust-bindgen. Otherwise, the same basic steps should work on any Rust-supported system.
 
@@ -32,4 +32,4 @@ $ DYLD_LIBRARY_PATH=/Library/Developer/CommandLineTools/usr/lib \
     ~/gen.h
 ```
 
-Then copy the `~/bindings.rs` file into the `src` directory of this project, and rebuild everything. Hopefully it still works.
+Then copy the `~/bindings.rs` file into the `src` directory of this project, and rebuild everything (`cargo clean` and `cargo test`). Hopefully it still works.
