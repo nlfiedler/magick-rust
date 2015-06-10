@@ -80,3 +80,20 @@ fn test_read_from_blob() {
     assert_eq!(512, wand.get_image_width());
     assert_eq!(384, wand.get_image_height());
 }
+
+#[test]
+fn test_write_to_blob() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert_eq!(512, wand.get_image_width());
+    assert_eq!(384, wand.get_image_height());
+    let blob = wand.write_image_blob("jpeg").unwrap();
+    assert_eq!(104061, blob.len());
+    // should be able to read it back again
+    assert!(wand.read_image_blob(blob).is_ok());
+    assert_eq!(512, wand.get_image_width());
+    assert_eq!(384, wand.get_image_height());
+}

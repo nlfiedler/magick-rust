@@ -1,6 +1,6 @@
 # magick-rust
 
-A "safe" Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. The *safe* is in scarequotes because honestly nearly everything is little more than calls into a C library with `unsafe` wrapped around it.
+A "safe" Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. The word *safe* is in scarequotes because, honestly, nearly everything is little more than a call into a C function with `unsafe` wrapped around it.
 
 ## TODO
 
@@ -9,8 +9,17 @@ A "safe" Rust interface to the [ImageMagick](http://www.imagemagick.org/) system
 1. Develop Rustic wrappers to the MagickWand library.
     * Old Rust bindings: https://github.com/influenza/wand-of-rust
     * Wand API: http://www.imagemagick.org/script/magick-wand.php
-1. Write unit tests
+1. ~~Write unit tests~~
 1. Test it on lots of images in batches to stress test it; should not crash
+
+## Build and Test
+
+Pretty simple for now.
+
+```
+$ cargo build
+$ cargo test
+```
 
 ## Generating Bindings
 

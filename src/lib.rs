@@ -16,6 +16,11 @@
 //!
 //! "Safe" wrapper around the low-level bindings to ImageMagick.
 //!
+//! Prior to using the ImageMagick system, the application should invoke
+//! `magick_wand_genesis()`, which maps directly to `MagickWandGenesis`.
+//! Likewise, when an application is done using ImageMagick, invoke the
+//! `magick_wand_terminus()` function, which maps to `MagickWandTerminus`.
+//!
 
 // Make the Rust bindings compile cleanly, despite being very un-Rust-like
 // wrappers around C code.
@@ -27,12 +32,18 @@
 extern crate libc;
 
 use std::ffi::CString;
+use std::ptr;
 use libc::{c_uint, size_t, c_double, c_void};
 use filters::FilterType;
 
 mod bindings;
 
 /// MagickWand is a Rustic wrapper to the Rust bindings to ImageMagick.
+///
+/// Instantiating a `MagickWand` will construct an ImageMagick "wand"
+/// on which operations can be performed via the `MagickWand` functions.
+/// When the `MagickWand` is dropped, the ImageMagick wand will be
+/// destroyed as well.
 pub struct MagickWand {
     wand: *mut bindings::MagickWand
 }
@@ -102,8 +113,6 @@ impl MagickWand {
         }
     }
 
-    // TODO: get the image from the wand somehow (maybe GetImageFromMagickWand())
-
     /// Write the current image to the provided path.
     pub fn write_image(&self, path: &str) -> Result<(), &'static str> {
         let c_name = CString::new(path).unwrap();
@@ -114,6 +123,28 @@ impl MagickWand {
             bindings::MagickTrue => Ok(()),
             _ => Err("failed to write image")
         }
+    }
+
+    /// Write the image in the desired format to a new blob.
+    ///
+    /// The `format` argument may be any ImageMagick supported image
+    /// format (e.g. GIF, JPEG, PNG, etc).
+    pub fn write_image_blob(&self, format: &str) -> Result<Vec<u8>, &'static str> {
+        let c_format = CString::new(format).unwrap();
+        let mut length: size_t = 0;
+        let blob = unsafe {
+            bindings::MagickSetImageFormat(self.wand, c_format.as_ptr());
+            bindings::MagickResetIterator(self.wand);
+            bindings::MagickGetImageBlob(self.wand, &mut length)
+        };
+        // would have used Vec::from_raw_buf() but it is unstable
+        let mut bytes = Vec::with_capacity(length as usize);
+        unsafe {
+            bytes.set_len(length as usize);
+            ptr::copy_nonoverlapping(blob, bytes.as_mut_ptr(), length as usize);
+            bindings::MagickRelinquishMemory(blob as *mut c_void);
+        };
+        Ok(bytes)
     }
 }
 
