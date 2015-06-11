@@ -113,6 +113,31 @@ impl MagickWand {
         }
     }
 
+    /// Resize the image to find within the given dimensions, maintaining
+    /// the current aspect ratio.
+    pub fn fit(&self, width: usize, height: usize) {
+        let mut width_ratio = width as f64;
+        width_ratio /= self.get_image_width() as f64;
+        let mut height_ratio = height as f64;
+        height_ratio /= self.get_image_height() as f64;
+        let new_width: usize;
+        let new_height: usize;
+        if width_ratio < height_ratio {
+            new_width = width;
+            new_height = (self.get_image_height() as f64 * width_ratio) as usize;
+        } else {
+            new_width = (self.get_image_width() as f64 * height_ratio) as usize;
+            new_height = height;
+        }
+        unsafe {
+            bindings::MagickResetIterator(self.wand);
+            while bindings::MagickNextImage(self.wand) != bindings::MagickFalse {
+                bindings::MagickResizeImage(self.wand, new_width as size_t, new_height as size_t,
+                                            FilterType::LanczosFilter as c_uint, 1.0);
+            }
+        }
+    }
+
     /// Write the current image to the provided path.
     pub fn write_image(&self, path: &str) -> Result<(), &'static str> {
         let c_name = CString::new(path).unwrap();

@@ -97,3 +97,17 @@ fn test_write_to_blob() {
     assert_eq!(512, wand.get_image_width());
     assert_eq!(384, wand.get_image_height());
 }
+
+#[test]
+fn test_fit() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert_eq!(512, wand.get_image_width());
+    assert_eq!(384, wand.get_image_height());
+    wand.fit(240, 240);
+    assert_eq!(240, wand.get_image_width());
+    assert_eq!(180, wand.get_image_height());
+}
