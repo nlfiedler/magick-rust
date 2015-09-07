@@ -1,5 +1,5 @@
 [package]
-name = "magick-rust"
+name = "magick_rust"
 version = "0.2.0"
 authors = ["Nathan Fiedler <nathanfiedler@fastmail.fm>"]
 
