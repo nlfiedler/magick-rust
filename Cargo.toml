@@ -2,6 +2,12 @@
 name = "magick_rust"
 version = "0.2.0"
 authors = ["Nathan Fiedler <nathanfiedler@fastmail.fm>"]
+description = "Selection of Rust bindings for the ImageMagick library."
+homepage = "https://github.com/nlfiedler/magick-rust"
+repository = "https://github.com/nlfiedler/magick-rust.git"
+readme = "README.md"
+license = "Apache-2.0"
+keywords = ["magickwand", "imagemagick"]
 
 [dependencies]
 libc = "0.1.8"
