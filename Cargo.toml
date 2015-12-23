@@ -8,6 +8,7 @@ repository = "https://github.com/nlfiedler/magick-rust.git"
 readme = "README.md"
 license = "Apache-2.0"
 keywords = ["magickwand", "imagemagick"]
+build = "build.rs"
 
 [dependencies]
 libc = "0.1.8"
