@@ -33,7 +33,7 @@ extern crate libc;
 
 use std::ffi::CString;
 use std::ptr;
-use libc::{c_uint, size_t, c_double, c_void};
+use libc::{c_uint, c_double, c_void};
 use filters::FilterType;
 
 mod bindings;
@@ -107,7 +107,7 @@ impl MagickWand {
                         filter: FilterType, blur_factor: f64) {
         unsafe {
             bindings::MagickResizeImage(
-                self.wand, width as size_t, height as size_t,
+                self.wand, width as u64, height as u64,
                 filter as c_uint, blur_factor as c_double
             );
         }
@@ -132,7 +132,7 @@ impl MagickWand {
         unsafe {
             bindings::MagickResetIterator(self.wand);
             while bindings::MagickNextImage(self.wand) != bindings::MagickFalse {
-                bindings::MagickResizeImage(self.wand, new_width as size_t, new_height as size_t,
+                bindings::MagickResizeImage(self.wand, new_width as u64, new_height as u64,
                                             FilterType::LanczosFilter as c_uint, 1.0);
             }
         }
@@ -156,7 +156,7 @@ impl MagickWand {
     /// format (e.g. GIF, JPEG, PNG, etc).
     pub fn write_image_blob(&self, format: &str) -> Result<Vec<u8>, &'static str> {
         let c_format = CString::new(format).unwrap();
-        let mut length: size_t = 0;
+        let mut length: u64 = 0;
         let blob = unsafe {
             bindings::MagickSetImageFormat(self.wand, c_format.as_ptr());
             bindings::MagickResetIterator(self.wand);
