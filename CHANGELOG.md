@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.0] - 2016-01-02
+### Changed
+- Add `get_image_property()` function to retrieve, for example, EXIF data.
+
 ## [0.2.3] - 2015-12-26
 ### Changed
 - Upgrade to libc 0.2.4 in hopes of fixing downstream build incompatibilities.

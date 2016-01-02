@@ -31,7 +31,7 @@
 
 extern crate libc;
 
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::ptr;
 use libc::{c_uint, c_double, c_void};
 use filters::FilterType;
@@ -96,6 +96,27 @@ impl MagickWand {
         unsafe {
             bindings::MagickGetImageHeight(self.wand) as usize
         }
+    }
+
+    /// Retrieve the named image property value.
+    pub fn get_image_property(&self, name: &str) -> Result<&str, &'static str> {
+        let c_name = CString::new(name).unwrap();
+        let result = unsafe {
+            bindings::MagickGetImageProperty(self.wand, c_name.as_ptr())
+        };
+        let value = if result.is_null() {
+            Err("missing property")
+        } else {
+            let cstr = unsafe { CStr::from_ptr(result) };
+            match cstr.to_str() {
+                Ok(v) => Ok(v),
+                Err(_) => Err("invalid value")
+            }
+        };
+        unsafe {
+            bindings::MagickRelinquishMemory(result as *mut c_void);
+        }
+        value
     }
 
     /// Resize the image to the specified width and height, using the

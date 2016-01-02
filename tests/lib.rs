@@ -111,3 +111,20 @@ fn test_fit() {
     assert_eq!(240, wand.get_image_width());
     assert_eq!(180, wand.get_image_height());
 }
+
+#[test]
+fn test_get_image_property() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    // retrieve a property we know exists
+    let found_value = wand.get_image_property("exif:DateTime");
+    assert!(found_value.is_ok());
+    assert_eq!("2014:04:23 13:33:08", found_value.unwrap());
+    // retrieve a property that does not exist
+    let missing_value = wand.get_image_property("exif:Foobar");
+    assert!(missing_value.is_err());
+    assert_eq!("missing property", missing_value.unwrap_err());
+}
