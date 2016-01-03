@@ -120,7 +120,7 @@ fn test_get_image_property() {
     let wand = MagickWand::new();
     assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
     // retrieve a property we know exists
-    let found_value = wand.get_image_property("exif:DateTime");
+    let found_value = wand.get_image_property("exif:DateTimeOriginal");
     assert!(found_value.is_ok());
     assert_eq!("2014:04:23 13:33:08", found_value.unwrap());
     // retrieve a property that does not exist
