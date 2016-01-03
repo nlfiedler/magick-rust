@@ -99,7 +99,7 @@ impl MagickWand {
     }
 
     /// Retrieve the named image property value.
-    pub fn get_image_property(&self, name: &str) -> Result<&str, &'static str> {
+    pub fn get_image_property(&self, name: &str) -> Result<String, &'static str> {
         let c_name = CString::new(name).unwrap();
         let result = unsafe {
             bindings::MagickGetImageProperty(self.wand, c_name.as_ptr())
@@ -107,11 +107,9 @@ impl MagickWand {
         let value = if result.is_null() {
             Err("missing property")
         } else {
+            // convert (and copy) the C string to a Rust string
             let cstr = unsafe { CStr::from_ptr(result) };
-            match cstr.to_str() {
-                Ok(v) => Ok(v),
-                Err(_) => Err("invalid value")
-            }
+            Ok(cstr.to_string_lossy().into_owned())
         };
         unsafe {
             bindings::MagickRelinquishMemory(result as *mut c_void);

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.1] - 2016-01-02
+### Changed
+- Fix bug `get_image_property()` to ensure C string is copied.
+
 ## [0.3.0] - 2016-01-02
 ### Changed
 - Add `get_image_property()` function to retrieve, for example, EXIF data.
