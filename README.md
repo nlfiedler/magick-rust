@@ -6,7 +6,8 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 
 * Rust
 * Cargo
-* ImageMagick
+* ImageMagick (version 6 or higher)
+* On Mac OS X: Xcode and Command Line Tools (`xcode-select --install`)
 
 ## Build and Test
 
