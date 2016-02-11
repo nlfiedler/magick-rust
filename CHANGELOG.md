@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.2] - 2016-02-10
+### Changed
+- Automatically generate `bindings.rs` using `rust-bindgen` via `build.rs` script.
+
 ## [0.3.1] - 2016-01-02
 ### Changed
 - Fix bug `get_image_property()` to ensure C string is copied.
