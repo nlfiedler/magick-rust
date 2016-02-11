@@ -1,0 +1,20 @@
+#
+# Vagrantfile for Ubuntu 14.04 test environment.
+#
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+
+  # need enough memory to build syntex_syntax crate
+  config.vm.provider 'virtualbox' do |vb|
+    vb.memory = 2048
+  end
+
+  # bring the system up to date
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get autoremove
+    sudo apt-get update
+    sudo apt-get upgrade
+  SHELL
+
+end

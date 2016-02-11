@@ -1,0 +1,25 @@
+#
+# Vagrantfile for FreeBSD 10.2 test environment.
+#
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "freebsd/FreeBSD-10.2-RELEASE"
+
+  # this box needs a MAC address
+  config.vm.base_mac = '0800273E2877'
+
+  # need enough memory to build syntex_syntax crate
+  config.vm.provider 'virtualbox' do |vb|
+    vb.memory = 2048
+  end
+
+  # bring the system up to date
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo freebsd-update fetch install
+    sudo pkg update
+    sudo pkg upgrade -y
+    sudo pkg autoremove -y
+    sudo pkg clean -y
+  SHELL
+
+end
