@@ -1,3 +1,4 @@
-target
+*.pyc
 Cargo.lock
 rust-bindgen
+target
