@@ -1,5 +1,5 @@
 #
-# Vagrantfile for Ubuntu 14.04 test environment.
+# Vagrantfile for Ubuntu Linux 14.04 test environment.
 #
 Vagrant.configure(2) do |config|
 

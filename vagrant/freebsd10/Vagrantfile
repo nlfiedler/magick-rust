@@ -20,7 +20,6 @@ Vagrant.configure(2) do |config|
 
   # bring the system up to date
   config.vm.provision 'shell', privileged: false, inline: <<-SHELL
-    sudo freebsd-update fetch install
     sudo pkg update -q
     sudo pkg upgrade -q -y
     sudo pkg autoremove -y
