@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.3] - 2016-03-17
+### Changed
+- Allow libc version 0.2 or higher
+
 ## [0.3.2] - 2016-02-10
 ### Changed
 - Automatically generate `bindings.rs` using `rust-bindgen` via `build.rs` script.

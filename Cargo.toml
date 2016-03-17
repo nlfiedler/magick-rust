@@ -1,6 +1,6 @@
 [package]
 name = "magick_rust"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["Nathan Fiedler <nathanfiedler@fastmail.fm>"]
 description = "Selection of Rust bindings for the ImageMagick library."
 homepage = "https://github.com/nlfiedler/magick-rust"
@@ -11,4 +11,4 @@ keywords = ["magickwand", "imagemagick"]
 build = "build.rs"
 
 [dependencies]
-libc = "0.2.7"
+libc = ">=0.2"
