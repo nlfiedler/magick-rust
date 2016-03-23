@@ -6,6 +6,7 @@ Vagrant.configure(2) do |config|
   config.ssh.shell = 'sh'
 
   config.vm.box = 'freebsd/FreeBSD-10.2-RELEASE'
+  config.vm.guest = :freebsd
 
   # this box needs a MAC address
   config.vm.base_mac = '0800273E2877'
