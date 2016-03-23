@@ -8,6 +8,8 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 * Cargo
 * ImageMagick (version 6 or higher)
 
+See the `docs/Development_Setup.md` file for details particular to each platform.
+
 ## Build and Test
 
 Pretty simple for now.
