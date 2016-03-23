@@ -21,6 +21,7 @@ use std::path::Path;
 use std::process::Command;
 
 static HEADER: &'static str = "#include <wand/MagickWand.h>\n";
+static LIBPATH: &'static str = "/Library/Developer/CommandLineTools/usr/lib";
 
 fn main() {
     //
@@ -69,17 +70,24 @@ fn main() {
         let mw_ldflags = std::str::from_utf8(&mw_ldflags_output.stdout).unwrap().trim();
         let mw_ldflags_arr: Vec<&str> = mw_ldflags.split_whitespace().collect();
         // Combine all of that in the invocation of rust-bindgen.
-        Command::new("./rust-bindgen/target/debug/bindgen")
-                // always include this even though it only makes sense on Mac to
-                // work around https://github.com/crabtw/rust-bindgen/issues/89
-                .env("DYLD_LIBRARY_PATH", "/Library/Developer/CommandLineTools/usr/lib")
-                .args(&mw_cflags_arr[..])
-                .arg("-builtins")
-                .arg("-o")
-                .arg("src/bindings.rs")
-                .args(&mw_ldflags_arr[..])
-                .arg("gen.h")
-                .status().unwrap();
+        let mut cmd = &mut Command::new("./rust-bindgen/target/debug/bindgen");
+        if cfg!(target_os = "macos") {
+            // Mac requires that the xcode tools are installed so that
+            // rustc can find the clang.dylib file. See also issue
+            // https://github.com/crabtw/rust-bindgen/issues/89
+            let lib_path = Path::new(LIBPATH);
+            if !lib_path.exists() {
+                panic!("missing {}, run xcode-select --install", LIBPATH);
+            }
+            cmd.env("DYLD_LIBRARY_PATH", LIBPATH);
+        }
+        cmd.args(&mw_cflags_arr[..])
+           .arg("-builtins")
+           .arg("-o")
+           .arg("src/bindings.rs")
+           .args(&mw_ldflags_arr[..])
+           .arg("gen.h")
+           .status().unwrap();
         // how to get the output of the command...
         // let output = Commad::new(...).output().unwrap();
         // let out = std::str::from_utf8(&output.stdout).unwrap();
