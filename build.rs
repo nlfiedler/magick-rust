@@ -49,6 +49,10 @@ fn main() {
                     .current_dir("rust-bindgen")
                     .status().unwrap();
         }
+        // Ensure MagickWand-config is in the PATH and report clearly if not.
+        if !Command::new("which").arg("MagickWand-config").status().unwrap().success() {
+            panic!("MagickWand-config not in the PATH, please install ImageMagick");
+        }
         // Create the header file that rust-bindgen needs as input.
         let mut gen_h = match File::create("gen.h") {
             Err(why) => panic!("could not create gen.h file: {}", Error::description(&why)),
