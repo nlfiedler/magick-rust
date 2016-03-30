@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Nathan Fiedler
+ * Copyright 2015-2016 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,4 +132,26 @@ fn test_get_image_property() {
     let missing_value = wand.get_image_property("exif:Foobar");
     assert!(missing_value.is_err());
     assert_eq!("missing property", missing_value.unwrap_err());
+}
+
+#[test]
+fn test_requires_orientation() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert_eq!(false, wand.requires_orientation());
+}
+
+#[test]
+fn test_auto_orient() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745_rotl.JPG").is_ok());
+    assert_eq!(true, wand.requires_orientation());
+    assert!(wand.auto_orient());
+    assert_eq!(false, wand.requires_orientation());
 }

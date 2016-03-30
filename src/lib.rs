@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Nathan Fiedler
+ * Copyright 2015-2016 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,6 +157,24 @@ impl MagickWand {
         }
     }
 
+    /// Detect if the loaded image is not in top-left orientation, and
+    /// hence should be "auto" oriented so it is suitable for viewing.
+    pub fn requires_orientation(&self) -> bool {
+        unsafe {
+            bindings::MagickGetImageOrientation(self.wand) != bindings::TopLeftOrientation
+        }
+    }
+
+    /// Automatically adjusts the loaded image so that its orientation is
+    /// suitable for viewing (i.e. top-left orientation).
+    ///
+    /// Returns `true` if successful or `false` if an error occurred.
+    pub fn auto_orient(&self) -> bool {
+        unsafe {
+            bindings::MagickAutoOrientImage(self.wand) == bindings::MagickTrue
+        }
+    }
+
     /// Write the current image to the provided path.
     pub fn write_image(&self, path: &str) -> Result<(), &'static str> {
         let c_name = CString::new(path).unwrap();
@@ -181,7 +199,6 @@ impl MagickWand {
             bindings::MagickResetIterator(self.wand);
             bindings::MagickGetImageBlob(self.wand, &mut length)
         };
-        // would have used Vec::from_raw_buf() but it is unstable
         let mut bytes = Vec::with_capacity(length as usize);
         unsafe {
             bytes.set_len(length as usize);
