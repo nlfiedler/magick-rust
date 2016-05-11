@@ -1,8 +1,13 @@
-use std::ffi::{CStr, CString};
+use std::fmt;
 use std::ptr;
+use std::ffi::{CStr, CString};
 use libc::{c_uint, c_double, c_void};
+
 use ::filters::FilterType;
 use ::bindings;
+use ::conversions::*;
+use super::{DrawingWand, PixelWand};
+
 
 /// MagickWand is a Rustic wrapper to the Rust bindings to ImageMagick.
 ///
@@ -10,17 +15,55 @@ use ::bindings;
 /// on which operations can be performed via the `MagickWand` functions.
 /// When the `MagickWand` is dropped, the ImageMagick wand will be
 /// destroyed as well.
-pub struct MagickWand {
-    wand: *mut bindings::MagickWand
-}
+wand_common!(
+    MagickWand,
+    NewMagickWand, ClearMagickWand, IsMagickWand, CloneMagickWand, DestroyMagickWand,
+    MagickClearException, MagickGetExceptionType, MagickGetException
+);
 
 impl MagickWand {
 
-    /// Create a new MagickWand instance. This instance will be properly
-    /// cleaned up once it falls out of scope.
-    pub fn new() -> MagickWand {
+    pub fn new_image(&self, columns: u64, rows: u64, pixel_wand: &PixelWand) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickNewImage(self.wand, columns, rows, pixel_wand.wand) } {
+            bindings::MagickTrue => Ok(()),
+            _ => Err("Could not create image"),
+        }
+    }
+
+    pub fn annotate_image(&mut self, drawing_wand: &DrawingWand, x: f64, y: f64, angle: f64, text: &str) -> Result<(), &'static str> {
+        let c_string = try!(CString::new(text).map_err(|_| "could not convert to cstring"));
+        match unsafe { bindings::MagickAnnotateImage(self.wand, drawing_wand.wand, x, y, angle, c_string.as_ptr() as *const _) } {
+            bindings::MagickTrue => Ok(()),
+            _ => Err("unable to annotate image")
+        }
+    }
+
+    pub fn append_all(&mut self, stack: bool) -> MagickWand {
+        unsafe { bindings::MagickResetIterator(self.wand) };
         MagickWand {
-            wand: unsafe { bindings::NewMagickWand() }
+            wand: unsafe { bindings::MagickAppendImages(self.wand, stack.to_magick()) }
+        }
+    }
+
+    pub fn label_image(&self, label: &str) -> Result<(), &'static str> {
+        let c_label = CString::new(label).unwrap();
+        let result = unsafe {
+            bindings::MagickLabelImage(self.wand, c_label.as_ptr())
+        };
+        match result {
+            bindings::MagickTrue => Ok(()),
+            _ => Err("failed to add label")
+        }
+    }
+
+    pub fn write_images(&self, path: &str, adjoin: bool) -> Result<(), &'static str> {
+        let c_name = CString::new(path).unwrap();
+        let result = unsafe {
+            bindings::MagickWriteImages(self.wand, c_name.as_ptr(), adjoin.to_magick())
+        };
+        match result {
+            bindings::MagickTrue => Ok(()),
+            _ => Err("failed to write images")
         }
     }
 
@@ -173,16 +216,57 @@ impl MagickWand {
         };
         Ok(bytes)
     }
+
+    string_set_get!(
+        get_filename,                    set_filename,                    MagickGetFilename,                 MagickSetFilename
+        get_font,                        set_font,                        MagickGetFont,                     MagickSetFont
+        get_format,                      set_format,                      MagickGetFormat,                   MagickSetFormat
+        get_image_filename,              set_image_filename,              MagickGetImageFilename,            MagickSetImageFilename
+        get_image_format,                set_image_format,                MagickGetImageFormat,              MagickSetImageFormat
+    );
+
+    set_get!(
+        get_colorspace,                  set_colorspace,                  MagickGetColorspace,               MagickSetColorspace,              u32
+        get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             u32
+        get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      u64
+        get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 u32
+        get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         u32
+        get_image_compose,               set_image_compose,               MagickGetImageCompose,             MagickSetImageCompose,            u32
+        get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        u32
+        get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, u64
+        get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              u64
+        get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              u64
+        get_image_dispose,               set_image_dispose,               MagickGetImageDispose,             MagickSetImageDispose,            u32
+        get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             u32
+        get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
+        get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
+        get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            u32
+        get_image_index,                 set_image_index,                 MagickGetImageIndex,               MagickSetImageIndex,              i64
+        get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    u32
+        get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  u32
+        get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         u64
+        get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        u32
+        get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    u32
+        get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              u64
+        get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               u32
+        get_image_units,                 set_image_units,                 MagickGetImageUnits,               MagickSetImageUnits,              u32
+        get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         u32
+        get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       u32
+        get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           i64
+        get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             u32
+        get_pointsize,                   set_pointsize,                   MagickGetPointsize,                MagickSetPointsize,               f64
+        get_type,                        set_type,                        MagickGetType,                     MagickSetType,                    u32
+    );
+
 }
 
-// Automate safe cleanup for MagickWand instances.
-impl Drop for MagickWand {
-
-    /// Clear any exceptions and destroy the magic wand.
-    fn drop(&mut self) {
-        unsafe {
-            bindings::MagickClearException(self.wand);
-            bindings::DestroyMagickWand(self.wand);
-        }
+impl fmt::Debug for MagickWand {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        try!(writeln!(f, "MagickWand {{"));
+        try!(writeln!(f, "    Exception: {:?}", self.get_exception()));
+        try!(writeln!(f, "    IsWand: {:?}", self.is_wand()));
+        try!(self.fmt_string_settings(f, "    "));
+        try!(self.fmt_checked_settings(f, "    "));
+        writeln!(f, "}}")
     }
 }

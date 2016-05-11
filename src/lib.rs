@@ -32,8 +32,9 @@
 extern crate libc;
 
 mod wand;
-mod bindings { include!(concat!(env!("OUT_DIR"), "/bindings.rs")); }
+mod conversions;
 pub mod filters;
+mod bindings { include!(concat!(env!("OUT_DIR"), "/bindings.rs")); }
 
 pub use wand::*;
 
@@ -58,4 +59,22 @@ pub fn magick_wand_terminus() {
             _ => ()
         }
     }
+}
+
+pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>, &'static str> {
+    let mut number_fonts: u64 = 0;
+    let c_string = try!(::std::ffi::CString::new(pattern).map_err(|_| "could not convert to cstring"));
+    let ptr = unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut _) };
+    if ptr.is_null() {
+        Err("null ptr returned by magick_query_fonts")
+    } else {
+        let mut v = Vec::new();
+        let c_str_ptr_slice = unsafe { ::std::slice::from_raw_parts(ptr, number_fonts as usize) };
+        for c_str_ptr in c_str_ptr_slice {
+            let c_str = unsafe { ::std::ffi::CStr::from_ptr(*c_str_ptr) };
+            v.push(c_str.to_string_lossy().into_owned())
+        }
+        Ok(v)
+    }
+
 }
