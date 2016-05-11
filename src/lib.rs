@@ -36,7 +36,9 @@ use std::ptr;
 use libc::{c_uint, c_double, c_void};
 use filters::FilterType;
 
-mod bindings;
+mod bindings {
+    include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+}
 
 /// MagickWand is a Rustic wrapper to the Rust bindings to ImageMagick.
 ///

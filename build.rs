@@ -28,13 +28,14 @@ fn main() {
     // If the MagickWand bindings are missing, generate them using
     // rust-bindgen.
     //
-    let bindings_path = Path::new("src/bindings.rs");
-    if !bindings_path.exists() {
-        let bindgen_path = Path::new("rust-bindgen");
+    let bindings_path_str = concat!(env!("OUT_DIR"), "/bindings.rs");
+    if !Path::new(bindings_path_str).exists() {
+        let bindgen_path = Path::new(concat!(env!("OUT_DIR"), "/rust-bindgen"));
         if !bindgen_path.exists() {
             Command::new("git")
                     .arg("clone")
                     .arg("https://github.com/crabtw/rust-bindgen.git")
+                    .arg(bindgen_path)
                     .status().unwrap();
             // Checkout a version of rust-bindgen that is known to work;
             // more recent versions produce code that does not compile (the
@@ -42,26 +43,35 @@ fn main() {
             Command::new("git")
                     .arg("checkout")
                     .arg("8a51860")
-                    .current_dir("rust-bindgen")
+                    .current_dir(bindgen_path)
                     .status().unwrap();
+
+        }
+        let mut bindgen_bin = bindgen_path.to_path_buf();
+        bindgen_bin.push("target/debug/bindgen");
+        if !bindgen_bin.exists() {
             Command::new("cargo")
                     .arg("build")
-                    .current_dir("rust-bindgen")
+                    .current_dir(bindgen_path)
                     .status().unwrap();
         }
+
         // Ensure MagickWand-config is in the PATH and report clearly if not.
         if !Command::new("which").arg("MagickWand-config").status().unwrap().success() {
             panic!("MagickWand-config not in the PATH, please install ImageMagick");
         }
+
+        let gen_h_path = concat!(env!("OUT_DIR"), "/gen.h");
         // Create the header file that rust-bindgen needs as input.
-        let mut gen_h = match File::create("gen.h") {
-            Err(why) => panic!("could not create gen.h file: {}", Error::description(&why)),
+        let mut gen_h = match File::create(gen_h_path) {
+            Err(why) => panic!("could not create {} file: {}", gen_h_path, Error::description(&why)),
             Ok(file) => file
         };
         match gen_h.write_all(HEADER.as_bytes()) {
-            Err(why) => panic!("could not write to gen.h: {}", Error::description(&why)),
+            Err(why) => panic!("could not write to {}: {}", gen_h_path, Error::description(&why)),
             Ok(_)    => ()
         };
+
         // Get the compiler and linker flags for the MagickWand library.
         let mw_cflags_output = Command::new("MagickWand-config")
                 .arg("--cflags")
@@ -73,8 +83,10 @@ fn main() {
                 .output().unwrap();
         let mw_ldflags = std::str::from_utf8(&mw_ldflags_output.stdout).unwrap().trim();
         let mw_ldflags_arr: Vec<&str> = mw_ldflags.split_whitespace().collect();
+
+
         // Combine all of that in the invocation of rust-bindgen.
-        let mut cmd = &mut Command::new("./rust-bindgen/target/debug/bindgen");
+        let mut cmd = &mut Command::new(bindgen_bin);
         if cfg!(target_os = "macos") {
             // Mac requires that the xcode tools are installed so that
             // rustc can find the clang.dylib file. See also issue
@@ -88,9 +100,9 @@ fn main() {
         cmd.args(&mw_cflags_arr[..])
            .arg("-builtins")
            .arg("-o")
-           .arg("src/bindings.rs")
+           .arg(bindings_path_str)
            .args(&mw_ldflags_arr[..])
-           .arg("gen.h")
+           .arg(gen_h_path)
            .status().unwrap();
         // how to get the output of the command...
         // let output = Commad::new(...).output().unwrap();
@@ -98,8 +110,8 @@ fn main() {
         // println!("cargo:output={}", out);
         // let err = std::str::from_utf8(&output.stderr).unwrap();
         // println!("cargo:error={}", err);
-        match std::fs::remove_file("gen.h") {
-            Err(why) => panic!("could not remove gen.h: {}", Error::description(&why)),
+        match std::fs::remove_file(gen_h_path) {
+            Err(why) => panic!("could not remove {}: {}", gen_h_path, Error::description(&why)),
             Ok(_)    => ()
         }
     }
