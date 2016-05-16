@@ -1,6 +1,7 @@
 use std::fmt;
 use std::ffi::{CStr, CString};
 use ::bindings;
+use ::size_t;
 
 
 #[derive(Default, Debug)]
@@ -67,7 +68,7 @@ impl PixelWand {
     string_get!(get_color_as_normalized_string, PixelGetColorAsNormalizedString);
 
     set_get_unchecked!(
-        get_color_count, set_color_count, PixelGetColorCount, PixelSetColorCount,   u64
+        get_color_count, set_color_count, PixelGetColorCount, PixelSetColorCount,   size_t
         get_index,       set_index,       PixelGetIndex,      PixelSetIndex,        u16
         get_fuzz,        set_fuzz,        PixelGetFuzz,       PixelSetFuzz,         f64
     );

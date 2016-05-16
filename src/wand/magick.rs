@@ -3,6 +3,7 @@ use std::ptr;
 use std::ffi::{CStr, CString};
 use libc::{c_uint, c_double, c_void};
 
+use ::{size_t, ssize_t};
 use ::filters::FilterType;
 use ::bindings;
 use ::conversions::*;
@@ -23,7 +24,7 @@ wand_common!(
 
 impl MagickWand {
 
-    pub fn new_image(&self, columns: u64, rows: u64, pixel_wand: &PixelWand) -> Result<(), &'static str> {
+    pub fn new_image(&self, columns: size_t, rows: size_t, pixel_wand: &PixelWand) -> Result<(), &'static str> {
         match unsafe { bindings::MagickNewImage(self.wand, columns, rows, pixel_wand.wand) } {
             bindings::MagickTrue => Ok(()),
             _ => Err("Could not create image"),
@@ -85,7 +86,7 @@ impl MagickWand {
         let size = data.len();
         let result = unsafe {
             bindings::MagickReadImageBlob(
-                self.wand, int_slice.as_ptr() as *const c_void, size as u64)
+                self.wand, int_slice.as_ptr() as *const c_void, size as size_t)
         };
         match result {
             bindings::MagickTrue => Ok(()),
@@ -135,7 +136,7 @@ impl MagickWand {
                         filter: FilterType, blur_factor: f64) {
         unsafe {
             bindings::MagickResizeImage(
-                self.wand, width as u64, height as u64,
+                self.wand, width as size_t, height as size_t,
                 filter as c_uint, blur_factor as c_double
             );
         }
@@ -143,24 +144,24 @@ impl MagickWand {
 
     /// Resize the image to find within the given dimensions, maintaining
     /// the current aspect ratio.
-    pub fn fit(&self, width: usize, height: usize) {
+    pub fn fit(&self, width: size_t, height: size_t) {
         let mut width_ratio = width as f64;
         width_ratio /= self.get_image_width() as f64;
         let mut height_ratio = height as f64;
         height_ratio /= self.get_image_height() as f64;
-        let new_width: usize;
-        let new_height: usize;
+        let new_width: size_t;
+        let new_height: size_t;
         if width_ratio < height_ratio {
             new_width = width;
-            new_height = (self.get_image_height() as f64 * width_ratio) as usize;
+            new_height = (self.get_image_height() as f64 * width_ratio) as size_t;
         } else {
-            new_width = (self.get_image_width() as f64 * height_ratio) as usize;
+            new_width = (self.get_image_width() as f64 * height_ratio) as size_t;
             new_height = height;
         }
         unsafe {
             bindings::MagickResetIterator(self.wand);
             while bindings::MagickNextImage(self.wand) != bindings::MagickFalse {
-                bindings::MagickResizeImage(self.wand, new_width as u64, new_height as u64,
+                bindings::MagickResizeImage(self.wand, new_width, new_height,
                                             FilterType::LanczosFilter as c_uint, 1.0);
             }
         }
@@ -202,7 +203,7 @@ impl MagickWand {
     /// format (e.g. GIF, JPEG, PNG, etc).
     pub fn write_image_blob(&self, format: &str) -> Result<Vec<u8>, &'static str> {
         let c_format = CString::new(format).unwrap();
-        let mut length: u64 = 0;
+        let mut length: size_t = 0;
         let blob = unsafe {
             bindings::MagickSetImageFormat(self.wand, c_format.as_ptr());
             bindings::MagickResetIterator(self.wand);
@@ -228,31 +229,31 @@ impl MagickWand {
     set_get!(
         get_colorspace,                  set_colorspace,                  MagickGetColorspace,               MagickSetColorspace,              u32
         get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             u32
-        get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      u64
+        get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      size_t
         get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 u32
         get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         u32
         get_image_compose,               set_image_compose,               MagickGetImageCompose,             MagickSetImageCompose,            u32
         get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        u32
-        get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, u64
-        get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              u64
-        get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              u64
+        get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, size_t
+        get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              size_t
+        get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              size_t
         get_image_dispose,               set_image_dispose,               MagickGetImageDispose,             MagickSetImageDispose,            u32
         get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             u32
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
         get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
         get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            u32
-        get_image_index,                 set_image_index,                 MagickGetImageIndex,               MagickSetImageIndex,              i64
+        get_image_index,                 set_image_index,                 MagickGetImageIndex,               MagickSetImageIndex,              ssize_t
         get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    u32
         get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  u32
-        get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         u64
+        get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         size_t
         get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        u32
         get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    u32
-        get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              u64
+        get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              size_t
         get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               u32
         get_image_units,                 set_image_units,                 MagickGetImageUnits,               MagickSetImageUnits,              u32
         get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         u32
         get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       u32
-        get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           i64
+        get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           ssize_t
         get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             u32
         get_pointsize,                   set_pointsize,                   MagickGetPointsize,                MagickSetPointsize,               f64
         get_type,                        set_type,                        MagickGetType,                     MagickSetType,                    u32

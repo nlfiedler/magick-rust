@@ -1,7 +1,7 @@
 use std::fmt;
 use std::ffi::{CStr, CString};
 use ::bindings;
-
+use ::size_t;
 
 wand_common!(
     DrawingWand,
@@ -44,13 +44,13 @@ impl DrawingWand {
 
         get_font_size,              set_font_size,                DrawGetFontSize,              DrawSetFontSize,              f64
         get_font_style,             set_font_style,               DrawGetFontStyle,             DrawSetFontStyle,             u32
-        get_font_weight,            set_font_weight,              DrawGetFontWeight,            DrawSetFontWeight,            u64
+        get_font_weight,            set_font_weight,              DrawGetFontWeight,            DrawSetFontWeight,            size_t
         get_font_stretch,           set_font_stretch,             DrawGetFontStretch,           DrawSetFontStretch,           u32
 
         get_stroke_dash_offset,     set_stroke_dash_offset,       DrawGetStrokeDashOffset,      DrawSetStrokeDashOffset,      f64
         get_stroke_line_cap,        set_stroke_line_cap,          DrawGetStrokeLineCap,         DrawSetStrokeLineCap,         u32
         get_stroke_line_join,       set_stroke_line_join,         DrawGetStrokeLineJoin,        DrawSetStrokeLineJoin,        u32
-        get_stroke_miter_limit,     set_stroke_miter_limit,       DrawGetStrokeMiterLimit,      DrawSetStrokeMiterLimit,      u64
+        get_stroke_miter_limit,     set_stroke_miter_limit,       DrawGetStrokeMiterLimit,      DrawSetStrokeMiterLimit,      size_t
         get_stroke_opacity,         set_stroke_opacity,           DrawGetStrokeOpacity,         DrawSetStrokeOpacity,         f64
         get_stroke_width,           set_stroke_width,             DrawGetStrokeWidth,           DrawSetStrokeWidth,           f64
         get_stroke_antialias,       set_stroke_antialias,         DrawGetStrokeAntialias,       DrawSetStrokeAntialias,       u32

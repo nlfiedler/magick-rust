@@ -38,6 +38,9 @@ mod bindings { include!(concat!(env!("OUT_DIR"), "/bindings.rs")); }
 
 pub use wand::*;
 
+pub type size_t = ::bindings::size_t;
+pub type ssize_t = ::bindings::ssize_t;
+
 
 /// This function must be called before any other ImageMagick operations
 /// are attempted. This function is safe to be called repeatedly.
@@ -62,9 +65,9 @@ pub fn magick_wand_terminus() {
 }
 
 pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>, &'static str> {
-    let mut number_fonts: u64 = 0;
+    let mut number_fonts: size_t = 0;
     let c_string = try!(::std::ffi::CString::new(pattern).map_err(|_| "could not convert to cstring"));
-    let ptr = unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut _) };
+    let ptr = unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut size_t) };
     if ptr.is_null() {
         Err("null ptr returned by magick_query_fonts")
     } else {
