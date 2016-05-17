@@ -66,7 +66,7 @@ fn main() {
         let mw_cflags_arr: Vec<&str> = mw_cflags.split_whitespace().collect();
         println!("CFLAGS={:?}", mw_cflags_arr);
         let mw_ldflags_output = Command::new("pkg-config")
-                .arg("--ldflags")
+                .arg("--libs")
                 .arg("MagickWand")
                 .output().unwrap();
         let mw_ldflags = std::str::from_utf8(&mw_ldflags_output.stdout).unwrap().trim();
