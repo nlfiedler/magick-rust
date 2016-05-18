@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.0] - 2016-05-18
+### Changed
+- marjakm: Added numerous functions and enabled cross-compile support.
+
 ## [0.4.0] - 2016-03-29
 ### Changed
 - Add functions for detecting and correcting image orientation.
