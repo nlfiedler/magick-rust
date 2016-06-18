@@ -6,7 +6,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 
 * Rust
 * Cargo
-* ImageMagick (version 6 or higher)
+* ImageMagick (version 6.9 or higher)
 
 See the `docs/Development_Setup.md` file for details particular to each platform.
 
