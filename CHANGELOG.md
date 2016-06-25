@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.1] - 2016-06-25
+### Changed
+- hjr3: Changed read_image_blob() to borrow data rather than take ownership.
+
 ## [0.5.0] - 2016-05-18
 ### Changed
 - marjakm: Added numerous functions and enabled cross-compile support.
