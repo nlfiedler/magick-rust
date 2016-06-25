@@ -81,7 +81,7 @@ impl MagickWand {
     }
 
     /// Read the image data from the vector of bytes.
-    pub fn read_image_blob(&self, data: Vec<u8>) -> Result<(), &'static str> {
+    pub fn read_image_blob(&self, data: &Vec<u8>) -> Result<(), &'static str> {
         let int_slice = &data[..];
         let size = data.len();
         let result = unsafe {
