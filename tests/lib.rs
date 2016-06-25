@@ -76,7 +76,7 @@ fn test_read_from_blob() {
         Err(why) => panic!("couldn't read file: {}", Error::description(&why)),
         Ok(_) => ()
     };
-    assert!(wand.read_image_blob(data).is_ok());
+    assert!(wand.read_image_blob(&data).is_ok());
     assert_eq!(512, wand.get_image_width());
     assert_eq!(384, wand.get_image_height());
 }
@@ -98,7 +98,7 @@ fn test_write_to_blob() {
         assert_eq!(104060, blob.len());
     }
     // should be able to read it back again
-    assert!(wand.read_image_blob(blob).is_ok());
+    assert!(wand.read_image_blob(&blob).is_ok());
     assert_eq!(512, wand.get_image_width());
     assert_eq!(384, wand.get_image_height());
 }
