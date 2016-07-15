@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
@@ -38,7 +37,7 @@ fn main() {
                     .arg("clone")
                     .arg("https://github.com/crabtw/rust-bindgen.git")
                     .arg(bindgen_path)
-                    .status().unwrap();
+                    .status().expect("git clone rust-bindgen");
             // Checkout a version of rust-bindgen that is known to work;
             // more recent versions produce code that does not compile (the
             // commit after 8a51860 changes the way enums are generated).
@@ -46,7 +45,7 @@ fn main() {
                     .arg("checkout")
                     .arg("8a51860")
                     .current_dir(bindgen_path)
-                    .status().unwrap();
+                    .status().expect("git checkout");
 
         }
         let mut bindgen_bin = bindgen_path.to_path_buf();
@@ -55,34 +54,28 @@ fn main() {
             let mut cmd = Command::new("cargo");
             cmd.arg("build").current_dir(bindgen_path);
             println!("BINDGEN_BUILD={:?}", cmd);
-            cmd.status().unwrap();
+            cmd.status().expect("cargo build");
         }
         // Get the compiler and linker flags for the MagickWand library.
         let mw_cflags_output = Command::new("pkg-config")
                 .arg("--cflags")
                 .arg("MagickWand")
-                .output().unwrap();
+                .output().expect("pkg-config --cflags MagickWand");
         let mw_cflags = std::str::from_utf8(&mw_cflags_output.stdout).unwrap().trim();
         let mw_cflags_arr: Vec<&str> = mw_cflags.split_whitespace().collect();
         println!("CFLAGS={:?}", mw_cflags_arr);
         let mw_ldflags_output = Command::new("pkg-config")
                 .arg("--libs")
                 .arg("MagickWand")
-                .output().unwrap();
+                .output().expect("pkg-config --libs MagickWand");
         let mw_ldflags = std::str::from_utf8(&mw_ldflags_output.stdout).unwrap().trim();
         let mw_ldflags_arr: Vec<&str> = mw_ldflags.split_whitespace().collect();
         println!("LDFLAGS={:?}", mw_ldflags_arr);
 
         let gen_h_path = out_dir.clone() + "/gen.h";
         // Create the header file that rust-bindgen needs as input.
-        let mut gen_h = match File::create(&gen_h_path) {
-            Err(why) => panic!("could not create {} file: {}", gen_h_path, Error::description(&why)),
-            Ok(file) => file
-        };
-        match gen_h.write_all(HEADER.as_bytes()) {
-            Err(why) => panic!("could not write to {}: {}", gen_h_path, Error::description(&why)),
-            Ok(_)    => ()
-        };
+        let mut gen_h = File::create(&gen_h_path).expect("could not create file");
+        gen_h.write_all(HEADER.as_bytes()).expect("could not write header file");
 
         // Combine all of that in the invocation of rust-bindgen.
         let mut cmd = &mut Command::new(bindgen_bin);
@@ -108,16 +101,13 @@ fn main() {
            .args(&mw_ldflags_arr[..])
            .arg(&gen_h_path);
         println!("BINDING_GENERATION={:?}", cmd);
-        cmd.status().unwrap();
+        cmd.status().expect("rust-bindgen invocation");
         // how to get the output of the command...
         // let output = Commad::new(...).output().unwrap();
         // let out = std::str::from_utf8(&output.stdout).unwrap();
         // println!("cargo:output={}", out);
         // let err = std::str::from_utf8(&output.stderr).unwrap();
         // println!("cargo:error={}", err);
-        match std::fs::remove_file(&gen_h_path) {
-            Err(why) => panic!("could not remove {}: {}", gen_h_path, Error::description(&why)),
-            Ok(_)    => ()
-        }
+        std::fs::remove_file(&gen_h_path).expect("could not remove header file");
     }
 }
