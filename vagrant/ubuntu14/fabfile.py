@@ -41,8 +41,8 @@ def all():
     run('./rustup.sh --yes')
     run('rm -f rustup.sh')
     sudo('apt-get -q -y build-dep imagemagick')
-    run('wget -q http://www.imagemagick.org/download/ImageMagick.tar.gz')
-    run('tar zxf ImageMagick.tar.gz')
+    run('wget -q http://www.imagemagick.org/download/ImageMagick-6.9.5-2.tar.gz')
+    run('tar zxf ImageMagick-6.9.5-2.tar.gz')
     with cd('ImageMagick-*'):
         run('./configure')
         run('make')
