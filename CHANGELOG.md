@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.2] - 2016-07-17
+### Changed
+- Streamline error handling in `build.rs` script.
+- Fix the crate version number (previously stuck at 0.4.0).
+
 ## [0.5.1] - 2016-06-25
 ### Changed
 - hjr3: Changed read_image_blob() to borrow data rather than take ownership.
