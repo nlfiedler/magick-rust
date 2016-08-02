@@ -155,3 +155,18 @@ fn test_auto_orient() {
     assert!(wand.auto_orient());
     assert_eq!(false, wand.requires_orientation());
 }
+
+#[test]
+fn test_set_option() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let mut wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    // The jpeg:size option is just a hint.
+    wand.set_option("jpeg:size", "128x128").unwrap();
+    let blob = wand.write_image_blob("jpeg").unwrap();
+    assert!(wand.read_image_blob(&blob).is_ok());
+    assert_eq!(192, wand.get_image_width());
+    assert_eq!(144, wand.get_image_height());
+}

@@ -31,6 +31,18 @@ impl MagickWand {
         }
     }
 
+    pub fn set_option(&mut self, key: &str, value: &str) -> Result<(), &'static str> {
+        let c_key = CString::new(key).unwrap();
+        let c_value = CString::new(value).unwrap();
+        let result = unsafe {
+            bindings::MagickSetOption(self.wand, c_key.as_ptr(), c_value.as_ptr())
+        }; 
+        match result {
+            bindings::MagickTrue => Ok(()),
+            _ => Err("failed to set option"),
+        }
+    }
+
     pub fn annotate_image(&mut self, drawing_wand: &DrawingWand, x: f64, y: f64, angle: f64, text: &str) -> Result<(), &'static str> {
         let c_string = try!(CString::new(text).map_err(|_| "could not convert to cstring"));
         match unsafe { bindings::MagickAnnotateImage(self.wand, drawing_wand.wand, x, y, angle, c_string.as_ptr() as *const _) } {
