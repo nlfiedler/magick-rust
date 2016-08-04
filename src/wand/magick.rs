@@ -218,6 +218,27 @@ impl MagickWand {
         Ok(bytes)
     }
 
+    /// Write the images in the desired format to a new blob.
+    ///
+    /// The `format` argument may be any ImageMagick supported image
+    /// format (e.g. GIF, JPEG, PNG, etc).
+    pub fn write_images_blob(&self, format: &str) -> Result<Vec<u8>, &'static str> {
+        let c_format = CString::new(format).unwrap();
+        let mut length: size_t = 0;
+        let blob = unsafe {
+            bindings::MagickSetImageIndex(self.wand, 0);
+            bindings::MagickSetImageFormat(self.wand, c_format.as_ptr());
+            bindings::MagickGetImagesBlob(self.wand, &mut length)
+        };
+        let mut bytes = Vec::with_capacity(length as usize);
+        unsafe {
+            bytes.set_len(length as usize);
+            ptr::copy_nonoverlapping(blob, bytes.as_mut_ptr(), length as usize);
+            bindings::MagickRelinquishMemory(blob as *mut c_void);
+        };
+        Ok(bytes)
+    }
+
     string_set_get!(
         get_filename,                    set_filename,                    MagickGetFilename,                 MagickSetFilename
         get_font,                        set_font,                        MagickGetFont,                     MagickSetFont

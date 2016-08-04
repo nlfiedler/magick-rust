@@ -82,7 +82,7 @@ fn test_read_from_blob() {
 }
 
 #[test]
-fn test_write_to_blob() {
+fn test_write_image_to_blob() {
     START.call_once(|| {
         magick_wand_genesis();
     });
@@ -91,6 +91,28 @@ fn test_write_to_blob() {
     assert_eq!(512, wand.get_image_width());
     assert_eq!(384, wand.get_image_height());
     let blob = wand.write_image_blob("jpeg").unwrap();
+    if cfg!(target_os = "macos") {
+        // yeah, don't know why...
+        assert_eq!(104061, blob.len());
+    } else {
+        assert_eq!(104060, blob.len());
+    }
+    // should be able to read it back again
+    assert!(wand.read_image_blob(&blob).is_ok());
+    assert_eq!(512, wand.get_image_width());
+    assert_eq!(384, wand.get_image_height());
+}
+
+#[test]
+fn test_write_images_to_blob() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert_eq!(512, wand.get_image_width());
+    assert_eq!(384, wand.get_image_height());
+    let blob = wand.write_images_blob("jpeg").unwrap();
     if cfg!(target_os = "macos") {
         // yeah, don't know why...
         assert_eq!(104061, blob.len());
