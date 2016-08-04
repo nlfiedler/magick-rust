@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.3] -
+### Changed
+- gadomski: add `set_option()` method to wand API.
+- gadomski: add `write_images_blob()` to create animated GIFs.
+
 ## [0.5.2] - 2016-07-17
 ### Changed
 - Streamline error handling in `build.rs` script.
