@@ -34,7 +34,7 @@ extern crate libc;
 mod wand;
 mod conversions;
 pub mod filters;
-mod bindings { include!(concat!(env!("OUT_DIR"), "/bindings.rs")); }
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 pub use wand::*;
 

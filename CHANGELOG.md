@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.5.3] -
 ### Changed
+- Update to 0.19.0 version of rust-bindgen; rebuilds are much faster.
 - gadomski: add `set_option()` method to wand API.
 - gadomski: add `write_images_blob()` to create animated GIFs.
 

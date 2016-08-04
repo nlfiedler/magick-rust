@@ -7,6 +7,8 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 * Rust
 * Cargo
 * ImageMagick (version 6.9 or higher)
+* [rust-bindgen](https://github.com/Yamakaky/rust-bindgen) (version 0.19 or higher)
+    - This will be installed automatically if it is missing.
 
 See the `docs/Development_Setup.md` file for details particular to each platform.
 

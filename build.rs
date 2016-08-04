@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
+use std::env;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 static HEADER: &'static str = "#include <wand/MagickWand.h>\n";
@@ -30,33 +31,31 @@ fn main() {
     let out_dir = ::std::env::var("OUT_DIR").unwrap();
     let bindings_path_str = out_dir.clone() + "/bindings.rs";
     if !Path::new(&bindings_path_str).exists() {
-        let bindgen_path_str = out_dir.clone() + "/rust-bindgen";
-        let bindgen_path = Path::new(&bindgen_path_str);
-        if !bindgen_path.exists() {
-            Command::new("git")
-                    .arg("clone")
-                    .arg("https://github.com/crabtw/rust-bindgen.git")
-                    .arg(bindgen_path)
-                    .status().expect("git clone rust-bindgen");
-            // Checkout a version of rust-bindgen that is known to work;
-            // more recent versions produce code that does not compile (the
-            // commit after 8a51860 changes the way enums are generated).
-            Command::new("git")
-                    .arg("checkout")
-                    .arg("8a51860")
-                    .current_dir(bindgen_path)
-                    .status().expect("git checkout");
+        // Install rust-bindgen so we can generate the bindings. While the
+        // bindgen crate is nice, it does not appear to support setting
+        // environment variables like DYLD_LIBRARY_PATH.
+        let home_dir = env::home_dir().expect("home directory");
+        let mut cargo_bin = PathBuf::from(home_dir);
+        cargo_bin.push(".cargo");
+        cargo_bin.push("bin");
+        cargo_bin.push("bindgen");
+        println!("BINDGEN_PATH={:?}", cargo_bin);
+        if !cargo_bin.exists() {
+            Command::new("cargo")
+                    .arg("install")
+                    .arg("bindgen")
+                    .status().expect("cargo install bindgen");
+        }
 
+        // Check that MagickWand is installed before proceeding.
+        if !Command::new("pkg-config")
+                    .arg("--exists")
+                    .arg("MagickWand")
+                    .status().unwrap().success() {
+            panic!("MagickWand library must be installed")
         }
-        let mut bindgen_bin = bindgen_path.to_path_buf();
-        bindgen_bin.push("target/debug/bindgen");
-        if !bindgen_bin.exists() {
-            let mut cmd = Command::new("cargo");
-            cmd.arg("build").current_dir(bindgen_path);
-            println!("BINDGEN_BUILD={:?}", cmd);
-            cmd.status().expect("cargo build");
-        }
-        // Get the compiler and linker flags for the MagickWand library.
+
+        // Get the compiler flags for the MagickWand library.
         let mw_cflags_output = Command::new("pkg-config")
                 .arg("--cflags")
                 .arg("MagickWand")
@@ -64,13 +63,18 @@ fn main() {
         let mw_cflags = std::str::from_utf8(&mw_cflags_output.stdout).unwrap().trim();
         let mw_cflags_arr: Vec<&str> = mw_cflags.split_whitespace().collect();
         println!("CFLAGS={:?}", mw_cflags_arr);
+
+        // Extract the library name for use with the --link option below.
+        // This just happens to be the first argument from the output of
+        // pkg-config when given the --libs-only-l option. We lop off the
+        // leading "-l" since we only need the name (e.g. "MagickWand-6").
         let mw_ldflags_output = Command::new("pkg-config")
-                .arg("--libs")
+                .arg("--libs-only-l")
                 .arg("MagickWand")
-                .output().expect("pkg-config --libs MagickWand");
+                .output().expect("pkg-config --libs-only-l MagickWand");
         let mw_ldflags = std::str::from_utf8(&mw_ldflags_output.stdout).unwrap().trim();
         let mw_ldflags_arr: Vec<&str> = mw_ldflags.split_whitespace().collect();
-        println!("LDFLAGS={:?}", mw_ldflags_arr);
+        let link_arg = &mw_ldflags_arr[0][2..];
 
         let gen_h_path = out_dir.clone() + "/gen.h";
         // Create the header file that rust-bindgen needs as input.
@@ -78,7 +82,7 @@ fn main() {
         gen_h.write_all(HEADER.as_bytes()).expect("could not write header file");
 
         // Combine all of that in the invocation of rust-bindgen.
-        let mut cmd = &mut Command::new(bindgen_bin);
+        let mut cmd = &mut Command::new(cargo_bin);
         if cfg!(target_os = "macos") {
             // Mac requires that the xcode tools are installed so that
             // rustc can find the clang.dylib file. See also issue
@@ -88,26 +92,49 @@ fn main() {
                 panic!("missing {}, run xcode-select --install", LIBPATH);
             }
             cmd.env("DYLD_LIBRARY_PATH", LIBPATH);
-
-            // For the sake of easily building and testing on Mac, include the path
-            // to MagickWand. Chances are MagickWand is in /usr/local/lib, or
-            // somewhere else that rustc can find it.
+            // For the sake of easily building and testing on Mac, include
+            // the path to MagickWand. Chances are MagickWand is in
+            // /usr/local/lib, or somewhere else that rustc can find it.
             println!("cargo:rustc-link-search=native=/usr/local/lib");
         }
-        cmd.args(&mw_cflags_arr[..])
-           .arg("-builtins")
-           .arg("-o")
-           .arg(bindings_path_str)
-           .args(&mw_ldflags_arr[..])
-           .arg(&gen_h_path);
+        let mut output_arg = String::from("--output");
+        output_arg.push('=');
+        output_arg.push_str(&bindings_path_str);
+        cmd.arg("--builtins")
+           // For the time being, avoid switching to proper Rust enums, as
+           // that would change quite a bit of the existing code. We can
+           // change that at a later time, and then remove this option.
+           .arg("--no-rust-enums")
+           // There are a few places where our code is still using `libc::`
+           // types, rather than the new default `std::os::raw` types. We
+           // can switch at a later time and then remove this option.
+           .arg("--ctypes-prefix=libc")
+           // Inform bindgen of the library to which we are linking,
+           // otherwise it may compile but the tests will fail to link
+           // properly. The -L and -l arguments provided by pkg-config
+           // apparently go unused with (newer versions of?) clang.
+           .arg(format!("--link={}", link_arg))
+           .arg(output_arg)
+           .arg(&gen_h_path)
+           .arg("--");
+        if cfg!(target_os = "macos") {
+            // Work around issue #361 in rust-bindgen for the time being.
+            cmd.arg("-U__BLOCKS__");
+        }
+        cmd.args(&mw_cflags_arr[..]);
         println!("BINDING_GENERATION={:?}", cmd);
         cmd.status().expect("rust-bindgen invocation");
-        // how to get the output of the command...
-        // let output = Commad::new(...).output().unwrap();
-        // let out = std::str::from_utf8(&output.stdout).unwrap();
-        // println!("cargo:output={}", out);
-        // let err = std::str::from_utf8(&output.stderr).unwrap();
-        // println!("cargo:error={}", err);
         std::fs::remove_file(&gen_h_path).expect("could not remove header file");
+
+        // Work around the include! issue in rustc (as described in the
+        // rust-bindgen README file) by wrapping the generated code in a
+        // `pub mod` declaration; see issue #359 in rust-bindgen.
+        let mut bind_f = File::open(&bindings_path_str).expect("could not open bindings file");
+        let mut bind_text = String::new();
+        bind_f.read_to_string(&mut bind_text).expect("could not read bindings file");
+        let mut file = File::create(&bindings_path_str).expect("could not create bindings file");
+        file.write(b"pub mod bindings {\n").unwrap();
+        file.write(bind_text.as_bytes()).unwrap();
+        file.write(b"\n}").unwrap();
     }
 }
