@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------------
 #
-# Copyright (c) 2014-2016 Nathan Fiedler
+# Copyright (c) 2016 Nathan Fiedler
 #
 # This file is provided to you under the Apache License,
 # Version 2.0 (the "License"); you may not use this file
