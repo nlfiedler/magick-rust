@@ -36,17 +36,20 @@ else:
 def all():
     """Install everything needed to build magick-rust."""
     run('sudo apt-get -q -y install git')
+    # the rustc and cargo packages are fairly old, so build from source
     run('wget -q https://static.rust-lang.org/rustup.sh')
     run('chmod +x rustup.sh')
     run('./rustup.sh --yes')
     run('rm -f rustup.sh')
     sudo('apt-get -q -y build-dep imagemagick')
-    run('wget -q http://www.imagemagick.org/download/ImageMagick-6.9.5-3.tar.gz')
-    run('tar zxf ImageMagick-6.9.5-3.tar.gz')
+    run('wget -q http://www.imagemagick.org/download/ImageMagick-6.9.5-7.tar.gz')
+    run('tar zxf ImageMagick-6.9.5-7.tar.gz')
     with cd('ImageMagick-*'):
         run('./configure')
         run('make')
         sudo('make install')
     run('rm -rf ImageMagick*')
-    run('sudo apt-get -q -y install libclang-dev')
+    run('sudo apt-get -q -y install clang libclang-dev')
+    # set LIBCLANG_PATH so rustc can find libclang.so in its hidden place
+    # (using the append operation results in 'Unmatched ".' error)
     run("echo 'export LIBCLANG_PATH=/usr/lib/llvm-3.8/lib' >> .bashrc")
