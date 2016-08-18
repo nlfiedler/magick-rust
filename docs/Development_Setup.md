@@ -35,6 +35,6 @@ Then build in the usual manner, as shown in the `README.md` file (i.e. `cargo bu
 1. Install ImageMagick
 1. Install the Clang libraries
 
-See the Ubuntu `fabfile.py` for an example of how to install everything.
+See the Ubuntu `fabfile.py` for an example of how to install everything. In particular, note that it may be necessary to set `LIBCLANG_PATH` to the path containing the `libclang.so` library.
 
 Then build in the usual manner, as shown in the `README.md` file (i.e. `cargo build` and `cargo test`). If running the tests fails because the MagickWand library cannot be found, try rebuilding the ldconfig cache (`sudo ldconfig`).
