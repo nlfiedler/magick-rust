@@ -4,10 +4,11 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 
 ## Dependenices
 
-* Rust
-* Cargo
-* ImageMagick (version 6.9 or higher)
-* Clang (LLVM front-end for C/C++)
+* Rust (~latest release)
+* Cargo (~latest release)
+* ImageMagick (version 6.9)
+* Clang (version 3.5 or higher)
+    - Or whatever version is dictated by rust-bindgen
 * [rust-bindgen](https://github.com/Yamakaky/rust-bindgen) (version 0.19 or higher)
     - This will be installed automatically if it is missing.
 
