@@ -92,10 +92,6 @@ fn main() {
                 panic!("missing {}, run xcode-select --install", LIBPATH);
             }
             cmd.env("DYLD_LIBRARY_PATH", LIBPATH);
-            // For the sake of easily building and testing on Mac, include
-            // the path to MagickWand. Chances are MagickWand is in
-            // /usr/local/lib, or somewhere else that rustc can find it.
-            println!("cargo:rustc-link-search=native=/usr/local/lib");
         }
         let mut output_arg = String::from("--output");
         output_arg.push('=');
