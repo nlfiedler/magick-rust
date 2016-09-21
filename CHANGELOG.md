@@ -3,9 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.5.3] -
+## [0.6.0] - 2016-09-20
 ### Changed
 - Update to 0.19.0 version of rust-bindgen; rebuilds are much faster.
+- Hacked bindings for FreeBSD systems due to rust-bindgen bug #385.
 - gadomski: add `set_option()` method to wand API.
 - gadomski: add `write_images_blob()` to create animated GIFs.
 
