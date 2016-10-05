@@ -27,7 +27,7 @@ $ cargo test
 
 MagickWand has some global state that needs to be initialized prior to using the library, but fortunately Rust makes handling this pretty easy. In the example below, we read in an image from a file and resize it to fit a square of 240 by 240 pixels, then convert the image to JPEG.
 
-```
+```rust
 use magick_rust::{MagickWand, magick_wand_genesis};
 use std::sync::{Once, ONCE_INIT};
 
