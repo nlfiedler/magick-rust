@@ -45,7 +45,7 @@ fn run_bindgen(out_dir: String, bindings_path_str: &str) {
                 .arg("--exists")
                 .arg("MagickWand")
                 .status().unwrap().success() {
-        panic!("MagickWand library must be installed")
+        panic!("MagickWand library must be installed");
     }
 
     // Get the compiler flags for the MagickWand library.
@@ -116,7 +116,32 @@ fn run_bindgen(out_dir: String, bindings_path_str: &str) {
     std::fs::remove_file(&gen_h_path).expect("could not remove header file");
 }
 
+fn assert_mw_version() {
+    //
+    // So far there is only 6.9 and then 7.x, so comparing to 6.10 should
+    // work for now. Such a release may very well work, but we will have to
+    // look at that when the time comes.
+    //
+    if !Command::new("pkg-config")
+                .arg("--atleast-version=6.9")
+                .arg("MagickWand")
+                .status().unwrap().success() {
+        panic!("MagickWand version must be at least 6.9");
+    }
+    if !Command::new("pkg-config")
+                .arg("--max-version=6.10")
+                .arg("MagickWand")
+                .status().unwrap().success() {
+        panic!("MagickWand version must be no higher than 6.9");
+    }
+}
+
 fn main() {
+    //
+    // Assert that the appropriate version of MagickWand is installed,
+    // since we are very dependent on the particulars of MagickWand.
+    //
+    assert_mw_version();
     //
     // If the MagickWand bindings are missing, generate them using
     // rust-bindgen.

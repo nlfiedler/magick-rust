@@ -7,6 +7,8 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 * Rust (~latest release)
 * Cargo (~latest release)
 * ImageMagick (version 6.9)
+    - [Homebrew](http://brew.sh) and [FreeBSD](https://www.freebsd.org) provide this version
+    - Linux may require building ImageMagick from source
 * Clang (version 3.5 or higher)
     - Or whatever version is dictated by rust-bindgen
 * [rust-bindgen](https://github.com/Yamakaky/rust-bindgen) (version 0.19 or higher)

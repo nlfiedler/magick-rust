@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.1] - 2016-10-16
+### Changed
+- MagickWand version enforced in `build.rs` script at build time.
+
 ## [0.6.0] - 2016-09-20
 ### Changed
 - Update to 0.19.0 version of rust-bindgen; rebuilds are much faster.
