@@ -40,7 +40,7 @@ def all():
     sudo("pkg install -q -y rust")
     sudo("pkg install -q -y cargo")
     sudo("pkg install -q -y ImageMagick-nox11")
-    sudo("pkg install pkgconf")
+    sudo("pkg install -q -y pkgconf")
     sudo("pkg install -q -y clang-devel")
     # set LIBCLANG_PATH so rustc can find libclang.so in its hidden place
     # (using the append operation results in 'Unmatched ".' error)

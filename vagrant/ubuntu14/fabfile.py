@@ -36,7 +36,7 @@ else:
 def all():
     """Install everything needed to build magick-rust."""
     sudo('apt-get -q -y install git')
-    sudo('apt-get install pkg-config')
+    sudo('apt-get -q -y install pkg-config')
     # the rustc and cargo packages are fairly old, so build from source
     run('wget -q https://static.rust-lang.org/rustup.sh')
     run('chmod +x rustup.sh')
