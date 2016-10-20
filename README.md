@@ -13,6 +13,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
     - Or whatever version is dictated by rust-bindgen
 * [rust-bindgen](https://github.com/Yamakaky/rust-bindgen) (version 0.19 or higher)
     - This will be installed automatically if it is missing.
+* Must have `pkg-config` in order to link with MagickWand.
 
 See the `docs/Development_Setup.md` file for details particular to each platform.
 

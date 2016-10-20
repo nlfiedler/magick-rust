@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.2] - 2016-10-20
+### Changed
+- Presence of `pkg-config` checked in `build.rs` script at build time.
+
 ## [0.6.1] - 2016-10-16
 ### Changed
 - MagickWand version enforced in `build.rs` script at build time.

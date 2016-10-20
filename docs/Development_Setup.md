@@ -14,6 +14,7 @@ $ xcode-select --install
 $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 $ brew install rust
 $ brew install imagemagick
+$ brew install pkg-config
 ```
 
 Then build in the usual manner, as shown in the `README.md` file (i.e. `cargo build` and `cargo test`).

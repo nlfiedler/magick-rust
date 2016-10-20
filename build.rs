@@ -40,14 +40,6 @@ fn run_bindgen(out_dir: String, bindings_path_str: &str) {
                 .status().expect("cargo install bindgen");
     }
 
-    // Check that MagickWand is installed before proceeding.
-    if !Command::new("pkg-config")
-                .arg("--exists")
-                .arg("MagickWand")
-                .status().unwrap().success() {
-        panic!("MagickWand library must be installed");
-    }
-
     // Get the compiler flags for the MagickWand library.
     let mw_cflags_output = Command::new("pkg-config")
             .arg("--cflags")
@@ -117,6 +109,19 @@ fn run_bindgen(out_dir: String, bindings_path_str: &str) {
 }
 
 fn assert_mw_version() {
+    // This build script depeneds heavily on the pkg-config utility.
+    if !Command::new("which")
+                .arg("pkg-config")
+                .status().unwrap().success() {
+        panic!("Cannot find pkg-config, see the README");
+    }
+    // Check that MagickWand is installed before proceeding.
+    if !Command::new("pkg-config")
+                .arg("--exists")
+                .arg("MagickWand")
+                .status().unwrap().success() {
+        panic!("MagickWand library must be installed");
+    }
     //
     // So far there is only 6.9 and then 7.x, so comparing to 6.10 should
     // work for now. Such a release may very well work, but we will have to
