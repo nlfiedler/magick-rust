@@ -91,12 +91,10 @@ fn test_write_image_to_blob() {
     assert_eq!(512, wand.get_image_width());
     assert_eq!(384, wand.get_image_height());
     let blob = wand.write_image_blob("jpeg").unwrap();
-    if cfg!(target_os = "macos") {
-        // yeah, don't know why...
-        assert_eq!(104061, blob.len());
-    } else {
-        assert_eq!(104060, blob.len());
-    }
+    let blob_len = blob.len();
+    // There is a slight degree of variability from platform to platform,
+    // and version to version of ImageMagick.
+    assert!(blob_len > 103000 && blob_len < 105000);
     // should be able to read it back again
     assert!(wand.read_image_blob(&blob).is_ok());
     assert_eq!(512, wand.get_image_width());
@@ -113,12 +111,10 @@ fn test_write_images_to_blob() {
     assert_eq!(512, wand.get_image_width());
     assert_eq!(384, wand.get_image_height());
     let blob = wand.write_images_blob("jpeg").unwrap();
-    if cfg!(target_os = "macos") {
-        // yeah, don't know why...
-        assert_eq!(104061, blob.len());
-    } else {
-        assert_eq!(104060, blob.len());
-    }
+    let blob_len = blob.len();
+    // There is a slight degree of variability from platform to platform,
+    // and version to version of ImageMagick.
+    assert!(blob_len > 103000 && blob_len < 105000);
     // should be able to read it back again
     assert!(wand.read_image_blob(&blob).is_ok());
     assert_eq!(512, wand.get_image_width());
