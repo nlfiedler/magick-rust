@@ -1,0 +1,1 @@
+#include <wand/MagickWand.h>

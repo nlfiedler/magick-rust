@@ -11,7 +11,8 @@ keywords = ["magickwand", "imagemagick"]
 build = "build.rs"
 
 [dependencies]
-libc = ">=0.2"
+libc = "0.2"
 
-# [build-dependencies]
-# bindgen = "0.22.1"
+[build-dependencies]
+bindgen = "0.20"
+pkg-config = "0.3"
