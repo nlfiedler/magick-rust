@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Nathan Fiedler
+ * Copyright 2015-2017 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,16 @@
 extern crate magick_rust;
 
 use magick_rust::{MagickWand, magick_wand_genesis};
-use magick_rust::filters::{FilterType};
 
 use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use std::sync::{Once, ONCE_INIT};
+
+// TODO: nathan does not understand how to expose the FilterTypes without
+//       this ugliness, his Rust skills are sorely lacking
+use magick_rust::bindings;
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
@@ -54,7 +57,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2
     };
-    wand.resize_image(halfwidth, halfheight, FilterType::LanczosFilter, 1.0);
+    wand.resize_image(halfwidth, halfheight, bindings::FilterTypes::LanczosFilter, 1.0);
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }

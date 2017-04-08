@@ -13,7 +13,7 @@
 $ xcode-select --install
 $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 $ brew install rust
-$ brew install imagemagick
+$ brew install imagemagick@6
 $ brew install pkg-config
 ```
 

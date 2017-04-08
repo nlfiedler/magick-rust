@@ -22,9 +22,9 @@ pub trait FromRust<T> {
 impl FromRust<bool> for bindings::MagickBooleanType {
     fn from_rust(b: bool) -> Self {
         if b {
-            bindings::MagickTrue
+            bindings::MagickBooleanType::MagickTrue
         } else {
-            bindings::MagickFalse
+            bindings::MagickBooleanType::MagickFalse
         }
     }
 }

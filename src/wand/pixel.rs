@@ -16,6 +16,9 @@
 use std::fmt;
 use std::ffi::{CStr, CString};
 use ::bindings;
+#[cfg(target_os = "freebsd")]
+use libc::size_t;
+#[cfg(not(target_os = "freebsd"))]
 use ::size_t;
 
 #[derive(Default, Debug)]
@@ -34,7 +37,7 @@ wand_common!(
 impl PixelWand {
     pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> Result<(), &'static str> {
         match unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) } {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("not similar")
         }
     }
@@ -73,7 +76,7 @@ impl PixelWand {
     pub fn set_color(&mut self, s: &str) -> Result<(), &'static str> {
         let c_string = try!(CString::new(s).map_err(|_| "could not convert to cstring"));
         match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr())} {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to set color")
         }
     }

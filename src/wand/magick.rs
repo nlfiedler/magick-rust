@@ -16,14 +16,21 @@
 use std::fmt;
 use std::ptr;
 use std::ffi::{CStr, CString};
-use libc::{c_uint, c_double, c_void};
+use libc::{c_double, c_void};
 
+#[cfg(target_os = "freebsd")]
+use libc::{size_t, ssize_t};
+#[cfg(not(target_os = "freebsd"))]
 use ::{size_t, ssize_t};
-use ::filters::FilterType;
 use ::bindings;
 use ::conversions::*;
 use super::{DrawingWand, PixelWand};
 
+wand_common!(
+    MagickWand,
+    NewMagickWand, ClearMagickWand, IsMagickWand, CloneMagickWand, DestroyMagickWand,
+    MagickClearException, MagickGetExceptionType, MagickGetException
+);
 
 /// MagickWand is a Rustic wrapper to the Rust bindings to ImageMagick.
 ///
@@ -31,17 +38,11 @@ use super::{DrawingWand, PixelWand};
 /// on which operations can be performed via the `MagickWand` functions.
 /// When the `MagickWand` is dropped, the ImageMagick wand will be
 /// destroyed as well.
-wand_common!(
-    MagickWand,
-    NewMagickWand, ClearMagickWand, IsMagickWand, CloneMagickWand, DestroyMagickWand,
-    MagickClearException, MagickGetExceptionType, MagickGetException
-);
-
 impl MagickWand {
 
     pub fn new_image(&self, columns: size_t, rows: size_t, pixel_wand: &PixelWand) -> Result<(), &'static str> {
         match unsafe { bindings::MagickNewImage(self.wand, columns, rows, pixel_wand.wand) } {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("Could not create image"),
         }
     }
@@ -53,7 +54,7 @@ impl MagickWand {
             bindings::MagickSetOption(self.wand, c_key.as_ptr(), c_value.as_ptr())
         };
         match result {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to set option"),
         }
     }
@@ -61,7 +62,7 @@ impl MagickWand {
     pub fn annotate_image(&mut self, drawing_wand: &DrawingWand, x: f64, y: f64, angle: f64, text: &str) -> Result<(), &'static str> {
         let c_string = try!(CString::new(text).map_err(|_| "could not convert to cstring"));
         match unsafe { bindings::MagickAnnotateImage(self.wand, drawing_wand.wand, x, y, angle, c_string.as_ptr() as *const _) } {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("unable to annotate image")
         }
     }
@@ -79,7 +80,7 @@ impl MagickWand {
             bindings::MagickLabelImage(self.wand, c_label.as_ptr())
         };
         match result {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to add label")
         }
     }
@@ -90,7 +91,7 @@ impl MagickWand {
             bindings::MagickWriteImages(self.wand, c_name.as_ptr(), adjoin.to_magick())
         };
         match result {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to write images")
         }
     }
@@ -102,7 +103,7 @@ impl MagickWand {
             bindings::MagickReadImage(self.wand, c_name.as_ptr())
         };
         match result {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to read image")
         }
     }
@@ -116,7 +117,7 @@ impl MagickWand {
                 self.wand, int_slice.as_ptr() as *const c_void, size as size_t)
         };
         match result {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to read image")
         }
     }
@@ -160,11 +161,11 @@ impl MagickWand {
     /// blur_factor values greater than 1 create blurriness, while values
     /// less than 1 create sharpness.
     pub fn resize_image(&self, width: usize, height: usize,
-                        filter: FilterType, blur_factor: f64) {
+                        filter: bindings::FilterTypes, blur_factor: f64) {
         unsafe {
             bindings::MagickResizeImage(
                 self.wand, width as size_t, height as size_t,
-                filter as c_uint, blur_factor as c_double
+                filter, blur_factor as c_double
             );
         }
     }
@@ -187,9 +188,9 @@ impl MagickWand {
         }
         unsafe {
             bindings::MagickResetIterator(self.wand);
-            while bindings::MagickNextImage(self.wand) != bindings::MagickFalse {
+            while bindings::MagickNextImage(self.wand) != bindings::MagickBooleanType::MagickFalse {
                 bindings::MagickResizeImage(self.wand, new_width, new_height,
-                                            FilterType::LanczosFilter as c_uint, 1.0);
+                                            bindings::FilterTypes::LanczosFilter, 1.0);
             }
         }
     }
@@ -198,7 +199,7 @@ impl MagickWand {
     /// hence should be "auto" oriented so it is suitable for viewing.
     pub fn requires_orientation(&self) -> bool {
         unsafe {
-            bindings::MagickGetImageOrientation(self.wand) != bindings::TopLeftOrientation
+            bindings::MagickGetImageOrientation(self.wand) != bindings::OrientationType::TopLeftOrientation
         }
     }
 
@@ -208,7 +209,7 @@ impl MagickWand {
     /// Returns `true` if successful or `false` if an error occurred.
     pub fn auto_orient(&self) -> bool {
         unsafe {
-            bindings::MagickAutoOrientImage(self.wand) == bindings::MagickTrue
+            bindings::MagickAutoOrientImage(self.wand) == bindings::MagickBooleanType::MagickTrue
         }
     }
 
@@ -219,7 +220,7 @@ impl MagickWand {
             bindings::MagickWriteImage(self.wand, c_name.as_ptr())
         };
         match result {
-            bindings::MagickTrue => Ok(()),
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to write image")
         }
     }
@@ -275,36 +276,36 @@ impl MagickWand {
     );
 
     set_get!(
-        get_colorspace,                  set_colorspace,                  MagickGetColorspace,               MagickSetColorspace,              u32
-        get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             u32
+        get_colorspace,                  set_colorspace,                  MagickGetColorspace,               MagickSetColorspace,              bindings::ColorspaceType
+        get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             bindings::CompressionType
         get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      size_t
-        get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 u32
-        get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         u32
-        get_image_compose,               set_image_compose,               MagickGetImageCompose,             MagickSetImageCompose,            u32
-        get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        u32
+        get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 bindings::GravityType
+        get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         bindings::ColorspaceType
+        get_image_compose,               set_image_compose,               MagickGetImageCompose,             MagickSetImageCompose,            bindings::CompositeOperator
+        get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        bindings::CompressionType
         get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, size_t
         get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              size_t
         get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              size_t
-        get_image_dispose,               set_image_dispose,               MagickGetImageDispose,             MagickSetImageDispose,            u32
-        get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             u32
+        get_image_dispose,               set_image_dispose,               MagickGetImageDispose,             MagickSetImageDispose,            bindings::DisposeType
+        get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             bindings::EndianType
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
         get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
-        get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            u32
+        get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            bindings::GravityType
         get_image_index,                 set_image_index,                 MagickGetImageIndex,               MagickSetImageIndex,              ssize_t
-        get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    u32
-        get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  u32
+        get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    bindings::InterlaceType
+        get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  bindings::InterpolatePixelMethod
         get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         size_t
-        get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        u32
-        get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    u32
+        get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        bindings::OrientationType
+        get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    bindings::RenderingIntent
         get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              size_t
-        get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               u32
-        get_image_units,                 set_image_units,                 MagickGetImageUnits,               MagickSetImageUnits,              u32
-        get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         u32
-        get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       u32
+        get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               bindings::ImageType
+        get_image_units,                 set_image_units,                 MagickGetImageUnits,               MagickSetImageUnits,              bindings::ResolutionType
+        get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         bindings::InterlaceType
+        get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       bindings::InterpolatePixelMethod
         get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           ssize_t
-        get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             u32
+        get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             bindings::OrientationType
         get_pointsize,                   set_pointsize,                   MagickGetPointsize,                MagickSetPointsize,               f64
-        get_type,                        set_type,                        MagickGetType,                     MagickSetType,                    u32
+        get_type,                        set_type,                        MagickGetType,                     MagickSetType,                    bindings::ImageType
     );
 
 }

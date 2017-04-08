@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Nathan Fiedler
+ * Copyright 2015-2017 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,26 +28,26 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(improper_ctypes)]  // the siginfo_t in waitid() definition in bindings.rs
 
 extern crate libc;
 
 mod wand;
 mod conversions;
-pub mod filters;
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 pub use wand::*;
 
-pub type size_t = ::bindings::size_t;
-pub type ssize_t = ::bindings::ssize_t;
-
+use libc::size_t;
+#[cfg(not(target_os = "freebsd"))]
+use libc::ssize_t;
 
 /// This function must be called before any other ImageMagick operations
 /// are attempted. This function is safe to be called repeatedly.
 pub fn magick_wand_genesis() {
     unsafe {
         match bindings::IsMagickWandInstantiated() {
-            bindings::MagickTrue => (),
+            bindings::MagickBooleanType::MagickTrue => (),
             _ => bindings::MagickWandGenesis()
         }
     }
@@ -58,7 +58,7 @@ pub fn magick_wand_genesis() {
 pub fn magick_wand_terminus() {
     unsafe {
         match bindings::IsMagickWandInstantiated() {
-            bindings::MagickTrue => bindings::MagickWandTerminus(),
+            bindings::MagickBooleanType::MagickTrue => bindings::MagickWandTerminus(),
             _ => ()
         }
     }
