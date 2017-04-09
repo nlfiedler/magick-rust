@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.4] - 2017-04-08
+### Changed
+- Actually set the version this time.
+
 ## [0.6.3] - 2017-04-08
 ### Changed
 - Changed to use `pkg-config` crate to get MagickWand compiler settings.
