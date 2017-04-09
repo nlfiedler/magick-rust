@@ -11,7 +11,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
     - Homebrew: `brew install imagemagick@6` followed by `brew link --force imagemagick@6`
     - Linux may require building ImageMagick from source
 * Clang (version 3.5 or higher)
-    - Or whatever version is dictated by rust-bindgen
+    - Or whatever version is dictated by [rust-bindgen](https://github.com/servo/rust-bindgen)
 * Must have `pkg-config` in order to link with MagickWand.
 
 See the `docs/Development_Setup.md` file for details particular to each platform.
@@ -47,3 +47,5 @@ fn resize() -> Result<Vec<u8>, &'static str> {
     wand.write_image_blob("jpeg")
 }
 ```
+
+Writing the image to a file rather than an in-memory blob is done by replacing the call to `write_image_blob()` with `write_image()`, which takes a string for the path to the file.

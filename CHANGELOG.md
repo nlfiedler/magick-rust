@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.3] - 2017-04-08
+### Changed
+- Changed to use `pkg-config` crate to get MagickWand compiler settings.
+- Fixed bindings generation on FreeBSD (i.e. no longer hard-coded).
+- Changed the bindings generation to use `libc` prefix for C types.
+- Changed the bindings generation and interface code to use Rust enums.
+
 ## [0.6.2] - 2016-10-20
 ### Changed
 - Presence of `pkg-config` checked in `build.rs` script at build time.
@@ -25,7 +32,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.5.1] - 2016-06-25
 ### Changed
-- hjr3: Changed read_image_blob() to borrow data rather than take ownership.
+- hjr3: Changed `read_image_blob()` to borrow data rather than take ownership.
 
 ## [0.5.0] - 2016-05-18
 ### Changed
