@@ -29,11 +29,14 @@ static HEADER: &'static str = "#include <wand/MagickWand.h>\n";
 fn main() {
     // Assert that the appropriate version of MagickWand is installed,
     // since we are very dependent on the particulars of MagickWand.
-    let library = pkg_config::Config::new()
+    pkg_config::Config::new()
         .atleast_version(MIN_VERSION)
         .arg(format!("--max-version={}", MAX_VERSION))
         .probe("MagickWand")
         .unwrap();
+    // We have to split the version check and the cflags/libs check because you can't do both at
+    // the same time on RHEL (apparently).
+    let library = pkg_config::Config::new().probe("MagickWand").unwrap();
 
     // If the generated bindings are missing, generate them now.
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
