@@ -122,6 +122,22 @@ impl MagickWand {
         }
     }
 
+    /// Compare two images and return tuple `(distortion, diffImage)`
+    /// `diffImage` is `None` if `distortion == 0`
+    pub fn compare_images(&self, reference: &MagickWand, metric: bindings::MetricType) -> (f64, Option<MagickWand>) {
+        let mut distortion: f64 = 0.0;
+        let result = unsafe {
+            bindings::MagickCompareImages(self.wand, reference.wand, metric, &mut distortion)
+        };
+        let wand = if result.is_null() {
+            None
+        }
+        else {
+            Some(MagickWand { wand: result })
+        };
+        (distortion, wand)
+    }
+
     /// Retrieve the width of the image.
     pub fn get_image_width(&self) -> usize {
         unsafe {

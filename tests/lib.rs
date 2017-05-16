@@ -16,7 +16,7 @@
 
 extern crate magick_rust;
 
-use magick_rust::{MagickWand, magick_wand_genesis};
+use magick_rust::{MagickWand, magick_wand_genesis, MetricType};
 
 use std::error::Error;
 use std::fs::File;
@@ -175,6 +175,23 @@ fn test_auto_orient() {
     assert_eq!(true, wand.requires_orientation());
     assert!(wand.auto_orient());
     assert_eq!(false, wand.requires_orientation());
+}
+
+#[test]
+fn test_compare_images() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand1 = MagickWand::new();
+    assert!(wand1.read_image("tests/data/IMG_5745.JPG").is_ok());
+
+    let wand2 = MagickWand::new();
+    assert!(wand2.read_image("tests/data/IMG_5745_rotl.JPG").is_ok());
+    wand2.auto_orient();
+
+    let (distortion, diff) = wand1.compare_images(&wand2, MetricType::RootMeanSquaredErrorMetric);
+    assert!(distortion < 0.01);
+    assert!(diff.is_some());
 }
 
 #[test]
