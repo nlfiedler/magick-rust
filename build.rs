@@ -34,8 +34,8 @@ fn main() {
         .arg(format!("--max-version={}", MAX_VERSION))
         .probe("MagickWand")
         .unwrap();
-    // We have to split the version check and the cflags/libs check because you can't do both at
-    // the same time on RHEL (apparently).
+    // We have to split the version check and the cflags/libs check because
+    // you can't do both at the same time on RHEL (apparently).
     let library = pkg_config::Config::new().probe("MagickWand").unwrap();
 
     // If the generated bindings are missing, generate them now.
@@ -50,7 +50,6 @@ fn main() {
 
         // Geneate the bindings.
         let mut builder = bindgen::Builder::default()
-            .no_unstable_rust()
             .emit_builtins()
             .ctypes_prefix("libc")
             .raw_line("extern crate libc;")
