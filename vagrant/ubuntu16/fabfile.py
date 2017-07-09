@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------------
 #
-# Copyright (c) 2016 Nathan Fiedler
+# Copyright (c) 2016-2017 Nathan Fiedler
 #
 # This file is provided to you under the Apache License,
 # Version 2.0 (the "License"); you may not use this file
@@ -18,13 +18,12 @@
 # under the License.
 #
 # -------------------------------------------------------------------
-"""Fabric file for installing requirements on FreeBSD."""
+"""Fabric file for installing requirements on Ubuntu Linux."""
 
 import os
 
-from fabric.api import env, run, sudo, task
+from fabric.api import cd, env, run, sudo, task
 
-env.shell = "/bin/sh -c"
 env.hosts = ["default"]
 env.use_ssh_config = True
 if os.path.exists("user_ssh_config"):
@@ -36,12 +35,22 @@ else:
 @task
 def all():
     """Install everything needed to build magick-rust."""
-    sudo("pkg install -q -y git")
-    sudo("pkg install -q -y rust")
-    sudo("pkg install -q -y cargo")
-    sudo("pkg install -q -y ImageMagick-nox11")
-    sudo("pkg install -q -y pkgconf")
-    sudo("pkg install -q -y clang-devel")
+    sudo('apt-get -q -y install git')
+    sudo('apt-get -q -y install pkg-config')
+    # need the latest possible release of rust for bindgen to work
+    run('wget -O rustup-init https://sh.rustup.rs')
+    run('chmod +x rustup-init')
+    run('./rustup-init -y')
+    run('rm -f rustup-init')
+    sudo('apt-get -q -y build-dep imagemagick')
+    run('wget -q https://www.imagemagick.org/download/ImageMagick-6.9.8-10.tar.gz')
+    run('tar zxf ImageMagick-6.9.8-10.tar.gz')
+    with cd('ImageMagick-*'):
+        run('./configure')
+        run('make')
+        sudo('make install')
+    run('rm -rf ImageMagick*')
+    sudo('apt-get -q -y install clang libclang-dev')
     # set LIBCLANG_PATH so rustc can find libclang.so in its hidden place
     # (using the append operation results in 'Unmatched ".' error)
-    run("echo 'setenv LIBCLANG_PATH /usr/local/llvm-devel/lib' >> .cshrc")
+    run("echo 'export LIBCLANG_PATH=/usr/lib/llvm-3.8/lib' >> .bashrc")
