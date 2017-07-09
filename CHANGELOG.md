@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.6] - 2017-07-08
+### Changed
+- Downgrade to version 0.25.5 of `bindgen` library to avoid errors on Linux.
+
 ## [0.6.5] - 2017-07-07
 ### Changed
 - Add `compare_images()` method to `MagickWand` type.

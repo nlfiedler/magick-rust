@@ -50,6 +50,7 @@ fn main() {
 
         // Geneate the bindings.
         let mut builder = bindgen::Builder::default()
+            .no_unstable_rust()
             .emit_builtins()
             .ctypes_prefix("libc")
             .raw_line("extern crate libc;")
