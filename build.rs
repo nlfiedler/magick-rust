@@ -20,6 +20,7 @@ use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 const MIN_VERSION: &'static str = "6.9";
 const MAX_VERSION: &'static str = "6.10";
@@ -31,9 +32,18 @@ fn main() {
     // since we are very dependent on the particulars of MagickWand.
     pkg_config::Config::new()
         .atleast_version(MIN_VERSION)
-        .arg(format!("--max-version={}", MAX_VERSION))
         .probe("MagickWand")
         .unwrap();
+    // Check the maximum version separately as pkg-config will ignore that
+    // option when combined with (certain) other options. And since the
+    // pkg-config crate always adds those other flags, we must run the
+    // command directly.
+    if !Command::new("pkg-config")
+                .arg(format!("--max-version={}", MAX_VERSION))
+                .arg("MagickWand")
+                .status().unwrap().success() {
+        panic!("MagickWand version must be no higher than 6.9");
+    }
     // We have to split the version check and the cflags/libs check because
     // you can't do both at the same time on RHEL (apparently).
     let library = pkg_config::Config::new().probe("MagickWand").unwrap();
