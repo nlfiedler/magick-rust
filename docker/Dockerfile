@@ -18,6 +18,6 @@ RUN adduser --disabled-password --gecos '' magick-rust
 
 USER magick-rust
 
-ENV USER magick-rust
+ENV USER=magick-rust LD_LIBRARY_PATH=/usr/local/lib
 
 WORKDIR /src
