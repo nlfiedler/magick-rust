@@ -24,7 +24,7 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::{Once, ONCE_INIT};
 
-// TODO: nathan does not understand how to expose the FilterTypes without
+// TODO: nathan does not understand how to expose the FilterType without
 //       this ugliness, his Rust skills are sorely lacking
 use magick_rust::bindings;
 
@@ -57,7 +57,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2
     };
-    wand.resize_image(halfwidth, halfheight, bindings::FilterTypes::LanczosFilter, 1.0);
+    wand.resize_image(halfwidth, halfheight, bindings::FilterType::LanczosFilter);
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
