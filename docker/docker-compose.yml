@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  magick-rust:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/src
+    stdin_open: true
+    tty: true
