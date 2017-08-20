@@ -2,21 +2,18 @@
 
 A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. Many of the functions in the MagickWand API are still missing, and those that are needed will be gradually added.
 
-## Dependenices
+## Dependencies
 
 * Rust (~latest release)
 * Cargo (~latest release)
-* ImageMagick (version 6.9)
+* ImageMagick (version 7.0)
     - [FreeBSD](https://www.freebsd.org) provides this version
     - [Homebrew](http://brew.sh) requires special steps:
-        + `brew install imagemagick@6`
-        + `brew link --force imagemagick@6`
+        + `brew install imagemagick`
     - Linux may require building ImageMagick from source
 * Clang (version 3.5 or higher)
     - Or whatever version is dictated by [rust-bindgen](https://github.com/servo/rust-bindgen)
 * Must have `pkg-config` in order to link with MagickWand.
-
-See the `docs/Development_Setup.md` file for details particular to each platform.
 
 ## Build and Test
 
@@ -51,3 +48,19 @@ fn resize() -> Result<Vec<u8>, &'static str> {
 ```
 
 Writing the image to a file rather than an in-memory blob is done by replacing the call to `write_image_blob()` with `write_image()`, which takes a string for the path to the file.
+
+## Docker
+
+[Docker](https://www.docker.com) can be used to build and test the code without
+affecting your development environment, which may have a different version of
+ImageMagick installed. The use of `docker-compose`, as shown in the example
+below, is optional, but it makes the process very simple.
+
+```
+$ cd docker
+$ docker-compose build
+$ docker-compose start
+$ docker-compose run magick-rust
+$ cargo build
+$ cargo test
+```
