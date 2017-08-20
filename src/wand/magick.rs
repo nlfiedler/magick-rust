@@ -186,7 +186,7 @@ impl MagickWand {
         }
     }
 
-    /// Resize the image to find within the given dimensions, maintaining
+    /// Resize the image to fit within the given dimensions, maintaining
     /// the current aspect ratio.
     pub fn fit(&self, width: size_t, height: size_t) {
         let mut width_ratio = width as f64;
