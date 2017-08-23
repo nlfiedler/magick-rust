@@ -152,6 +152,15 @@ impl MagickWand {
         }
     }
 
+    /// Retrieve the page geometry (width, height, x offset, y offset) of the image.
+    pub fn get_image_page(&self) -> (usize, usize, isize, isize) {
+        let (mut width, mut height, mut x, mut y) = (0usize, 0usize, 0isize, 0isize);
+        unsafe {
+            bindings::MagickGetImagePage(self.wand, &mut width, &mut height, &mut x, &mut y);
+        }
+        (width, height, x, y)
+    }
+
     /// Retrieve the named image property value.
     pub fn get_image_property(&self, name: &str) -> Result<String, &'static str> {
         let c_name = CString::new(name).unwrap();

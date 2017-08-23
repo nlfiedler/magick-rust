@@ -208,3 +208,15 @@ fn test_set_option() {
     assert_eq!(192, wand.get_image_width());
     assert_eq!(144, wand.get_image_height());
 }
+
+#[test]
+fn test_page_geometry() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/rust.gif").is_ok());
+    assert_eq!((156, 150, 39, 36), wand.get_image_page()); /* width, height, x offset, y offset */
+    assert_eq!(80, wand.get_image_width());
+    assert_eq!(76, wand.get_image_height());
+}
