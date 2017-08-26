@@ -22,10 +22,10 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-const MIN_VERSION: &'static str = "6.9";
-const MAX_VERSION: &'static str = "6.10";
+const MIN_VERSION: &'static str = "7.0";
+const MAX_VERSION: &'static str = "7.1";
 
-static HEADER: &'static str = "#include <wand/MagickWand.h>\n";
+static HEADER: &'static str = "#include <MagickWand/MagickWand.h>\n";
 
 fn main() {
     // Assert that the appropriate version of MagickWand is installed,
@@ -42,7 +42,7 @@ fn main() {
                 .arg(format!("--max-version={}", MAX_VERSION))
                 .arg("MagickWand")
                 .status().unwrap().success() {
-        panic!("MagickWand version must be no higher than 6.9");
+        panic!(format!("MagickWand version must be no higher than {}", MAX_VERSION));
     }
     // We have to split the version check and the cflags/libs check because
     // you can't do both at the same time on RHEL (apparently).
@@ -60,20 +60,26 @@ fn main() {
 
         // Geneate the bindings.
         let mut builder = bindgen::Builder::default()
-            .no_unstable_rust()
             .emit_builtins()
             .ctypes_prefix("libc")
             .raw_line("extern crate libc;")
-            .header(gen_h_path.to_str().unwrap());
+            .header(gen_h_path.to_str().unwrap())
+            /* https://github.com/rust-lang-nursery/rust-bindgen/issues/687 */
+            .hide_type("FP_NAN")
+            .hide_type("FP_INFINITE")
+            .hide_type("FP_ZERO")
+            .hide_type("FP_SUBNORMAL")
+            .hide_type("FP_NORMAL");
+
         for include_path in library.include_paths {
             builder = builder.clang_arg(format!("-I{}", include_path.to_string_lossy()));
         }
         if cfg!(target_os = "freebsd") {
             // pkg_config does not seem to work properly on FreeBSD, so
             // hard-code the builder settings for the time being.
-            builder = builder.clang_arg("-I/usr/local/include/ImageMagick-6");
+            builder = builder.clang_arg("-I/usr/local/include/ImageMagick-7");
             // Need to hack the linker flags as well.
-            println!("cargo:rustc-link-lib=dylib=MagickWand-6");
+            println!("cargo:rustc-link-lib=dylib=MagickWand-7");
             println!("cargo:rustc-link-search=native=/usr/local/lib");
         }
         let bindings = builder.generate().unwrap();

@@ -204,13 +204,13 @@ macro_rules! color_set_get {
             pub fn $get(&self) -> f64 {
                 unsafe { ::bindings::$c_get(self.wand) }
             }
-            pub fn $get_quantum(&self) -> u16 {
+            pub fn $get_quantum(&self) -> bindings::Quantum {
                 unsafe { ::bindings::$c_get_quantum(self.wand) }
             }
             pub fn $set(&mut self, v: f64) {
                 unsafe { ::bindings::$c_set(self.wand, v) }
             }
-            pub fn $set_quantum(&mut self, v: u16) {
+            pub fn $set_quantum(&mut self, v: bindings::Quantum) {
                 unsafe { ::bindings::$c_set_quantum(self.wand, v) }
             }
         )*

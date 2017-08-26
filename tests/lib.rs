@@ -24,7 +24,7 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::{Once, ONCE_INIT};
 
-// TODO: nathan does not understand how to expose the FilterTypes without
+// TODO: nathan does not understand how to expose the FilterType without
 //       this ugliness, his Rust skills are sorely lacking
 use magick_rust::bindings;
 
@@ -57,7 +57,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2
     };
-    wand.resize_image(halfwidth, halfheight, bindings::FilterTypes::LanczosFilter, 1.0);
+    wand.resize_image(halfwidth, halfheight, bindings::FilterType::LanczosFilter);
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -207,4 +207,16 @@ fn test_set_option() {
     assert!(wand.read_image_blob(&blob).is_ok());
     assert_eq!(192, wand.get_image_width());
     assert_eq!(144, wand.get_image_height());
+}
+
+#[test]
+fn test_page_geometry() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/rust.gif").is_ok());
+    assert_eq!((156, 150, 39, 36), wand.get_image_page()); /* width, height, x offset, y offset */
+    assert_eq!(80, wand.get_image_width());
+    assert_eq!(76, wand.get_image_height());
 }

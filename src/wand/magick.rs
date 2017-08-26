@@ -16,7 +16,7 @@
 use std::fmt;
 use std::ptr;
 use std::ffi::{CStr, CString};
-use libc::{c_double, c_void};
+use libc::{c_void};
 
 #[cfg(target_os = "freebsd")]
 use libc::{size_t, ssize_t};
@@ -152,6 +152,15 @@ impl MagickWand {
         }
     }
 
+    /// Retrieve the page geometry (width, height, x offset, y offset) of the image.
+    pub fn get_image_page(&self) -> (usize, usize, isize, isize) {
+        let (mut width, mut height, mut x, mut y) = (0usize, 0usize, 0isize, 0isize);
+        unsafe {
+            bindings::MagickGetImagePage(self.wand, &mut width, &mut height, &mut x, &mut y);
+        }
+        (width, height, x, y)
+    }
+
     /// Retrieve the named image property value.
     pub fn get_image_property(&self, name: &str) -> Result<String, &'static str> {
         let c_name = CString::new(name).unwrap();
@@ -172,16 +181,12 @@ impl MagickWand {
     }
 
     /// Resize the image to the specified width and height, using the
-    /// specified filter type with the specified blur / sharpness factor.
-    ///
-    /// blur_factor values greater than 1 create blurriness, while values
-    /// less than 1 create sharpness.
+    /// specified filter type.
     pub fn resize_image(&self, width: usize, height: usize,
-                        filter: bindings::FilterTypes, blur_factor: f64) {
+                        filter: bindings::FilterType) {
         unsafe {
             bindings::MagickResizeImage(
-                self.wand, width as size_t, height as size_t,
-                filter, blur_factor as c_double
+                self.wand, width as size_t, height as size_t, filter
             );
         }
     }
@@ -206,7 +211,7 @@ impl MagickWand {
             bindings::MagickResetIterator(self.wand);
             while bindings::MagickNextImage(self.wand) != bindings::MagickBooleanType::MagickFalse {
                 bindings::MagickResizeImage(self.wand, new_width, new_height,
-                                            bindings::FilterTypes::LanczosFilter, 1.0);
+                                            bindings::FilterType::LanczosFilter);
             }
         }
     }
@@ -270,7 +275,7 @@ impl MagickWand {
         let c_format = CString::new(format).unwrap();
         let mut length: size_t = 0;
         let blob = unsafe {
-            bindings::MagickSetImageIndex(self.wand, 0);
+            bindings::MagickSetIteratorIndex(self.wand, 0);
             bindings::MagickSetImageFormat(self.wand, c_format.as_ptr());
             bindings::MagickGetImagesBlob(self.wand, &mut length)
         };
@@ -307,9 +312,8 @@ impl MagickWand {
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
         get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
         get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            bindings::GravityType
-        get_image_index,                 set_image_index,                 MagickGetImageIndex,               MagickSetImageIndex,              ssize_t
         get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    bindings::InterlaceType
-        get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  bindings::InterpolatePixelMethod
+        get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  bindings::PixelInterpolateMethod
         get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         size_t
         get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        bindings::OrientationType
         get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    bindings::RenderingIntent
@@ -317,7 +321,7 @@ impl MagickWand {
         get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               bindings::ImageType
         get_image_units,                 set_image_units,                 MagickGetImageUnits,               MagickSetImageUnits,              bindings::ResolutionType
         get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         bindings::InterlaceType
-        get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       bindings::InterpolatePixelMethod
+        get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       bindings::PixelInterpolateMethod
         get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           ssize_t
         get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             bindings::OrientationType
         get_pointsize,                   set_pointsize,                   MagickGetPointsize,                MagickSetPointsize,               f64

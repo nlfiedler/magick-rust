@@ -2,14 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
+This file follows the convention described at
+[Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
+
+## [0.7.0] - 2017-08-26
+### Changed
+- Upgrade bindgen to 0.29
+- Change to MagickWand 7.0; this introduces backward incompatible changes
+- `get_quantum` and `set_quantum` now take `Quantum` instead of `u16`
+- `resize_image` no longer takes a `blur_factor` argument
+- `InterpolatePixelMethod` was renamed `PixelInterpolateMethod`
 
 ## [0.6.6] - 2017-07-08
 ### Changed
 - Downgrade to version 0.25.5 of `bindgen` library to avoid errors on Linux.
 
 ## [0.6.5] - 2017-07-07
-### Changed
+### Added
 - Add `compare_images()` method to `MagickWand` type.
+### Changed
 - Update to latest release of `bindgen` library.
 
 ## [0.6.4] - 2017-04-08
@@ -48,11 +59,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - hjr3: Changed `read_image_blob()` to borrow data rather than take ownership.
 
 ## [0.5.0] - 2016-05-18
-### Changed
+### Added
 - marjakm: Added numerous functions and enabled cross-compile support.
 
 ## [0.4.0] - 2016-03-29
-### Changed
+### Added
 - Add functions for detecting and correcting image orientation.
 
 ## [0.3.3] - 2016-03-17
@@ -68,7 +79,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix bug `get_image_property()` to ensure C string is copied.
 
 ## [0.3.0] - 2016-01-02
-### Changed
+### Added
 - Add `get_image_property()` function to retrieve, for example, EXIF data.
 
 ## [0.2.3] - 2015-12-26
@@ -84,7 +95,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix the cargo package name (replace dash with underscore).
 
 ## [0.2.0] - 2015-06-10
-### Changed
+### Added
 - Add a `fit()` function for fitting an image to a given bounds.
 
 ## [0.1.0] - 2015-06-09
