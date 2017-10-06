@@ -4,16 +4,17 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 
 ## Dependencies
 
-* Rust (~latest release)
+* Rust (~latest release) (on Windows you will require MSVC version)
 * Cargo (~latest release)
 * ImageMagick (version 7.0.x)
     - Does _not_ work with ImageMagick 6.x due to backward incompatible changes.
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
     - [Homebrew](http://brew.sh): `brew install imagemagick`
     - Linux may require building ImageMagick from source, see the `Dockerfile` for an example
+    - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/binary-releases.php#windows). Only MSVC version available. When installing, check the checkbox "Install development headers and libraries for C and C++".
 * [Clang](https://clang.llvm.org) (version 3.5 or higher)
     - Or whatever version is dictated by [rust-bindgen](https://github.com/servo/rust-bindgen)
-* `pkg-config`, to facilitate linking with ImageMagick.
+* Optionally `pkg-config`, to facilitate linking with ImageMagick. Or you can set linker parameters via environment variables.
 
 ## Build and Test
 
@@ -22,6 +23,25 @@ Pretty simple for now.
 ```
 $ cargo build
 $ cargo test
+```
+
+Optionally you can set some environment variables before building:
+* `IMAGE_MAGICK_DIR` - installation directory of ImageMagick
+* `IMAGE_MAGICK_LIB_DIRS` - list of lib directories split by `:`
+* `IMAGE_MAGICK_INCLUDE_DIRS` - list of include directories split by `:`
+* `IMAGE_MAGICK_LIBS` - list of the libs to link to
+
+### Build on Windows
+
+On Windows you will need to launch build in Visual Studio Native Tools Command Prompt.
+It can be found in *Start menu -> Visual Studio < VERSION > -> Visual Studio Tools -> Windows Desktop Command Prompts*.
+Choose the architecture corresponding to architecture of your rust compiler.
+This is required for proper work of `rust-bindgen`.
+
+```
+> set IMAGE_MAGICK_DIR=<path to ImageMagick installation directory>
+> cargo build
+> cargo test
 ```
 
 ## Example Usage
