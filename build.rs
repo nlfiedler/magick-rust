@@ -38,40 +38,32 @@ fn main() {
         env_var_set_default("IMAGE_MAGICK_LIBS", "MagickWand-7");
     }
 
-    let target = env::var("TARGET").unwrap();
-
     let lib_dirs = find_image_magick_lib_dirs();
-    let include_dirs = find_image_magick_include_dirs();
-
-
     for d in &lib_dirs {
         if !d.exists() {
             panic!("ImageMagick library directory does not exist: {}", d.to_string_lossy());
         }
         println!( "cargo:rustc-link-search=native={}", d.to_string_lossy());
     }
-
+    let include_dirs = find_image_magick_include_dirs();
     for d in &include_dirs {
         if !d.exists() {
             panic!("ImageMagick include directory does not exist: {}", d.to_string_lossy());
         }
         println!("cargo:include={}", d.to_string_lossy());
     }
-
-    // let version = validate_headers(&[include_dir.clone().into()]);
-
     println!("cargo:rerun-if-env-changed=IMAGE_MAGICK_LIBS");
+
+    let target = env::var("TARGET").unwrap();
     let libs_env = env::var("IMAGE_MAGICK_LIBS").ok();
     let libs = match libs_env {
         Some(ref v) => v.split(":").map(|x| x.to_owned()).collect(),
         None => {
             if target.contains("windows") {
                 vec!["CORE_RL_MagickWand_".to_string()]
-            }
-            else if target.contains("freebsd") {
+            } else if target.contains("freebsd") {
                 vec!["MagickWand-7".to_string()]
-            }
-            else {
+            } else {
                 run_pkg_config().libs
             }
         }
@@ -98,7 +90,7 @@ fn main() {
             .ctypes_prefix("libc")
             .raw_line("extern crate libc;")
             .header(gen_h_path.to_str().unwrap())
-            /* https://github.com/rust-lang-nursery/rust-bindgen/issues/687 */
+            // https://github.com/rust-lang-nursery/rust-bindgen/issues/687
             .hide_type("FP_NAN")
             .hide_type("FP_INFINITE")
             .hide_type("FP_ZERO")
@@ -173,10 +165,12 @@ fn determine_mode<T: AsRef<str>>(libdirs: &Vec<PathBuf>, libs: &[T]) -> &'static
         .filter_map(|e| e.into_string().ok())
         .collect::<HashSet<_>>();
     let can_static = libs.iter().all(|l| {
-        files.contains(&format!("lib{}.a", l.as_ref())) || files.contains(&format!("{}.lib", l.as_ref()))
+        files.contains(&format!("lib{}.a", l.as_ref())) ||
+            files.contains(&format!("{}.lib", l.as_ref()))
     });
     let can_dylib = libs.iter().all(|l| {
-        files.contains(&format!("lib{}.so", l.as_ref())) || files.contains(&format!("{}.dll", l.as_ref())) ||
+        files.contains(&format!("lib{}.so", l.as_ref())) ||
+            files.contains(&format!("{}.dll", l.as_ref())) ||
             files.contains(&format!("lib{}.dylib", l.as_ref()))
     });
 

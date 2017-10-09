@@ -80,8 +80,8 @@ There are still many missing functions, so if you find there is something you wo
 ```
 $ cd docker
 $ docker-compose build
-$ docker-compose start
 $ docker-compose run magick-rust
+$ cargo clean
 $ cargo build
 $ cargo test
 ```
