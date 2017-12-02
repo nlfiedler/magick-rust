@@ -4,7 +4,7 @@ RUN apt-get update \
  && apt-get -y install curl build-essential clang pkg-config libjpeg-turbo-progs libpng-dev \
  && rm -rfv /var/lib/apt/lists/*
 
-ENV MAGICK_VERSION 7.0.7-11
+ENV MAGICK_VERSION 7.0.7-13
 
 RUN curl https://www.imagemagick.org/download/ImageMagick-${MAGICK_VERSION}.tar.gz | tar xz \
  && cd ImageMagick-${MAGICK_VERSION} \
