@@ -95,7 +95,12 @@ fn main() {
             .hide_type("FP_INFINITE")
             .hide_type("FP_ZERO")
             .hide_type("FP_SUBNORMAL")
-            .hide_type("FP_NORMAL");
+            .hide_type("FP_NORMAL")
+            .hide_type("FP_INT_UPWARD")
+            .hide_type("FP_INT_DOWNWARD")
+            .hide_type("FP_INT_TOWARDZERO")
+            .hide_type("FP_INT_TONEARESTFROMZERO")
+            .hide_type("FP_INT_TONEAREST");
 
         for d in include_dirs {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));
