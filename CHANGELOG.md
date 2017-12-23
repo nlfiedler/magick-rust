@@ -7,6 +7,7 @@ This file follows the convention described at
 
 ## [Unreleased]
 ### Changed
+- gentoo90: Hide more types from bindgen to fix the build for some systems
 - gentoo90: Build now supports Windows
 
 ## [0.7.0] - 2017-08-26
