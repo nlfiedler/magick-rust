@@ -1,6 +1,6 @@
 [package]
 name = "magick_rust"
-version = "0.7.0"
+version = "0.7.1"
 authors = ["Nathan Fiedler <nathanfiedler@fastmail.fm>"]
 description = "Selection of Rust bindings for the ImageMagick library."
 homepage = "https://github.com/nlfiedler/magick-rust"
