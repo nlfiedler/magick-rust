@@ -23,9 +23,9 @@ use ::size_t;
 
 #[derive(Default, Debug)]
 pub struct HSL {
-    hue: f64,
-    saturation: f64,
-    lightness: f64
+    pub hue: f64,
+    pub saturation: f64,
+    pub lightness: f64
 }
 
 wand_common!(

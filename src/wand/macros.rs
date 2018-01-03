@@ -83,6 +83,16 @@ macro_rules! wand_common {
     }
 }
 
+macro_rules! get {
+    ($($get:ident, $c_get:ident, $typ:ty )*) => {
+        $(
+            pub fn $get(&self) -> $typ {
+                unsafe { ::bindings::$c_get(self.wand) }
+            }
+        )*
+    }
+}
+
 macro_rules! set_get {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident, $typ:ty )*) => {
         $(
@@ -225,5 +235,19 @@ macro_rules! color_set_get {
             $( try!(writeln!(f, "{}{:<10}: {:>} quantum: {}", prefix, stringify!($c_get).split_at(8).1, self.$get(), self.$get_quantum())); )*
             Ok(())
         }
+    }
+}
+
+macro_rules! mutations {
+    ($($(#[$attr:meta])* $c_fun:ident => $fun:ident($($arg:ident: $ty:ty),*))*) => {
+        $(
+            $(#[$attr])*
+            pub fn $fun(&self $(, $arg: $ty)*) -> Result<(), &'static str> {
+                match unsafe { bindings::$c_fun(self.wand $(, $arg)*) } {
+                    bindings::MagickBooleanType::MagickTrue => Ok(()),
+                    _ => Err(concat!(stringify!($c_fun), " invocation failed"))
+                }
+            }
+        )*
     }
 }
