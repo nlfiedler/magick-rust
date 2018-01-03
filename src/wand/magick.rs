@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use std::fmt;
-use std::ptr;
+use std::{fmt, ptr, slice};
 use std::ffi::{CStr, CString};
 use libc::{c_void};
 
@@ -180,6 +179,50 @@ impl MagickWand {
         value
     }
 
+    /// Returns a `PixelWand` instance for the pixel specified by x and y offests.
+    pub fn get_image_pixel_color(&self, x: isize, y: isize) -> Option<PixelWand> {
+        let pw = PixelWand::new();
+
+        unsafe {
+            if bindings::MagickGetImagePixelColor(self.wand, x, y, pw.wand) == bindings::MagickBooleanType::MagickTrue {
+                Some(pw)
+            } else {
+                None
+            }
+        }
+    }
+
+    /// Returns the image histogram as a vector of `PixelWand` instances for every unique color.
+    pub fn get_image_histogram(&self) -> Option<Vec<PixelWand>> {
+        let mut color_count: size_t = 0;
+
+        unsafe {
+            bindings::MagickGetImageHistogram(self.wand, &mut color_count)
+                .as_mut()
+                .map(|ptrs| slice::from_raw_parts(ptrs, color_count)
+                                .iter().map(|raw_wand| PixelWand { wand: *raw_wand })
+                                .collect())
+        }
+    }
+
+    /// Extracts pixel data from the image as a vector of 0..255 values defined by `map`.
+    /// See https://www.imagemagick.org/api/magick-image.php#MagickExportImagePixels for more information.
+    pub fn export_image_pixels(&self, x: isize, y: isize, width: usize, height: usize, map: &str) -> Option<Vec<u8>> {
+        let c_map = CString::new(map).unwrap();
+        let capacity = width * height * map.len();
+        let mut pixels = Vec::with_capacity(capacity);
+
+        unsafe {
+            pixels.set_len(capacity as usize);
+            if bindings::MagickExportImagePixels(self.wand, x, y, width, height, c_map.as_ptr(),
+                bindings::StorageType::CharPixel, pixels.as_mut_ptr() as *mut c_void) == bindings::MagickBooleanType::MagickTrue {
+                Some(pixels)
+            } else {
+                None
+            }
+        }
+    }
+
     /// Resize the image to the specified width and height, using the
     /// specified filter type.
     pub fn resize_image(&self, width: usize, height: usize,
@@ -287,6 +330,30 @@ impl MagickWand {
         };
         Ok(bytes)
     }
+
+    mutations!(
+        /// Set the image colorspace, transforming (unlike `set_image_colorspace`) image data in
+        /// the process.
+        MagickTransformImageColorspace => transform_image_colorspace(
+            colorspace: bindings::ColorspaceType)
+
+        /// Reduce the number of colors in the image.
+        MagickQuantizeImage => quantize_image(
+            number_of_colors: size_t, colorspace: bindings::ColorspaceType,
+            tree_depth: size_t, dither_method: bindings::DitherMethod, measure_error: bindings::MagickBooleanType)
+
+        /// Reduce the number of colors in the image.
+        MagickQuantizeImages => quantize_images(
+            number_of_colors: size_t, colorspace: bindings::ColorspaceType,
+            tree_depth: size_t, dither_method: bindings::DitherMethod, measure_error: bindings::MagickBooleanType)
+
+        /// Discard all but one of any pixel color.
+        MagickUniqueImageColors => unique_image_colors()
+    );
+
+    get!(
+        get_image_colors,                MagickGetImageColors,            size_t
+    );
 
     string_set_get!(
         get_filename,                    set_filename,                    MagickGetFilename,                 MagickSetFilename

@@ -16,17 +16,14 @@
 
 extern crate magick_rust;
 
-use magick_rust::{MagickWand, magick_wand_genesis, MetricType};
+use magick_rust::{MagickWand, magick_wand_genesis, MetricType, ColorspaceType, FilterType, DitherMethod};
 
 use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use std::sync::{Once, ONCE_INIT};
-
-// TODO: nathan does not understand how to expose the FilterType without
-//       this ugliness, his Rust skills are sorely lacking
-use magick_rust::bindings;
+use magick_rust::ToMagick;
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
@@ -57,7 +54,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2
     };
-    wand.resize_image(halfwidth, halfheight, bindings::FilterType::LanczosFilter);
+    wand.resize_image(halfwidth, halfheight, FilterType::LanczosFilter);
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -219,4 +216,47 @@ fn test_page_geometry() {
     assert_eq!((156, 150, 39, 36), wand.get_image_page()); /* width, height, x offset, y offset */
     assert_eq!(80, wand.get_image_width());
     assert_eq!(76, wand.get_image_height());
+}
+
+#[test]
+fn test_transform_image_colorspace() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert_eq!(wand.get_image_colorspace(), ColorspaceType::sRGBColorspace);
+
+    let pixel_color = wand.get_image_pixel_color(10, 10).unwrap();
+    assert_ne!(pixel_color.get_hsl().hue, 0.0);
+
+    assert!(wand.transform_image_colorspace(ColorspaceType::GRAYColorspace).is_ok());
+    assert_eq!(wand.get_image_colorspace(), ColorspaceType::GRAYColorspace);
+
+    let pixel_grayscale = wand.get_image_pixel_color(10, 10).unwrap();
+    assert_eq!(pixel_grayscale.get_hsl().hue, 0.0);
+
+    /* The output of `export_image_pixels` should match
+     * `convert -type Grayscale tests/data/IMG_5745.JPG[2x2+0+0] txt:` */
+    assert_eq!(wand.export_image_pixels(0, 0, 2, 2, "I").unwrap(),
+        vec![212, 212, 210, 210])
+}
+
+#[test]
+fn test_color_reduction() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert_eq!(38322, wand.get_image_colors());
+
+    assert!(wand.quantize_image(6, ColorspaceType::RGBColorspace, 1,
+                                DitherMethod::UndefinedDitherMethod, false.to_magick()).is_ok());
+    assert_eq!(6, wand.get_image_colors());
+
+    let histogram = wand.get_image_histogram().unwrap();
+    assert_eq!(6, histogram.len());
+    assert_eq!(wand.get_image_width() * wand.get_image_height(),
+               histogram.iter().fold(0, |total_colors, wand| total_colors + wand.get_color_count()));
 }
