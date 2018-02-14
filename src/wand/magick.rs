@@ -234,6 +234,16 @@ impl MagickWand {
         }
     }
 
+    /// Extract a region of the image. The width and height is used as the size
+    /// of the region. X and Y is the offset.
+    pub fn crop_image(&self, width: usize, height: usize, x: isize, y: isize) {
+        unsafe {
+            bindings::MagickCropImage(
+                self.wand, width as size_t, height as size_t, x as ssize_t, y as ssize_t,
+            );
+        }
+    }
+
     /// Resize the image to fit within the given dimensions, maintaining
     /// the current aspect ratio.
     pub fn fit(&self, width: size_t, height: size_t) {
