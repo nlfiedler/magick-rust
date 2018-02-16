@@ -249,7 +249,10 @@ fn test_color_reduction() {
     });
     let wand = MagickWand::new();
     assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
-    assert_eq!(38322, wand.get_image_colors());
+    // There is a slight degree of variability from platform to platform,
+    // and version to version of ImageMagick.
+    let image_colors = wand.get_image_colors();
+    assert!(image_colors > 38000 || image_colors < 40000);
 
     assert!(wand.quantize_image(6, ColorspaceType::RGBColorspace, 1,
                                 DitherMethod::UndefinedDitherMethod, false.to_magick()).is_ok());
