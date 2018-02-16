@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [0.8.0] - 2018-02-16
+### Changed
+- little-bobby-tables: add color-related getters and mutations
+- sindreij: Add crop_image to MagickWand
+
 ## [0.7.1] - 2017-12-30
 ### Changed
 - gentoo90: Hide more types from bindgen to fix the build for some systems
