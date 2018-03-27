@@ -307,8 +307,8 @@ impl MagickWand {
         let c_format = CString::new(format).unwrap();
         let mut length: size_t = 0;
         let blob = unsafe {
-            bindings::MagickSetImageFormat(self.wand, c_format.as_ptr());
             bindings::MagickResetIterator(self.wand);
+            bindings::MagickSetImageFormat(self.wand, c_format.as_ptr());
             bindings::MagickGetImageBlob(self.wand, &mut length)
         };
         let mut bytes = Vec::with_capacity(length as usize);
