@@ -133,13 +133,14 @@ macro_rules! set_get_unchecked {
 macro_rules! string_get {
     ($get:ident, $c_get:ident) => {
         pub fn $get(&self) -> Result<String, &'static str> {
-            // TODO: memory management
             let ptr = unsafe { ::bindings::$c_get(self.wand) };
             if ptr.is_null() {
                 Err(concat!("null ptr returned by ", stringify!($get)))
             } else {
                 let c_str = unsafe { ::std::ffi::CStr::from_ptr(ptr) };
-                Ok(c_str.to_string_lossy().into_owned())
+                let result: String = c_str.to_string_lossy().into_owned();
+                unsafe { ::bindings::free(ptr as *mut ::libc::c_void) };
+                Ok(result)
             }
         }
     }
