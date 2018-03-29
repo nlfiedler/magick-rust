@@ -236,11 +236,13 @@ impl MagickWand {
 
     /// Extract a region of the image. The width and height is used as the size
     /// of the region. X and Y is the offset.
-    pub fn crop_image(&self, width: usize, height: usize, x: isize, y: isize) {
-        unsafe {
-            bindings::MagickCropImage(
-                self.wand, width as size_t, height as size_t, x as ssize_t, y as ssize_t,
-            );
+    pub fn crop_image(&self, width: usize, height: usize, x: isize, y: isize) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickCropImage(self.wand, width, height, x, y)
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to crop image")
         }
     }
 
