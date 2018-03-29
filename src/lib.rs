@@ -37,7 +37,7 @@ mod conversions;
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 pub use wand::*;
-pub use bindings::{MetricType, FilterType, ColorspaceType, DitherMethod};
+pub use bindings::{MetricType, FilterType, ColorspaceType, DitherMethod, CompositeOperator, GravityType};
 pub use conversions::ToMagick;
 
 use libc::size_t;
