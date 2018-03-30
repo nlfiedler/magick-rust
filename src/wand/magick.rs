@@ -137,6 +137,83 @@ impl MagickWand {
         (distortion, wand)
     }
 
+    /// Compose another image onto self at (x, y) using composition_operator
+    pub fn compose_images(&self, reference: &MagickWand, composition_operator: bindings::CompositeOperator, clip_to_self: bool, x: isize, y: isize) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickCompositeImage(self.wand, reference.wand,
+                composition_operator, bindings::MagickBooleanType::from_rust(clip_to_self),
+                x, y
+            )
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to compose images")
+        }
+    }
+
+    /// Extend the image as defined by the geometry, gravity, and wand background color. Set the
+    /// (x,y) offset of the geometry to move the original wand relative to the extended wand.
+    pub fn extend_image(&self, width: usize, height: usize, x: isize, y: isize) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickExtentImage(self.wand, width, height, x, y)
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to extend image")
+        }
+    }
+
+    pub fn profile_image<'a, T: Into<Option<&'a [u8]>>>(&self, name: &str, profile: T) -> Result<(), &'static str> {
+        let c_name = CString::new(name).unwrap();
+        let result = unsafe {
+            let profile = profile.into();
+            let profile_ptr = match profile {
+                Some(data) => data.as_ptr(),
+                None => ptr::null()
+            } as *const c_void;
+            let profile_len = match profile {
+                Some(data) => data.len(),
+                None => 0
+            };
+            bindings::MagickProfileImage(self.wand, c_name.as_ptr(), profile_ptr, profile_len)
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to profile image")
+        }
+    }
+
+    pub fn flip_image(&self) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickFlipImage(self.wand)
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to flip image")
+        }
+    }
+
+    pub fn flop_image(&self) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickFlopImage(self.wand)
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to flip image")
+        }
+    }
+
+    /// Trim the image removing the backround color from the edges.
+    pub fn trim_image(&self, fuzz: f64) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickTrimImage(self.wand, fuzz)
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to trim image")
+        }
+    }
+
     /// Retrieve the width of the image.
     pub fn get_image_width(&self) -> usize {
         unsafe {
@@ -179,6 +256,20 @@ impl MagickWand {
         value
     }
 
+    /// Set the named image property.
+    pub fn set_image_property(&self, name: &str, value: &str) -> Result<(), &'static str> {
+        let c_name = CString::new(name).unwrap();
+        let c_value = CString::new(value).unwrap();
+        let result = unsafe {
+            bindings::MagickSetImageProperty(self.wand, c_name.as_ptr(), c_value.as_ptr())
+        };
+        if result == bindings::MagickBooleanType::MagickTrue {
+            Ok(())
+        } else {
+            Err("Setting image property failed.")
+        }
+    }
+
     /// Returns a `PixelWand` instance for the pixel specified by x and y offests.
     pub fn get_image_pixel_color(&self, x: isize, y: isize) -> Option<PixelWand> {
         let pw = PixelWand::new();
@@ -202,6 +293,52 @@ impl MagickWand {
                 .map(|ptrs| slice::from_raw_parts(ptrs, color_count)
                                 .iter().map(|raw_wand| PixelWand { wand: *raw_wand })
                                 .collect())
+        }
+    }
+
+    /// Returns the image resolution as a pair (horizontal resolution, vertical resolution)
+    pub fn get_image_resolution(&self) -> Result<(f64, f64), &'static str> {
+        let mut x_resolution = 0f64;
+        let mut y_resolution = 0f64;
+        unsafe {
+            if bindings::MagickGetImageResolution(self.wand, &mut x_resolution, &mut y_resolution) == bindings::MagickBooleanType::MagickTrue {
+                Ok((x_resolution, y_resolution))
+            } else {
+                Err("GetImageResolution returned false")
+            }
+        }
+    }
+
+    /// Sets the image resolution
+    pub fn set_image_resolution(&self, x_resolution: f64, y_resolution: f64) -> Result<(), &'static str> {
+        unsafe {
+            if bindings::MagickSetImageResolution(self.wand, x_resolution, y_resolution) == bindings::MagickBooleanType::MagickTrue {
+                Ok(())
+            } else {
+                Err("SetImageResolution returned false")
+            }
+        }
+    }
+
+    /// Sets the wand resolution
+    pub fn set_resolution(&self, x_resolution: f64, y_resolution: f64) -> Result<(), &'static str> {
+        unsafe {
+            if bindings::MagickSetResolution(self.wand, x_resolution, y_resolution) == bindings::MagickBooleanType::MagickTrue {
+                Ok(())
+            } else {
+                Err("SetResolution returned false")
+            }
+        }
+    }
+
+    /// Returns the image resolution as a pair (horizontal resolution, vertical resolution)
+    pub fn sepia_tone_image(&self, threshold: f64) -> Result<(), &'static str> {
+        unsafe {
+            if bindings::MagickSepiaToneImage(self.wand, threshold * bindings::QuantumRange) == bindings::MagickBooleanType::MagickTrue {
+                Ok(())
+            } else {
+                Err("SepiaToneImage returned false")
+            }
         }
     }
 
@@ -236,10 +373,23 @@ impl MagickWand {
 
     /// Extract a region of the image. The width and height is used as the size
     /// of the region. X and Y is the offset.
-    pub fn crop_image(&self, width: usize, height: usize, x: isize, y: isize) {
+    pub fn crop_image(&self, width: usize, height: usize, x: isize, y: isize) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickCropImage(self.wand, width, height, x, y)
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to crop image")
+        }
+    }
+
+    /// Resample the image to the specified horizontal and vertical resolution, using the
+    /// specified filter type.
+    pub fn resample_image(&self, x_resolution: f64, y_resolution: f64,
+                        filter: bindings::FilterType) {
         unsafe {
-            bindings::MagickCropImage(
-                self.wand, width as size_t, height as size_t, x as ssize_t, y as ssize_t,
+            bindings::MagickResampleImage(
+                self.wand, x_resolution, y_resolution, filter
             );
         }
     }
