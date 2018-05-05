@@ -5,10 +5,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [0.8.0] - 2018-02-16
+## [0.9.0] - 2018-05-05
+### Added
+- Mewp: Numerous additional MagickWand functions
 ### Changed
+- Mewp: crop_image() now returns a Result
+### Fixed
+- Mewp: Fixed memory management in `string_get!`
+- sindreij: Fix exporting pdf->jpeg for multi-page pdf
+
+## [0.8.0] - 2018-02-16
+### Added
 - little-bobby-tables: add color-related getters and mutations
-- sindreij: Add crop_image to MagickWand
+- sindreij: Add crop_image() to MagickWand
 
 ## [0.7.1] - 2017-12-30
 ### Changed
