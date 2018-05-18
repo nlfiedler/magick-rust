@@ -538,6 +538,10 @@ impl MagickWand {
         MagickTransformImageColorspace => transform_image_colorspace(
             colorspace: bindings::ColorspaceType)
 
+        /// Set the image alpha channel mode.
+        MagickSetImageAlphaChannel => set_image_alpha_channel(
+            alpha_channel: bindings::AlphaChannelOption)
+
         /// Reduce the number of colors in the image.
         MagickQuantizeImage => quantize_image(
             number_of_colors: size_t, colorspace: bindings::ColorspaceType,
