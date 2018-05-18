@@ -265,6 +265,19 @@ impl MagickWand {
         (width, height, x, y)
     }
 
+    /// Reset the Wand page canvas and position.
+    pub fn reset_image_page(&self, page_geometry: &str) -> Result<(), &'static str> {
+        let c_page_geometry = CString::new(page_geometry).unwrap();
+        let result = unsafe {
+            bindings::MagickResetImagePage(self.wand, c_page_geometry.as_ptr())
+        };
+        if result == bindings::MagickBooleanType::MagickTrue {
+            Ok(())
+        } else {
+            Err("Resetting page geometry failed.")
+        }
+    }
+
     /// Retrieve the named image property value.
     pub fn get_image_property(&self, name: &str) -> Result<String, &'static str> {
         let c_name = CString::new(name).unwrap();
