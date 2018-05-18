@@ -108,9 +108,9 @@ impl MagickWand {
     }
 
     /// Read the image data from the vector of bytes.
-    pub fn read_image_blob(&self, data: &Vec<u8>) -> Result<(), &'static str> {
-        let int_slice = &data[..];
-        let size = data.len();
+    pub fn read_image_blob<T: AsRef<[u8]>>(&self, data: T) -> Result<(), &'static str> {
+        let int_slice = data.as_ref();
+        let size = int_slice.len();
         let result = unsafe {
             bindings::MagickReadImageBlob(
                 self.wand, int_slice.as_ptr() as *const c_void, size as size_t)
@@ -118,6 +118,34 @@ impl MagickWand {
         match result {
             bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to read image")
+        }
+    }
+
+    /// Same as read_image, but reads only the width, height, size and format of an image,
+    /// without reading data.
+    pub fn ping_image(&self, path: &str) -> Result<(), &'static str> {
+        let c_name = CString::new(path).unwrap();
+        let result = unsafe {
+            bindings::MagickPingImage(self.wand, c_name.as_ptr())
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to ping image")
+        }
+    }
+
+    /// Same as read_image, but reads only the width, height, size and format of an image,
+    /// without reading data.
+    pub fn ping_image_blob<T: AsRef<[u8]>>(&self, data: T) -> Result<(), &'static str> {
+        let int_slice = data.as_ref();
+        let size = int_slice.len();
+        let result = unsafe {
+            bindings::MagickPingImageBlob(
+                self.wand, int_slice.as_ptr() as *const c_void, size as size_t)
+        };
+        match result {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to ping image")
         }
     }
 
