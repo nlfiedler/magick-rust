@@ -66,6 +66,14 @@ impl MagickWand {
         }
     }
 
+    /// Add all images from another wand to this wand at the current index.
+    pub fn add_image(&mut self, other_wand: &MagickWand) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickAddImage(self.wand, other_wand.wand) } {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("unable to add images from another wand")
+        }
+    }
+
     pub fn append_all(&mut self, stack: bool) -> MagickWand {
         unsafe { bindings::MagickResetIterator(self.wand) };
         MagickWand {
@@ -228,6 +236,15 @@ impl MagickWand {
         match result {
             bindings::MagickBooleanType::MagickTrue => Ok(()),
             _ => Err("failed to flip image")
+        }
+    }
+
+    /// Rotate the currently selected image by the given number of degrees,
+    /// filling any empty space with the background color of a given PixelWand
+    pub fn rotate_image(&self, background: &PixelWand, degrees: f64) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickRotateImage(self.wand, background.wand, degrees) } {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("failed to rotate image")
         }
     }
 
