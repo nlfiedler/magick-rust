@@ -66,6 +66,13 @@ impl MagickWand {
         }
     }
 
+    pub fn add_image(&mut self, other_wand: &MagickWand) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickAddImage(self.wand, other_wand.wand) } {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("unable to add images from another wand")
+        }
+    }
+
     pub fn append_all(&mut self, stack: bool) -> MagickWand {
         unsafe { bindings::MagickResetIterator(self.wand) };
         MagickWand {
