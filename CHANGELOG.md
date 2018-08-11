@@ -5,6 +5,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [0.10.0] - 2018-08-11
+### Added
+- Mewp: Add ping_image and ping_image_blob functions.
+- Mewp: Add reset_image_page function.
+- Mewp: Add set_image_alpha_channel function.
+- NQNStudios: Adding binding for MagickAddImage function.
+- NQNStudios: Adding doc comment and rotate_image function.
+- NQNStudios: Adding binding for adaptive_resize_image function.
+
 ## [0.9.0] - 2018-05-05
 ### Added
 - Mewp: Numerous additional MagickWand functions
