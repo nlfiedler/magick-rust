@@ -362,6 +362,25 @@ impl MagickWand {
         }
     }
 
+    /// Sharpens an image. We convolve the image with a Gaussian operator of the
+    /// given radius and standard deviation (sigma). For reasonable results, the
+    /// radius should be larger than sigma. Use a radius of 0 and SharpenImage()
+    /// selects a suitable radius for you.
+    ///
+    /// radius: the radius of the Gaussian, in pixels, not counting the center pixel.
+    ///
+    /// sigma: the standard deviation of the Gaussian, in pixels.
+    ///
+    pub fn sharpen_image(&self, radius: f64, sigma: f64) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickSharpenImage(self.wand, radius, sigma) } {
+		
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+		
+            _ => Err("SharpenImage returned false")
+		
+        }
+    }
+
     /// Returns the image resolution as a pair (horizontal resolution, vertical resolution)
     pub fn get_image_resolution(&self) -> Result<(f64, f64), &'static str> {
         let mut x_resolution = 0f64;
