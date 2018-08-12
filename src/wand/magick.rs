@@ -381,6 +381,19 @@ impl MagickWand {
         }
     }
 
+    /// Set the image background color.
+    pub fn set_image_background_color(&self, pixel_wand: &PixelWand) -> Result<(), &'static str> {
+		
+        match unsafe { bindings::MagickSetImageBackgroundColor(self.wand, pixel_wand.wand) } {
+		
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+		
+            _ => Err("SetImageBackgroundColor returned false")
+		
+        }
+		
+    }
+
     /// Returns the image resolution as a pair (horizontal resolution, vertical resolution)
     pub fn get_image_resolution(&self) -> Result<(f64, f64), &'static str> {
         let mut x_resolution = 0f64;
