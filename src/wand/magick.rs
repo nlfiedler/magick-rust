@@ -349,6 +349,16 @@ impl MagickWand {
         }
     }
 
+    /// Sets the image sampling factors.
+    ///
+    /// samplingFactors: An array of floats representing the sampling factor for each color component (in RGB order).
+    pub fn set_sampling_factors(&self, samplingFactors: &[f64]) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickSetSamplingFactors(self.wand, samplingFactors.len(), &samplingFactors[0]) } {
+            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            _ => Err("SetSamplingFactors returned false")
+        }
+    }
+
     /// Returns the image histogram as a vector of `PixelWand` instances for every unique color.
     pub fn get_image_histogram(&self) -> Option<Vec<PixelWand>> {
         let mut color_count: size_t = 0;
