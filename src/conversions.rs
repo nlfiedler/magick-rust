@@ -33,7 +33,10 @@ pub trait ToMagick<T> {
     fn to_magick(self) -> T;
 }
 
-impl<T, E> ToMagick<T> for E where T: FromRust<E> {
+impl<T, E> ToMagick<T> for E
+where
+    T: FromRust<E>,
+{
     fn to_magick(self) -> T {
         <T as FromRust<E>>::from_rust(self)
     }

@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use std::fmt;
-use std::ffi::{CStr, CString};
-use ::bindings;
+use bindings;
 #[cfg(target_os = "freebsd")]
 use libc::size_t;
 #[cfg(not(target_os = "freebsd"))]
-use ::size_t;
+use size_t;
+use std::ffi::{CStr, CString};
+use std::fmt;
 
 wand_common!(
     DrawingWand,
-    NewDrawingWand, ClearDrawingWand, IsDrawingWand, CloneDrawingWand, DestroyDrawingWand,
-    DrawClearException, DrawGetExceptionType, DrawGetException
+    NewDrawingWand,
+    ClearDrawingWand,
+    IsDrawingWand,
+    CloneDrawingWand,
+    DestroyDrawingWand,
+    DrawClearException,
+    DrawGetExceptionType,
+    DrawGetException
 );
 
 impl DrawingWand {
@@ -42,7 +48,10 @@ impl DrawingWand {
     );
 
     string_set_get_unchecked!(
-        get_text_encoding,          set_text_encoding,            DrawGetTextEncoding,          DrawSetTextEncoding
+        get_text_encoding,
+        set_text_encoding,
+        DrawGetTextEncoding,
+        DrawSetTextEncoding
     );
 
     pixel_set_get!(

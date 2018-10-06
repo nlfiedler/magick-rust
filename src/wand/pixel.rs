@@ -13,53 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use std::fmt;
-use std::ffi::{CStr, CString};
-use ::bindings;
+use bindings;
 #[cfg(target_os = "freebsd")]
 use libc::size_t;
 #[cfg(not(target_os = "freebsd"))]
-use ::size_t;
+use size_t;
+use std::ffi::{CStr, CString};
+use std::fmt;
 
 #[derive(Default, Debug)]
 pub struct HSL {
     pub hue: f64,
     pub saturation: f64,
-    pub lightness: f64
+    pub lightness: f64,
 }
 
 wand_common!(
     PixelWand,
-    NewPixelWand, ClearPixelWand, IsPixelWand, ClonePixelWand, DestroyPixelWand,
-    PixelClearException, PixelGetExceptionType, PixelGetException
+    NewPixelWand,
+    ClearPixelWand,
+    IsPixelWand,
+    ClonePixelWand,
+    DestroyPixelWand,
+    PixelClearException,
+    PixelGetExceptionType,
+    PixelGetException
 );
 
 impl PixelWand {
     pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> Result<(), &'static str> {
         match unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
-            _ => Err("not similar")
+            _ => Err("not similar"),
         }
     }
 
     pub fn get_hsl(&self) -> HSL {
         let mut hsl = HSL::default();
-        unsafe { bindings::PixelGetHSL(
-            self.wand,
-            &mut hsl.hue as *mut _,
-            &mut hsl.saturation as *mut _,
-            &mut hsl.lightness as *mut _
-        );}
+        unsafe {
+            bindings::PixelGetHSL(
+                self.wand,
+                &mut hsl.hue as *mut _,
+                &mut hsl.saturation as *mut _,
+                &mut hsl.lightness as *mut _,
+            );
+        }
         hsl
     }
 
     pub fn set_hsl(&self, hsl: &HSL) {
-        unsafe { bindings::PixelSetHSL(
-            self.wand,
-            hsl.hue,
-            hsl.saturation,
-            hsl.lightness
-        );}
+        unsafe {
+            bindings::PixelSetHSL(self.wand, hsl.hue, hsl.saturation, hsl.lightness);
+        }
     }
 
     pub fn fmt_w_prefix(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
@@ -75,14 +80,17 @@ impl PixelWand {
 
     pub fn set_color(&mut self, s: &str) -> Result<(), &'static str> {
         let c_string = try!(CString::new(s).map_err(|_| "could not convert to cstring"));
-        match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr())} {
+        match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr()) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
-            _ => Err("failed to set color")
+            _ => Err("failed to set color"),
         }
     }
 
     string_get!(get_color_as_string, PixelGetColorAsString);
-    string_get!(get_color_as_normalized_string, PixelGetColorAsNormalizedString);
+    string_get!(
+        get_color_as_normalized_string,
+        PixelGetColorAsNormalizedString
+    );
 
     set_get_unchecked!(
         get_color_count, set_color_count, PixelGetColorCount, PixelSetColorCount,   size_t

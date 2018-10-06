@@ -19,13 +19,13 @@ macro_rules! wand_common {
         $clear_exc:ident, $get_exc_type:ident, $get_exc:ident
     ) => {
         pub struct $wand {
-            pub wand: *mut ::bindings::$wand
+            pub wand: *mut ::bindings::$wand,
         }
 
         impl $wand {
             pub fn new() -> Self {
                 $wand {
-                    wand: unsafe { ::bindings::$new_wand() }
+                    wand: unsafe { ::bindings::$new_wand() },
                 }
             }
 
@@ -36,7 +36,7 @@ macro_rules! wand_common {
             fn clear_exception(&mut self) -> Result<(), &'static str> {
                 match unsafe { ::bindings::$clear_exc(self.wand) } {
                     ::bindings::MagickBooleanType_MagickTrue => Ok(()),
-                    _ => Err(concat!("failed to clear", stringify!($wand), "exception"))
+                    _ => Err(concat!("failed to clear", stringify!($wand), "exception")),
                 }
             }
 
@@ -45,11 +45,16 @@ macro_rules! wand_common {
             }
 
             fn get_exception(&self) -> Result<(String, ::bindings::ExceptionType), &'static str> {
-                let mut severity: ::bindings::ExceptionType = ::bindings::ExceptionType_UndefinedException;
+                let mut severity: ::bindings::ExceptionType =
+                    ::bindings::ExceptionType_UndefinedException;
                 // TODO: memory management
                 let ptr = unsafe { ::bindings::$get_exc(self.wand, &mut severity as *mut _) };
                 if ptr.is_null() {
-                    Err(concat!("null ptr returned by", stringify!($wand), "get_exception"))
+                    Err(concat!(
+                        "null ptr returned by",
+                        stringify!($wand),
+                        "get_exception"
+                    ))
                 } else {
                     let c_str = unsafe { CStr::from_ptr(ptr) };
                     Ok((c_str.to_string_lossy().into_owned(), severity))
@@ -59,7 +64,7 @@ macro_rules! wand_common {
             pub fn is_wand(&self) -> Result<(), &'static str> {
                 match unsafe { ::bindings::$is_wand(self.wand) } {
                     ::bindings::MagickBooleanType_MagickTrue => Ok(()),
-                    _ => Err(concat!(stringify!($wand), " not a wand"))
+                    _ => Err(concat!(stringify!($wand), " not a wand")),
                 }
             }
         }
@@ -67,7 +72,7 @@ macro_rules! wand_common {
         impl Clone for $wand {
             fn clone(&self) -> Self {
                 $wand {
-                    wand: unsafe { ::bindings::$clone(self.wand) }
+                    wand: unsafe { ::bindings::$clone(self.wand) },
                 }
             }
         }
@@ -80,7 +85,7 @@ macro_rules! wand_common {
                 }
             }
         }
-    }
+    };
 }
 
 macro_rules! get {
@@ -165,7 +170,6 @@ macro_rules! string_set_get {
     }
 }
 
-
 macro_rules! string_set_get_unchecked {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident )*) => {
         $(
@@ -182,7 +186,6 @@ macro_rules! string_set_get_unchecked {
         }
     }
 }
-
 
 macro_rules! pixel_set_get {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident )*) => {

@@ -32,7 +32,10 @@ fn main() {
     if cfg!(target_os = "freebsd") {
         // pkg_config does not seem to work properly on FreeBSD, so
         // hard-code the builder settings for the time being.
-        env_var_set_default("IMAGE_MAGICK_INCLUDE_DIRS", "/usr/local/include/ImageMagick-7");
+        env_var_set_default(
+            "IMAGE_MAGICK_INCLUDE_DIRS",
+            "/usr/local/include/ImageMagick-7",
+        );
         // Need to hack the linker flags as well.
         env_var_set_default("IMAGE_MAGICK_LIB_DIRS", "/usr/local/lib");
         env_var_set_default("IMAGE_MAGICK_LIBS", "MagickWand-7");
@@ -41,14 +44,20 @@ fn main() {
     let lib_dirs = find_image_magick_lib_dirs();
     for d in &lib_dirs {
         if !d.exists() {
-            panic!("ImageMagick library directory does not exist: {}", d.to_string_lossy());
+            panic!(
+                "ImageMagick library directory does not exist: {}",
+                d.to_string_lossy()
+            );
         }
-        println!( "cargo:rustc-link-search=native={}", d.to_string_lossy());
+        println!("cargo:rustc-link-search=native={}", d.to_string_lossy());
     }
     let include_dirs = find_image_magick_include_dirs();
     for d in &include_dirs {
         if !d.exists() {
-            panic!("ImageMagick include directory does not exist: {}", d.to_string_lossy());
+            panic!(
+                "ImageMagick include directory does not exist: {}",
+                d.to_string_lossy()
+            );
         }
         println!("cargo:include={}", d.to_string_lossy());
     }
@@ -82,7 +91,9 @@ fn main() {
         // Create the header file that rust-bindgen needs as input.
         let gen_h_path = out_dir.join("gen.h");
         let mut gen_h = File::create(&gen_h_path).expect("could not create file");
-        gen_h.write_all(HEADER.as_bytes()).expect("could not write header file");
+        gen_h
+            .write_all(HEADER.as_bytes())
+            .expect("could not write header file");
 
         // Geneate the bindings.
         let mut builder = bindgen::Builder::default()
@@ -130,9 +141,7 @@ fn find_image_magick_lib_dirs() -> Vec<PathBuf> {
     env::var("IMAGE_MAGICK_LIB_DIRS")
         .map(|x| x.split(":").map(PathBuf::from).collect::<Vec<PathBuf>>())
         .or_else(|_| Ok(vec![find_image_magick_dir()?.join("lib")]))
-        .or_else(|_: env::VarError| -> Result<_, env::VarError> {
-            Ok(run_pkg_config().link_paths)
-        })
+        .or_else(|_: env::VarError| -> Result<_, env::VarError> { Ok(run_pkg_config().link_paths) })
         .expect("Couldn't find ImageMagick library directory")
 }
 
@@ -142,15 +151,13 @@ fn find_image_magick_include_dirs() -> Vec<PathBuf> {
         .map(|x| x.split(":").map(PathBuf::from).collect::<Vec<PathBuf>>())
         .or_else(|_| Ok(vec![find_image_magick_dir()?.join("include")]))
         .or_else(|_: env::VarError| -> Result<_, env::VarError> {
-             Ok(run_pkg_config().include_paths)
-        })
-        .expect("Couldn't find ImageMagick include directory")
+            Ok(run_pkg_config().include_paths)
+        }).expect("Couldn't find ImageMagick include directory")
 }
 
 fn find_image_magick_dir() -> Result<PathBuf, env::VarError> {
     println!("cargo:rerun-if-env-changed=IMAGE_MAGICK_DIR");
-    env::var("IMAGE_MAGICK_DIR")
-        .map(PathBuf::from)
+    env::var("IMAGE_MAGICK_DIR").map(PathBuf::from)
 }
 
 fn determine_mode<T: AsRef<str>>(libdirs: &Vec<PathBuf>, libs: &[T]) -> &'static str {
@@ -164,19 +171,21 @@ fn determine_mode<T: AsRef<str>>(libdirs: &Vec<PathBuf>, libs: &[T]) -> &'static
 
     // See what files we actually have to link against, and see what our
     // possibilities even are.
-    let files = libdirs.into_iter().flat_map(|d| d.read_dir().unwrap())
+    let files = libdirs
+        .into_iter()
+        .flat_map(|d| d.read_dir().unwrap())
         .map(|e| e.unwrap())
         .map(|e| e.file_name())
         .filter_map(|e| e.into_string().ok())
         .collect::<HashSet<_>>();
     let can_static = libs.iter().all(|l| {
-        files.contains(&format!("lib{}.a", l.as_ref())) ||
-            files.contains(&format!("{}.lib", l.as_ref()))
+        files.contains(&format!("lib{}.a", l.as_ref()))
+            || files.contains(&format!("{}.lib", l.as_ref()))
     });
     let can_dylib = libs.iter().all(|l| {
-        files.contains(&format!("lib{}.so", l.as_ref())) ||
-            files.contains(&format!("{}.dll", l.as_ref())) ||
-            files.contains(&format!("lib{}.dylib", l.as_ref()))
+        files.contains(&format!("lib{}.so", l.as_ref()))
+            || files.contains(&format!("{}.dll", l.as_ref()))
+            || files.contains(&format!("lib{}.dylib", l.as_ref()))
     });
 
     match (can_static, can_dylib) {
@@ -185,7 +194,7 @@ fn determine_mode<T: AsRef<str>>(libdirs: &Vec<PathBuf>, libs: &[T]) -> &'static
         (false, false) => {
             panic!(
                 "ImageMagick libdirs at `{:?}` do not contain the required files \
-                    to either statically or dynamically link ImageMagick",
+                 to either statically or dynamically link ImageMagick",
                 libdirs
             );
         }
@@ -209,14 +218,21 @@ fn run_pkg_config() -> pkg_config::Library {
     // pkg-config crate always adds those other flags, we must run the
     // command directly.
     if !Command::new("pkg-config")
-                .arg(format!("--max-version={}", MAX_VERSION))
-                .arg("MagickWand")
-                .status().unwrap().success() {
-        panic!(format!("MagickWand version must be no higher than {}", MAX_VERSION));
+        .arg(format!("--max-version={}", MAX_VERSION))
+        .arg("MagickWand")
+        .status()
+        .unwrap()
+        .success()
+    {
+        panic!(format!(
+            "MagickWand version must be no higher than {}",
+            MAX_VERSION
+        ));
     }
     // We have to split the version check and the cflags/libs check because
     // you can't do both at the same time on RHEL (apparently).
     pkg_config::Config::new()
         .cargo_metadata(false)
-        .probe("MagickWand").unwrap()
+        .probe("MagickWand")
+        .unwrap()
 }

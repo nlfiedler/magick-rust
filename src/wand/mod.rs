@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#[macro_use] mod macros;
-mod magick;
+#[macro_use]
+mod macros;
 mod drawing;
+mod magick;
 mod pixel;
 
-pub use self::magick::MagickWand;
 pub use self::drawing::DrawingWand;
-pub use self::pixel::{HSL, PixelWand};
+pub use self::magick::MagickWand;
+pub use self::pixel::{PixelWand, HSL};

@@ -28,17 +28,19 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-#![allow(improper_ctypes)]  // the siginfo_t in waitid() definition in bindings.rs
+#![allow(improper_ctypes)] // the siginfo_t in waitid() definition in bindings.rs
 
 extern crate libc;
 
-mod wand;
 mod conversions;
+mod wand;
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-pub use wand::*;
-pub use bindings::{MetricType, FilterType, ColorspaceType, DitherMethod, CompositeOperator, GravityType};
+pub use bindings::{
+    ColorspaceType, CompositeOperator, DitherMethod, FilterType, GravityType, MetricType,
+};
 pub use conversions::ToMagick;
+pub use wand::*;
 
 use libc::size_t;
 #[cfg(not(target_os = "freebsd"))]
@@ -50,7 +52,7 @@ pub fn magick_wand_genesis() {
     unsafe {
         match bindings::IsMagickWandInstantiated() {
             bindings::MagickBooleanType_MagickTrue => (),
-            _ => bindings::MagickWandGenesis()
+            _ => bindings::MagickWandGenesis(),
         }
     }
 }
@@ -61,15 +63,17 @@ pub fn magick_wand_terminus() {
     unsafe {
         match bindings::IsMagickWandInstantiated() {
             bindings::MagickBooleanType_MagickTrue => bindings::MagickWandTerminus(),
-            _ => ()
+            _ => (),
         }
     }
 }
 
 pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>, &'static str> {
     let mut number_fonts: size_t = 0;
-    let c_string = try!(::std::ffi::CString::new(pattern).map_err(|_| "could not convert to cstring"));
-    let ptr = unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut size_t) };
+    let c_string =
+        try!(::std::ffi::CString::new(pattern).map_err(|_| "could not convert to cstring"));
+    let ptr =
+        unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut size_t) };
     if ptr.is_null() {
         Err("null ptr returned by magick_query_fonts")
     } else {
@@ -81,5 +85,4 @@ pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>, &'static str> {
         }
         Ok(v)
     }
-
 }
