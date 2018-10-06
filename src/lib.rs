@@ -49,7 +49,7 @@ use libc::ssize_t;
 pub fn magick_wand_genesis() {
     unsafe {
         match bindings::IsMagickWandInstantiated() {
-            bindings::MagickBooleanType::MagickTrue => (),
+            bindings::MagickBooleanType_MagickTrue => (),
             _ => bindings::MagickWandGenesis()
         }
     }
@@ -60,7 +60,7 @@ pub fn magick_wand_genesis() {
 pub fn magick_wand_terminus() {
     unsafe {
         match bindings::IsMagickWandInstantiated() {
-            bindings::MagickBooleanType::MagickTrue => bindings::MagickWandTerminus(),
+            bindings::MagickBooleanType_MagickTrue => bindings::MagickWandTerminus(),
             _ => ()
         }
     }

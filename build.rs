@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2017 Nathan Fiedler
+ * Copyright 2016-2018 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,16 +91,16 @@ fn main() {
             .raw_line("extern crate libc;")
             .header(gen_h_path.to_str().unwrap())
             // https://github.com/rust-lang-nursery/rust-bindgen/issues/687
-            .hide_type("FP_NAN")
-            .hide_type("FP_INFINITE")
-            .hide_type("FP_ZERO")
-            .hide_type("FP_SUBNORMAL")
-            .hide_type("FP_NORMAL")
-            .hide_type("FP_INT_UPWARD")
-            .hide_type("FP_INT_DOWNWARD")
-            .hide_type("FP_INT_TOWARDZERO")
-            .hide_type("FP_INT_TONEARESTFROMZERO")
-            .hide_type("FP_INT_TONEAREST");
+            .blacklist_type("FP_NAN")
+            .blacklist_type("FP_INFINITE")
+            .blacklist_type("FP_ZERO")
+            .blacklist_type("FP_SUBNORMAL")
+            .blacklist_type("FP_NORMAL")
+            .blacklist_type("FP_INT_UPWARD")
+            .blacklist_type("FP_INT_DOWNWARD")
+            .blacklist_type("FP_INT_TOWARDZERO")
+            .blacklist_type("FP_INT_TONEARESTFROMZERO")
+            .blacklist_type("FP_INT_TONEAREST");
 
         for d in include_dirs {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));

@@ -41,7 +41,7 @@ impl MagickWand {
 
     pub fn new_image(&self, columns: size_t, rows: size_t, pixel_wand: &PixelWand) -> Result<(), &'static str> {
         match unsafe { bindings::MagickNewImage(self.wand, columns, rows, pixel_wand.wand) } {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("Could not create image"),
         }
     }
@@ -53,7 +53,7 @@ impl MagickWand {
             bindings::MagickSetOption(self.wand, c_key.as_ptr(), c_value.as_ptr())
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to set option"),
         }
     }
@@ -61,7 +61,7 @@ impl MagickWand {
     pub fn annotate_image(&mut self, drawing_wand: &DrawingWand, x: f64, y: f64, angle: f64, text: &str) -> Result<(), &'static str> {
         let c_string = try!(CString::new(text).map_err(|_| "could not convert to cstring"));
         match unsafe { bindings::MagickAnnotateImage(self.wand, drawing_wand.wand, x, y, angle, c_string.as_ptr() as *const _) } {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("unable to annotate image")
         }
     }
@@ -69,7 +69,7 @@ impl MagickWand {
     /// Add all images from another wand to this wand at the current index.
     pub fn add_image(&mut self, other_wand: &MagickWand) -> Result<(), &'static str> {
         match unsafe { bindings::MagickAddImage(self.wand, other_wand.wand) } {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("unable to add images from another wand")
         }
     }
@@ -87,7 +87,7 @@ impl MagickWand {
             bindings::MagickLabelImage(self.wand, c_label.as_ptr())
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to add label")
         }
     }
@@ -98,7 +98,7 @@ impl MagickWand {
             bindings::MagickWriteImages(self.wand, c_name.as_ptr(), adjoin.to_magick())
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to write images")
         }
     }
@@ -110,7 +110,7 @@ impl MagickWand {
             bindings::MagickReadImage(self.wand, c_name.as_ptr())
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to read image")
         }
     }
@@ -124,7 +124,7 @@ impl MagickWand {
                 self.wand, int_slice.as_ptr() as *const c_void, size as size_t)
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to read image")
         }
     }
@@ -137,7 +137,7 @@ impl MagickWand {
             bindings::MagickPingImage(self.wand, c_name.as_ptr())
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to ping image")
         }
     }
@@ -152,7 +152,7 @@ impl MagickWand {
                 self.wand, int_slice.as_ptr() as *const c_void, size as size_t)
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to ping image")
         }
     }
@@ -175,14 +175,18 @@ impl MagickWand {
 
     /// Compose another image onto self at (x, y) using composition_operator
     pub fn compose_images(&self, reference: &MagickWand, composition_operator: bindings::CompositeOperator, clip_to_self: bool, x: isize, y: isize) -> Result<(), &'static str> {
+        let native_clip_to_self = if clip_to_self {
+            bindings::MagickBooleanType_MagickTrue
+        } else {
+            bindings::MagickBooleanType_MagickFalse
+        };
         let result = unsafe {
             bindings::MagickCompositeImage(self.wand, reference.wand,
-                composition_operator, bindings::MagickBooleanType::from_rust(clip_to_self),
-                x, y
+                composition_operator, native_clip_to_self, x, y
             )
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to compose images")
         }
     }
@@ -194,7 +198,7 @@ impl MagickWand {
             bindings::MagickExtentImage(self.wand, width, height, x, y)
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to extend image")
         }
     }
@@ -214,7 +218,7 @@ impl MagickWand {
             bindings::MagickProfileImage(self.wand, c_name.as_ptr(), profile_ptr, profile_len)
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to profile image")
         }
     }
@@ -224,7 +228,7 @@ impl MagickWand {
             bindings::MagickFlipImage(self.wand)
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to flip image")
         }
     }
@@ -234,7 +238,7 @@ impl MagickWand {
             bindings::MagickFlopImage(self.wand)
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to flip image")
         }
     }
@@ -242,7 +246,7 @@ impl MagickWand {
     /// Adaptively resize the currently selected image.
     pub fn adaptive_resize_image(&self, width: usize, height: usize) -> Result<(), &'static str> {
         match unsafe { bindings::MagickAdaptiveResizeImage(self.wand, width, height)} {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to adaptive-resize image")
         }
     }
@@ -251,7 +255,7 @@ impl MagickWand {
     /// filling any empty space with the background color of a given PixelWand
     pub fn rotate_image(&self, background: &PixelWand, degrees: f64) -> Result<(), &'static str> {
         match unsafe { bindings::MagickRotateImage(self.wand, background.wand, degrees) } {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to rotate image")
         }
     }
@@ -262,7 +266,7 @@ impl MagickWand {
             bindings::MagickTrimImage(self.wand, fuzz)
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to trim image")
         }
     }
@@ -296,7 +300,7 @@ impl MagickWand {
         let result = unsafe {
             bindings::MagickResetImagePage(self.wand, c_page_geometry.as_ptr())
         };
-        if result == bindings::MagickBooleanType::MagickTrue {
+        if result == bindings::MagickBooleanType_MagickTrue {
             Ok(())
         } else {
             Err("Resetting page geometry failed.")
@@ -329,7 +333,7 @@ impl MagickWand {
         let result = unsafe {
             bindings::MagickSetImageProperty(self.wand, c_name.as_ptr(), c_value.as_ptr())
         };
-        if result == bindings::MagickBooleanType::MagickTrue {
+        if result == bindings::MagickBooleanType_MagickTrue {
             Ok(())
         } else {
             Err("Setting image property failed.")
@@ -341,7 +345,7 @@ impl MagickWand {
         let pw = PixelWand::new();
 
         unsafe {
-            if bindings::MagickGetImagePixelColor(self.wand, x, y, pw.wand) == bindings::MagickBooleanType::MagickTrue {
+            if bindings::MagickGetImagePixelColor(self.wand, x, y, pw.wand) == bindings::MagickBooleanType_MagickTrue {
                 Some(pw)
             } else {
                 None
@@ -354,7 +358,7 @@ impl MagickWand {
     /// samplingFactors: An array of floats representing the sampling factor for each color component (in RGB order).
     pub fn set_sampling_factors(&self, samplingFactors: &[f64]) -> Result<(), &'static str> {
         match unsafe { bindings::MagickSetSamplingFactors(self.wand, samplingFactors.len(), &samplingFactors[0]) } {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("SetSamplingFactors returned false")
         }
     }
@@ -384,7 +388,7 @@ impl MagickWand {
     pub fn sharpen_image(&self, radius: f64, sigma: f64) -> Result<(), &'static str> {
         match unsafe { bindings::MagickSharpenImage(self.wand, radius, sigma) } {
 		
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
 		
             _ => Err("SharpenImage returned false")
 		
@@ -396,7 +400,7 @@ impl MagickWand {
 		
         match unsafe { bindings::MagickSetImageBackgroundColor(self.wand, pixel_wand.wand) } {
 		
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
 		
             _ => Err("SetImageBackgroundColor returned false")
 		
@@ -409,7 +413,7 @@ impl MagickWand {
         let mut x_resolution = 0f64;
         let mut y_resolution = 0f64;
         unsafe {
-            if bindings::MagickGetImageResolution(self.wand, &mut x_resolution, &mut y_resolution) == bindings::MagickBooleanType::MagickTrue {
+            if bindings::MagickGetImageResolution(self.wand, &mut x_resolution, &mut y_resolution) == bindings::MagickBooleanType_MagickTrue {
                 Ok((x_resolution, y_resolution))
             } else {
                 Err("GetImageResolution returned false")
@@ -420,7 +424,7 @@ impl MagickWand {
     /// Sets the image resolution
     pub fn set_image_resolution(&self, x_resolution: f64, y_resolution: f64) -> Result<(), &'static str> {
         unsafe {
-            if bindings::MagickSetImageResolution(self.wand, x_resolution, y_resolution) == bindings::MagickBooleanType::MagickTrue {
+            if bindings::MagickSetImageResolution(self.wand, x_resolution, y_resolution) == bindings::MagickBooleanType_MagickTrue {
                 Ok(())
             } else {
                 Err("SetImageResolution returned false")
@@ -431,7 +435,7 @@ impl MagickWand {
     /// Sets the wand resolution
     pub fn set_resolution(&self, x_resolution: f64, y_resolution: f64) -> Result<(), &'static str> {
         unsafe {
-            if bindings::MagickSetResolution(self.wand, x_resolution, y_resolution) == bindings::MagickBooleanType::MagickTrue {
+            if bindings::MagickSetResolution(self.wand, x_resolution, y_resolution) == bindings::MagickBooleanType_MagickTrue {
                 Ok(())
             } else {
                 Err("SetResolution returned false")
@@ -442,7 +446,7 @@ impl MagickWand {
     /// Returns the image resolution as a pair (horizontal resolution, vertical resolution)
     pub fn sepia_tone_image(&self, threshold: f64) -> Result<(), &'static str> {
         unsafe {
-            if bindings::MagickSepiaToneImage(self.wand, threshold * bindings::QuantumRange) == bindings::MagickBooleanType::MagickTrue {
+            if bindings::MagickSepiaToneImage(self.wand, threshold * bindings::QuantumRange) == bindings::MagickBooleanType_MagickTrue {
                 Ok(())
             } else {
                 Err("SepiaToneImage returned false")
@@ -460,7 +464,7 @@ impl MagickWand {
         unsafe {
             pixels.set_len(capacity as usize);
             if bindings::MagickExportImagePixels(self.wand, x, y, width, height, c_map.as_ptr(),
-                bindings::StorageType::CharPixel, pixels.as_mut_ptr() as *mut c_void) == bindings::MagickBooleanType::MagickTrue {
+                bindings::StorageType_CharPixel, pixels.as_mut_ptr() as *mut c_void) == bindings::MagickBooleanType_MagickTrue {
                 Some(pixels)
             } else {
                 None
@@ -486,7 +490,7 @@ impl MagickWand {
             bindings::MagickCropImage(self.wand, width, height, x, y)
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to crop image")
         }
     }
@@ -520,9 +524,9 @@ impl MagickWand {
         }
         unsafe {
             bindings::MagickResetIterator(self.wand);
-            while bindings::MagickNextImage(self.wand) != bindings::MagickBooleanType::MagickFalse {
+            while bindings::MagickNextImage(self.wand) != bindings::MagickBooleanType_MagickFalse {
                 bindings::MagickResizeImage(self.wand, new_width, new_height,
-                                            bindings::FilterType::LanczosFilter);
+                                            bindings::FilterType_LanczosFilter);
             }
         }
     }
@@ -531,7 +535,7 @@ impl MagickWand {
     /// hence should be "auto" oriented so it is suitable for viewing.
     pub fn requires_orientation(&self) -> bool {
         unsafe {
-            bindings::MagickGetImageOrientation(self.wand) != bindings::OrientationType::TopLeftOrientation
+            bindings::MagickGetImageOrientation(self.wand) != bindings::OrientationType_TopLeftOrientation
         }
     }
 
@@ -541,7 +545,7 @@ impl MagickWand {
     /// Returns `true` if successful or `false` if an error occurred.
     pub fn auto_orient(&self) -> bool {
         unsafe {
-            bindings::MagickAutoOrientImage(self.wand) == bindings::MagickBooleanType::MagickTrue
+            bindings::MagickAutoOrientImage(self.wand) == bindings::MagickBooleanType_MagickTrue
         }
     }
 
@@ -552,7 +556,7 @@ impl MagickWand {
             bindings::MagickWriteImage(self.wand, c_name.as_ptr())
         };
         match result {
-            bindings::MagickBooleanType::MagickTrue => Ok(()),
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to write image")
         }
     }

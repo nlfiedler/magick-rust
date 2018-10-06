@@ -20,7 +20,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 
 Pretty simple for now.
 
-```
+```shell
 $ cargo build
 $ cargo test
 ```
@@ -38,7 +38,7 @@ It can be found in *Start menu -> Visual Studio < VERSION > -> Visual Studio Too
 Choose the architecture corresponding to architecture of your rust compiler.
 This is required for the proper functioning of `rust-bindgen`.
 
-```
+```shell
 > set IMAGE_MAGICK_DIR=<path to ImageMagick installation directory>
 > cargo build
 > cargo test
@@ -77,7 +77,7 @@ There are still many missing functions, so if you find there is something you wo
 
 [Docker](https://www.docker.com) can be used to build and test the code without affecting your development environment, which may have a different version of ImageMagick installed. The use of `docker-compose`, as shown in the example below, is optional, but it makes the process very simple.
 
-```
+```shell
 $ cd docker
 $ docker-compose build
 $ docker-compose run magick-rust

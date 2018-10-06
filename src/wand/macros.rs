@@ -35,7 +35,7 @@ macro_rules! wand_common {
 
             fn clear_exception(&mut self) -> Result<(), &'static str> {
                 match unsafe { ::bindings::$clear_exc(self.wand) } {
-                    ::bindings::MagickBooleanType::MagickTrue => Ok(()),
+                    ::bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(concat!("failed to clear", stringify!($wand), "exception"))
                 }
             }
@@ -45,7 +45,7 @@ macro_rules! wand_common {
             }
 
             fn get_exception(&self) -> Result<(String, ::bindings::ExceptionType), &'static str> {
-                let mut severity: ::bindings::ExceptionType = ::bindings::ExceptionType::UndefinedException;
+                let mut severity: ::bindings::ExceptionType = ::bindings::ExceptionType_UndefinedException;
                 // TODO: memory management
                 let ptr = unsafe { ::bindings::$get_exc(self.wand, &mut severity as *mut _) };
                 if ptr.is_null() {
@@ -58,7 +58,7 @@ macro_rules! wand_common {
 
             pub fn is_wand(&self) -> Result<(), &'static str> {
                 match unsafe { ::bindings::$is_wand(self.wand) } {
-                    ::bindings::MagickBooleanType::MagickTrue => Ok(()),
+                    ::bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(concat!(stringify!($wand), " not a wand"))
                 }
             }
@@ -101,7 +101,7 @@ macro_rules! set_get {
             }
             pub fn $set(&mut self, v: $typ) -> Result<(), &'static str> {
                 match unsafe { ::bindings::$c_set(self.wand, v) } {
-                    ::bindings::MagickBooleanType::MagickTrue => Ok(()),
+                    ::bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(concat!(stringify!($set), " returned false"))
                 }
             }
@@ -153,7 +153,7 @@ macro_rules! string_set_get {
             pub fn $set(&mut self, s: &str) -> Result<(), &'static str> {
                 let c_string = try!(::std::ffi::CString::new(s).map_err(|_| "could not convert to cstring"));
                 match unsafe { ::bindings::$c_set(self.wand, c_string.as_ptr()) } {
-                    ::bindings::MagickBooleanType::MagickTrue => Ok(()),
+                    ::bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(concat!(stringify!($set), " returned false"))
                 }
             }
@@ -245,7 +245,7 @@ macro_rules! mutations {
             $(#[$attr])*
             pub fn $fun(&self $(, $arg: $ty)*) -> Result<(), &'static str> {
                 match unsafe { bindings::$c_fun(self.wand $(, $arg)*) } {
-                    bindings::MagickBooleanType::MagickTrue => Ok(()),
+                    bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(concat!(stringify!($c_fun), " invocation failed"))
                 }
             }

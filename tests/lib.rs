@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Nathan Fiedler
+ * Copyright 2015-2018 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 extern crate magick_rust;
 
-use magick_rust::{MagickWand, magick_wand_genesis, MetricType, ColorspaceType, FilterType, DitherMethod, PixelWand, bindings};
+use magick_rust::{MagickWand, magick_wand_genesis, PixelWand, bindings};
 
 use std::error::Error;
 use std::fs::File;
@@ -54,7 +54,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2
     };
-    wand.resize_image(halfwidth, halfheight, FilterType::LanczosFilter);
+    wand.resize_image(halfwidth, halfheight, bindings::FilterType_LanczosFilter);
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -186,7 +186,7 @@ fn test_compare_images() {
     assert!(wand2.read_image("tests/data/IMG_5745_rotl.JPG").is_ok());
     wand2.auto_orient();
 
-    let (distortion, diff) = wand1.compare_images(&wand2, MetricType::RootMeanSquaredErrorMetric);
+    let (distortion, diff) = wand1.compare_images(&wand2, bindings::MetricType_RootMeanSquaredErrorMetric);
     assert!(distortion < 0.01);
     assert!(diff.is_some());
 }
@@ -225,13 +225,13 @@ fn test_transform_image_colorspace() {
     });
     let wand = MagickWand::new();
     assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
-    assert_eq!(wand.get_image_colorspace(), ColorspaceType::sRGBColorspace);
+    assert_eq!(wand.get_image_colorspace(), bindings::ColorspaceType_sRGBColorspace);
 
     let pixel_color = wand.get_image_pixel_color(10, 10).unwrap();
     assert_ne!(pixel_color.get_hsl().hue, 0.0);
 
-    assert!(wand.transform_image_colorspace(ColorspaceType::GRAYColorspace).is_ok());
-    assert_eq!(wand.get_image_colorspace(), ColorspaceType::GRAYColorspace);
+    assert!(wand.transform_image_colorspace(bindings::ColorspaceType_GRAYColorspace).is_ok());
+    assert_eq!(wand.get_image_colorspace(), bindings::ColorspaceType_GRAYColorspace);
 
     let pixel_grayscale = wand.get_image_pixel_color(10, 10).unwrap();
     assert_eq!(pixel_grayscale.get_hsl().hue, 0.0);
@@ -254,8 +254,8 @@ fn test_color_reduction() {
     let image_colors = wand.get_image_colors();
     assert!(image_colors > 38000 || image_colors < 40000);
 
-    assert!(wand.quantize_image(6, ColorspaceType::RGBColorspace, 1,
-                                DitherMethod::UndefinedDitherMethod, false.to_magick()).is_ok());
+    assert!(wand.quantize_image(6, bindings::ColorspaceType_RGBColorspace, 1,
+                                bindings::DitherMethod_UndefinedDitherMethod, false.to_magick()).is_ok());
     assert_eq!(6, wand.get_image_colors());
 
     let histogram = wand.get_image_histogram().unwrap();
@@ -267,33 +267,16 @@ fn test_color_reduction() {
 #[test]	
 fn test_set_image_background_color() {
     START.call_once(|| {
-		
         magick_wand_genesis();
-		
     });
-		
     let wand = MagickWand::new();
-		
     assert!(wand.read_image("tests/data/rust.png").is_ok());
-		
-		
     let mut pw = PixelWand::new();
-		
     pw.set_color("#0000FF").unwrap();
-		
-		
     wand.set_image_background_color(&pw).unwrap();
-		
-		
-    wand.set_image_alpha_channel(bindings::AlphaChannelOption::RemoveAlphaChannel).unwrap();
-		
-		
+    wand.set_image_alpha_channel(bindings::AlphaChannelOption_RemoveAlphaChannel).unwrap();
     let blob = wand.write_image_blob("rgb").unwrap();
-		
-		
     assert_eq!(0u8, blob[0]);
-		
     assert_eq!(0u8, blob[1]);
-		
     assert_eq!(255u8, blob[2]);
 }

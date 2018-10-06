@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Changed
+- Updated `bindgen` dependency to latest release and fixed compiler issues.
+  Enum definitions changed again, default in bindgen is different now, and
+  using `default_enum_style()` caused endless compiler errors.
+
 ## [0.10.0] - 2018-08-11
 ### Added
 - Mewp: Add ping_image and ping_image_blob functions.
