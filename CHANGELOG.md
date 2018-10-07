@@ -7,7 +7,7 @@ This file follows the convention described at
 
 ## [Unreleased]
 ### Changed
-- Updated `bindgen` dependency to latest release and fixed compiler issues.
+- Updated `bindgen` dependency to 0.31 release and fixed compiler issues.
   Enum definitions changed again, default in bindgen is different now, and
   using `default_enum_style()` caused endless compiler errors.
 
