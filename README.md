@@ -11,7 +11,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
     - [Homebrew](http://brew.sh): `brew install imagemagick`
     - Linux may require building ImageMagick from source, see the `Dockerfile` for an example
-    - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/binary-releases.php#windows). Only MSVC version available. When installing, check the checkbox "Install development headers and libraries for C and C++".
+    - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/download.php#windows). Only MSVC version available. When installing, check the checkbox "Install development headers and libraries for C and C++".
 * [Clang](https://clang.llvm.org) (version 3.5 or higher)
     - Or whatever version is dictated by [rust-bindgen](https://github.com/servo/rust-bindgen)
 * Optionally `pkg-config`, to facilitate linking with ImageMagick. Or you can set linker parameters via environment variables.
