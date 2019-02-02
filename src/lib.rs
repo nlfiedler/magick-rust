@@ -61,9 +61,8 @@ pub fn magick_wand_genesis() {
 /// This function is safe to be called repeatedly.
 pub fn magick_wand_terminus() {
     unsafe {
-        match bindings::IsMagickWandInstantiated() {
-            bindings::MagickBooleanType_MagickTrue => bindings::MagickWandTerminus(),
-            _ => (),
+        if let bindings::MagickBooleanType_MagickTrue = bindings::IsMagickWandInstantiated() {
+            bindings::MagickWandTerminus();
         }
     }
 }

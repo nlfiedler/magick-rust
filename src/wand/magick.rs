@@ -582,15 +582,17 @@ impl MagickWand {
         width_ratio /= self.get_image_width() as f64;
         let mut height_ratio = height as f64;
         height_ratio /= self.get_image_height() as f64;
-        let new_width: size_t;
-        let new_height: size_t;
-        if width_ratio < height_ratio {
-            new_width = width;
-            new_height = (self.get_image_height() as f64 * width_ratio) as size_t;
+        let (new_width, new_height) = if width_ratio < height_ratio {
+            (
+                width,
+                (self.get_image_height() as f64 * width_ratio) as size_t,
+            )
         } else {
-            new_width = (self.get_image_width() as f64 * height_ratio) as size_t;
-            new_height = height;
-        }
+            (
+                (self.get_image_width() as f64 * height_ratio) as size_t,
+                height,
+            )
+        };
         unsafe {
             bindings::MagickResetIterator(self.wand);
             while bindings::MagickNextImage(self.wand) != bindings::MagickBooleanType_MagickFalse {
