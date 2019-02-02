@@ -4,8 +4,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 
 ## Dependencies
 
-* Rust 1.20 or higher (on Windows you will require MSVC version)
-* Cargo 0.20 or higher
+* Rust stable
 * ImageMagick (version 7.0.x)
     - Does _not_ work with ImageMagick 6.x due to backward incompatible changes.
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
@@ -14,6 +13,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
     - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/download.php#windows). Only MSVC version available. When installing, check the checkbox "Install development headers and libraries for C and C++".
 * [Clang](https://clang.llvm.org) (version 3.5 or higher)
     - Or whatever version is dictated by [rust-bindgen](https://github.com/servo/rust-bindgen)
+* Windows requires MSVC toolchain
 * Optionally `pkg-config`, to facilitate linking with ImageMagick. Or you can set linker parameters via environment variables.
 
 ## Build and Test
