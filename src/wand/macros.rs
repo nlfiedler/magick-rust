@@ -33,18 +33,18 @@ macro_rules! wand_common {
                 unsafe { ::bindings::$clear_wand(self.wand) }
             }
 
-            fn clear_exception(&mut self) -> Result<(), &'static str> {
+            pub fn clear_exception(&mut self) -> Result<(), &'static str> {
                 match unsafe { ::bindings::$clear_exc(self.wand) } {
                     ::bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(concat!("failed to clear", stringify!($wand), "exception")),
                 }
             }
 
-            fn get_exception_type(&self) -> ::bindings::ExceptionType {
+            pub fn get_exception_type(&self) -> ::bindings::ExceptionType {
                 unsafe { ::bindings::$get_exc_type(self.wand) }
             }
 
-            fn get_exception(&self) -> Result<(String, ::bindings::ExceptionType), &'static str> {
+            pub fn get_exception(&self) -> Result<(String, ::bindings::ExceptionType), &'static str> {
                 let mut severity: ::bindings::ExceptionType =
                     ::bindings::ExceptionType_UndefinedException;
                 // TODO: memory management

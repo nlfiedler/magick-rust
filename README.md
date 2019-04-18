@@ -12,7 +12,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
     - Linux may require building ImageMagick from source, see the `Dockerfile` for an example
     - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/download.php#windows). Only MSVC version available. When installing, check the checkbox "Install development headers and libraries for C and C++".
 * [Clang](https://clang.llvm.org) (version 3.5 or higher)
-    - Or whatever version is dictated by [rust-bindgen](https://github.com/servo/rust-bindgen)
+    - Or whatever version is dictated by [rust-bindgen](https://github.com/rust-lang/rust-bindgen)
 * Windows requires MSVC toolchain
 * Optionally `pkg-config`, to facilitate linking with ImageMagick. Or you can set linker parameters via environment variables.
 
@@ -68,6 +68,10 @@ fn resize() -> Result<Vec<u8>, &'static str> {
 ```
 
 Writing the image to a file rather than an in-memory blob is done by replacing the call to `write_image_blob()` with `write_image()`, which takes a string for the path to the file.
+
+## Frequent API Changes
+
+Because rust-bindgen changes from time to time, and is very difficult to use for a library as large as ImageMagick, the API of this crate may experience dramatic mood swings. Typically this pain manifests itself in the way the enums are represented. I am deeply sorry for this pain. Hopefully someone smarter than me can fix it some day. Pull requests are welcome.
 
 ## Contributing
 

@@ -5,11 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.11.0] - 2019-04-17
 ### Changed
 - Updated `bindgen` dependency to 0.31 release and fixed compiler issues.
   Enum definitions changed again, default in bindgen is different now, and
   using `default_enum_style()` caused endless compiler errors.
+- Made `get_exception_type()`, `get_exception()`, and `clear_exception()`
+  on the various wand implementations.
 
 ## [0.10.0] - 2018-08-11
 ### Added
