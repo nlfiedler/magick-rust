@@ -437,6 +437,15 @@ impl MagickWand {
         }
     }
 
+    /// Set the background color.
+    pub fn set_background_color(&self, pixel_wand: &PixelWand) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickSetBackgroundColor(self.wand, pixel_wand.wand) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+
+            _ => Err("SetBackgroundColor returned false"),
+        }
+    }
+
     /// Set the image background color.
     pub fn set_image_background_color(&self, pixel_wand: &PixelWand) -> Result<(), &'static str> {
         match unsafe { bindings::MagickSetImageBackgroundColor(self.wand, pixel_wand.wand) } {

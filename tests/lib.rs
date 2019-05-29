@@ -303,3 +303,20 @@ fn test_set_image_background_color() {
     assert_eq!(0u8, blob[1]);
     assert_eq!(255u8, blob[2]);
 }
+
+#[test]
+fn test_set_background_color() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    let mut pw = PixelWand::new();
+    pw.set_color("none").unwrap();
+    wand.set_background_color(&pw).unwrap();
+    assert!(wand.read_image("tests/data/rust.svg").is_ok());
+    let blob = wand.write_image_blob("rgba").unwrap();
+    assert_eq!(0u8, blob[0]);
+    assert_eq!(0u8, blob[1]);
+    assert_eq!(0u8, blob[2]);
+    assert_eq!(0u8, blob[3]);
+}
