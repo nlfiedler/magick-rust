@@ -44,7 +44,9 @@ macro_rules! wand_common {
                 unsafe { ::bindings::$get_exc_type(self.wand) }
             }
 
-            pub fn get_exception(&self) -> Result<(String, ::bindings::ExceptionType), &'static str> {
+            pub fn get_exception(
+                &self,
+            ) -> Result<(String, ::bindings::ExceptionType), &'static str> {
                 let mut severity: ::bindings::ExceptionType =
                     ::bindings::ExceptionType_UndefinedException;
                 // TODO: memory management

@@ -234,10 +234,9 @@ fn test_transform_image_colorspace() {
     let pixel_color = wand.get_image_pixel_color(10, 10).unwrap();
     assert_ne!(pixel_color.get_hsl().hue, 0.0);
 
-    assert!(
-        wand.transform_image_colorspace(bindings::ColorspaceType_GRAYColorspace)
-            .is_ok()
-    );
+    assert!(wand
+        .transform_image_colorspace(bindings::ColorspaceType_GRAYColorspace)
+        .is_ok());
     assert_eq!(
         wand.get_image_colorspace(),
         bindings::ColorspaceType_GRAYColorspace
@@ -266,15 +265,15 @@ fn test_color_reduction() {
     let image_colors = wand.get_image_colors();
     assert!(image_colors > 38000 || image_colors < 40000);
 
-    assert!(
-        wand.quantize_image(
+    assert!(wand
+        .quantize_image(
             6,
             bindings::ColorspaceType_RGBColorspace,
             1,
             bindings::DitherMethod_UndefinedDitherMethod,
             false.to_magick()
-        ).is_ok()
-    );
+        )
+        .is_ok());
     assert_eq!(6, wand.get_image_colors());
 
     let histogram = wand.get_image_histogram().unwrap();
