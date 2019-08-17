@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- magiclen: Binding for set_background_color
+
 ## [0.11.0] - 2019-04-17
 ### Changed
 - Updated `bindgen` dependency to 0.31 release and fixed compiler issues.
