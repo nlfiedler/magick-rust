@@ -152,7 +152,8 @@ fn find_image_magick_include_dirs() -> Vec<PathBuf> {
         .or_else(|_| Ok(vec![find_image_magick_dir()?.join("include")]))
         .or_else(|_: env::VarError| -> Result<_, env::VarError> {
             Ok(run_pkg_config().include_paths)
-        }).expect("Couldn't find ImageMagick include directory")
+        })
+        .expect("Couldn't find ImageMagick include directory")
 }
 
 fn find_image_magick_dir() -> Result<PathBuf, env::VarError> {
