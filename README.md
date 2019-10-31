@@ -50,11 +50,11 @@ MagickWand has some global state that needs to be initialized prior to using the
 
 ```rust
 use magick_rust::{MagickWand, magick_wand_genesis};
-use std::sync::{Once, ONCE_INIT};
+use std::sync::Once;
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when we're done.
-static START: Once = ONCE_INIT;
+static START: Once = Once::new();
 
 fn resize() -> Result<Vec<u8>, &'static str> {
     START.call_once(|| {

@@ -23,11 +23,11 @@ use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
-use std::sync::{Once, ONCE_INIT};
+use std::sync::Once;
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
-static START: Once = ONCE_INIT;
+static START: Once = Once::new();
 
 #[test]
 fn test_new_drop() {
