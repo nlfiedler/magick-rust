@@ -286,6 +286,14 @@ impl MagickWand {
         }
     }
 
+    pub fn gaussian_blur_image(&self, radius: f64, sigma: f64) -> Result<(), &'static str> {
+        let result = unsafe { bindings::MagickGaussianBlurImage(self.wand, radius, sigma) };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to blur image"),
+        }
+    }
+
     /// Adaptively resize the currently selected image.
     pub fn adaptive_resize_image(&self, width: usize, height: usize) -> Result<(), &'static str> {
         match unsafe { bindings::MagickAdaptiveResizeImage(self.wand, width, height) } {
