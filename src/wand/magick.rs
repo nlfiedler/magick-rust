@@ -230,6 +230,19 @@ impl MagickWand {
         }
     }
 
+    // Replaces colors in the image from a color lookup table.
+    pub fn clut_image(
+        &self,
+        clut_wand: &MagickWand,
+        method: bindings::PixelInterpolateMethod,
+    ) -> Result<(), &'static str> {
+        let result = unsafe { bindings::MagickClutImage(self.wand, clut_wand.wand, method) };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to replace colors in the image from color lookup table"),
+        }
+    }
+
     pub fn set_size(&self, columns: size_t, rows: size_t) -> Result<(), &'static str> {
         let result = unsafe { bindings::MagickSetSize(self.wand, columns, rows) };
         match result {
