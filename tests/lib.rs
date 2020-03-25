@@ -319,3 +319,30 @@ fn test_set_background_color() {
     assert_eq!(0u8, blob[2]);
     assert_eq!(0u8, blob[3]);
 }
+
+#[test]
+fn test_set_size() {
+    let wand = MagickWand::new();
+    assert!(wand.set_size(100, 100).is_ok());
+}
+
+#[test]
+fn test_clut_image() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+
+    let mut gradient = MagickWand::new();
+    assert!(gradient.set_size(128, 20).is_ok());
+    assert!(gradient.set_option("gradient:angle", "90").is_ok());
+    assert!(gradient.read_image("gradient:black-yellow").is_ok());
+
+    assert!(wand
+        .clut_image(
+            &gradient,
+            bindings::PixelInterpolateMethod_BilinearInterpolatePixel
+        )
+        .is_ok());
+}
