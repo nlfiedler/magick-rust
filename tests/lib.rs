@@ -319,3 +319,9 @@ fn test_set_background_color() {
     assert_eq!(0u8, blob[2]);
     assert_eq!(0u8, blob[3]);
 }
+
+#[test]
+fn test_set_size() {
+    let wand = MagickWand::new();
+    assert!(wand.set_size(100, 100).is_ok());
+}

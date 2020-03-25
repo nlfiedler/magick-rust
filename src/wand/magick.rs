@@ -230,6 +230,14 @@ impl MagickWand {
         }
     }
 
+    pub fn set_size(&self, columns: size_t, rows: size_t) -> Result<(), &'static str> {
+        let result = unsafe { bindings::MagickSetSize(self.wand, columns, rows) };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to set size of wand"),
+        }
+    }
+
     /// Extend the image as defined by the geometry, gravity, and wand background color. Set the
     /// (x,y) offset of the geometry to move the original wand relative to the extended wand.
     pub fn extend_image(
