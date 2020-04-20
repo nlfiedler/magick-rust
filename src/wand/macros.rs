@@ -29,6 +29,10 @@ macro_rules! wand_common {
                 }
             }
 
+            pub fn new_from_wand(wand: *mut ::bindings::$wand) -> Self {
+                $wand { wand }
+            }
+
             fn clear(&mut self) {
                 unsafe { ::bindings::$clear_wand(self.wand) }
             }

@@ -243,6 +243,12 @@ impl MagickWand {
         }
     }
 
+    pub fn fx(&mut self, expression: &str) -> MagickWand {
+        let c_expression = CString::new(expression).unwrap();
+        let wand = unsafe { bindings::MagickFxImage(self.wand, c_expression.as_ptr()) };
+        MagickWand::new_from_wand(wand)
+    }
+
     pub fn set_size(&self, columns: size_t, rows: size_t) -> Result<(), &'static str> {
         let result = unsafe { bindings::MagickSetSize(self.wand, columns, rows) };
         match result {
