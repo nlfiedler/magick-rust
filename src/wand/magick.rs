@@ -251,6 +251,8 @@ impl MagickWand {
         }
     }
 
+    // Level an image. Black and white points are multiplied with QuantumRange to
+    // decrease dependencies on the end user.
     pub fn level_image(
         &self,
         black_point: f64,
