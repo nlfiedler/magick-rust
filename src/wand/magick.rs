@@ -257,6 +257,28 @@ impl MagickWand {
         }
     }
 
+    // Level an image. Black and white points are multiplied with QuantumRange to
+    // decrease dependencies on the end user.
+    pub fn level_image(
+        &self,
+        black_point: f64,
+        gamma: f64,
+        white_point: f64,
+    ) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickLevelImage(
+                self.wand,
+                black_point * bindings::QuantumRange,
+                gamma,
+                white_point * bindings::QuantumRange,
+            )
+        };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to set size of wand"),
+        }
+    }
+
     /// Extend the image as defined by the geometry, gravity, and wand background color. Set the
     /// (x,y) offset of the geometry to move the original wand relative to the extended wand.
     pub fn extend_image(
