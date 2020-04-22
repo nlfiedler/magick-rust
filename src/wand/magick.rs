@@ -743,14 +743,6 @@ impl MagickWand {
         Ok(bytes)
     }
 
-    pub fn set_image_gray (&self) -> Result<(), &'static str> {
-        let result = unsafe { bindings::SetImageGray(self.wand) };
-        match result {
-            MagickBooleanType_MagickTrue => Ok(()),
-            _ => Err("Couldn't set image to gray")
-        }
-    }
-
     mutations!(
         /// Set the image colorspace, transforming (unlike `set_image_colorspace`) image data in
         /// the process.
