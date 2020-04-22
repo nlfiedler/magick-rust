@@ -335,11 +335,19 @@ impl MagickWand {
         }
     }
 
+    pub fn blur_image(&self, radius: f64, sigma: f64) -> Result<(), &'static str> {
+        let result = unsafe { bindings::MagickBlurImage(self.wand, radius, sigma) };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to blur image"),
+        }
+    }
+
     pub fn gaussian_blur_image(&self, radius: f64, sigma: f64) -> Result<(), &'static str> {
         let result = unsafe { bindings::MagickGaussianBlurImage(self.wand, radius, sigma) };
         match result {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
-            _ => Err("failed to blur image"),
+            _ => Err("failed to gaussian blur image"),
         }
     }
 
