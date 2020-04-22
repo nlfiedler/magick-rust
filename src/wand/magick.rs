@@ -243,6 +243,14 @@ impl MagickWand {
         }
     }
 
+    pub fn hald_clut_image(&self, clut_wand: &MagickWand) -> Result<(), &'static str> {
+        let result = unsafe { bindings::MagickHaldClutImage(self.wand, clut_wand.wand) };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to replace colors in the image from color lookup table"),
+        }
+    }
+
     pub fn fx(&mut self, expression: &str) -> MagickWand {
         let c_expression = CString::new(expression).unwrap();
         let wand = unsafe { bindings::MagickFxImage(self.wand, c_expression.as_ptr()) };
