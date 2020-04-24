@@ -765,6 +765,9 @@ impl MagickWand {
         MagickTransformImageColorspace => transform_image_colorspace(
             colorspace: bindings::ColorspaceType)
 
+        // Sets the image to the specified alpha level.
+        MagickSetImageAlpha => set_image_alpha(alpha: f64)
+
         /// Set the image alpha channel mode.
         MagickSetImageAlphaChannel => set_image_alpha_channel(
             alpha_channel: bindings::AlphaChannelOption)
