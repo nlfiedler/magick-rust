@@ -70,16 +70,16 @@ impl PixelWand {
     pub fn fmt_w_prefix(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
         let mut prf = prefix.to_string();
         prf.push_str("    ");
-        try!(writeln!(f, "{}PixelWand {{", prefix));
-        try!(writeln!(f, "{}Exception: {:?}", prf, self.get_exception()));
-        try!(writeln!(f, "{}IsWand: {:?}", prf, self.is_wand()));
-        try!(self.fmt_unchecked_settings(f, &prf));
-        try!(self.fmt_color_settings(f, &prf));
+        writeln!(f, "{}PixelWand {{", prefix)?;
+        writeln!(f, "{}Exception: {:?}", prf, self.get_exception())?;
+        writeln!(f, "{}IsWand: {:?}", prf, self.is_wand())?;
+        self.fmt_unchecked_settings(f, &prf)?;
+        self.fmt_color_settings(f, &prf)?;
         writeln!(f, "{}}}", prefix)
     }
 
     pub fn set_color(&mut self, s: &str) -> Result<(), &'static str> {
-        let c_string = try!(CString::new(s).map_err(|_| "could not convert to cstring"));
+        let c_string = CString::new(s).map_err(|_| "could not convert to cstring")?;
         match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr()) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to set color"),

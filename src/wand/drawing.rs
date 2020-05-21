@@ -35,7 +35,7 @@ wand_common!(
 
 impl DrawingWand {
     pub fn draw_annotation(&mut self, x: f64, y: f64, text: &str) -> Result<(), &'static str> {
-        let c_string = try!(CString::new(text).map_err(|_| "could not convert to cstring"));
+        let c_string = CString::new(text).map_err(|_| "could not convert to cstring")?;
         unsafe { bindings::DrawAnnotation(self.wand, x, y, c_string.as_ptr() as *const _) };
         Ok(())
     }
@@ -94,13 +94,13 @@ impl DrawingWand {
 
 impl fmt::Debug for DrawingWand {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        try!(writeln!(f, "DrawingWand {{"));
-        try!(writeln!(f, "    Exception: {:?}", self.get_exception()));
-        try!(writeln!(f, "    IsWand: {:?}", self.is_wand()));
-        try!(self.fmt_unchecked_settings(f, "    "));
-        try!(self.fmt_string_settings(f, "    "));
-        try!(self.fmt_string_unchecked_settings(f, "    "));
-        try!(self.fmt_pixel_settings(f, "    "));
+        writeln!(f, "DrawingWand {{")?;
+        writeln!(f, "    Exception: {:?}", self.get_exception())?;
+        writeln!(f, "    IsWand: {:?}", self.is_wand())?;
+        self.fmt_unchecked_settings(f, "    ")?;
+        self.fmt_string_settings(f, "    ")?;
+        self.fmt_string_unchecked_settings(f, "    ")?;
+        self.fmt_pixel_settings(f, "    ")?;
         writeln!(f, "}}")
     }
 }

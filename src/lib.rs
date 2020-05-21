@@ -69,8 +69,7 @@ pub fn magick_wand_terminus() {
 
 pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>, &'static str> {
     let mut number_fonts: size_t = 0;
-    let c_string =
-        try!(::std::ffi::CString::new(pattern).map_err(|_| "could not convert to cstring"));
+    let c_string = ::std::ffi::CString::new(pattern).map_err(|_| "could not convert to cstring")?;
     let ptr =
         unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut size_t) };
     if ptr.is_null() {
