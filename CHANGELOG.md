@@ -11,6 +11,7 @@ This file follows the convention described at
 ### Changed
 - npajkovsky: remove use of deprecated item `try!`, use `?` instead
 - npajkovsky: fix multiple redefined values on linux build
+- Updated `bindgen` to `0.53.2` release, added "size_t is usize" flag.
 
 ## [0.13.0] - 2020-03-25
 ### Added
