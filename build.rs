@@ -132,6 +132,7 @@ fn main() {
             .ctypes_prefix("libc")
             .raw_line("extern crate libc;")
             .header(gen_h_path.to_str().unwrap())
+            .size_t_is_usize(true)
             .parse_callbacks(Box::new(ignored_macros))
             .blacklist_type("timex")
             .blacklist_function("clock_adjtime");
