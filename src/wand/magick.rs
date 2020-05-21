@@ -335,6 +335,16 @@ impl MagickWand {
         }
     }
 
+    pub fn negate_image(&self) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickNegateImage(self.wand, bindings::MagickBooleanType_MagickTrue)
+        };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to flip image"),
+        }
+    }
+
     pub fn flop_image(&self) -> Result<(), &'static str> {
         let result = unsafe { bindings::MagickFlopImage(self.wand) };
         match result {
