@@ -83,7 +83,7 @@ There are still many missing functions, so if you find there is something you wo
 
 ```shell
 $ cd docker
-$ docker-compose build
+$ docker-compose build --pull
 $ docker-compose run magick-rust
 $ cargo clean
 $ cargo build
