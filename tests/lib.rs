@@ -68,12 +68,12 @@ fn test_read_from_blob() {
 
     let path = Path::new("tests/data/IMG_5745.JPG");
     let mut file = match File::open(&path) {
-        Err(why) => panic!("couldn't open file: {}", Error::description(&why)),
+        Err(why) => panic!("couldn't open file: {}", Error::to_string(&why)),
         Ok(file) => file,
     };
     let mut data: Vec<u8> = Vec::new();
     match file.read_to_end(&mut data) {
-        Err(why) => panic!("couldn't read file: {}", Error::description(&why)),
+        Err(why) => panic!("couldn't read file: {}", Error::to_string(&why)),
         Ok(_) => (),
     };
     assert!(wand.read_image_blob(&data).is_ok());

@@ -135,7 +135,7 @@ macro_rules! set_get_unchecked {
             }
         )*
         pub fn fmt_unchecked_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {
-            $( writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get()); )*
+            $( writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get())?; )*
             Ok(())
         }
     }
