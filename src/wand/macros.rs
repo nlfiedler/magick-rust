@@ -118,7 +118,7 @@ macro_rules! set_get {
             }
         )*
         pub fn fmt_checked_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {
-            $( try!(writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get())); )*
+            $( writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get())?; )*
             Ok(())
         }
     }
@@ -135,7 +135,7 @@ macro_rules! set_get_unchecked {
             }
         )*
         pub fn fmt_unchecked_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {
-            $( try!(writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get())); )*
+            $( writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get()); )*
             Ok(())
         }
     }
@@ -154,7 +154,7 @@ macro_rules! string_get {
                 Ok(result)
             }
         }
-    }
+    };
 }
 
 macro_rules! string_set_get {
@@ -162,7 +162,7 @@ macro_rules! string_set_get {
         $(
             string_get!($get, $c_get);
             pub fn $set(&mut self, s: &str) -> Result<(), &'static str> {
-                let c_string = try!(::std::ffi::CString::new(s).map_err(|_| "could not convert to cstring"));
+                let c_string = std::ffi::CString::new(s).map_err(|_| "could not convert to cstring")?;
                 match unsafe { ::bindings::$c_set(self.wand, c_string.as_ptr()) } {
                     ::bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(concat!(stringify!($set), " returned false"))
@@ -170,7 +170,7 @@ macro_rules! string_set_get {
             }
         )*
         pub fn fmt_string_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {
-            $( try!(writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get())); )*
+            $( writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get())?; )*
             Ok(())
         }
     }
@@ -181,13 +181,13 @@ macro_rules! string_set_get_unchecked {
         $(
             string_get!($get, $c_get);
             pub fn $set(&mut self, s: &str) -> Result<(), &'static str> {
-                let c_string = try!(::std::ffi::CString::new(s).map_err(|_| "could not convert to cstring"));
+                let c_string = ::std::ffi::CString::new(s).map_err(|_| "could not convert to cstring")?;
                 unsafe { ::bindings::$c_set(self.wand, c_string.as_ptr()) };
                 Ok(())
             }
         )*
         pub fn fmt_string_unchecked_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {
-            $( try!(writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get())); )*
+            $( writeln!(f, "{}{:<50}: {:?}", prefix, stringify!($c_get), self.$get())?; )*
             Ok(())
         }
     }
@@ -207,8 +207,8 @@ macro_rules! pixel_set_get {
         )*
         pub fn fmt_pixel_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {
             $(
-                try!(writeln!(f, "{}{:<50}: ", prefix, stringify!($c_get)));
-                try!(self.$get().fmt_w_prefix(f, &format!("{}{:<53}", prefix, " ") ));
+                writeln!(f, "{}{:<50}: ", prefix, stringify!($c_get))?;
+                self.$get().fmt_w_prefix(f, &format!("{}{:<53}", prefix, " ") )?;
             )*
             Ok(())
         }
@@ -235,14 +235,14 @@ macro_rules! color_set_get {
             }
         )*
         pub fn fmt_color_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {
-            try!(writeln!(f, "{}Color: {:?}, normalized: {:?}\n{}hsl: {:?}",
+            writeln!(f, "{}Color: {:?}, normalized: {:?}\n{}hsl: {:?}",
                      prefix,
                      self.get_color_as_string(),
                      self.get_color_as_normalized_string(),
                      prefix,
                      self.get_hsl()
-            ));
-            $( try!(writeln!(f, "{}{:<10}: {:>} quantum: {}", prefix, stringify!($c_get).split_at(8).1, self.$get(), self.$get_quantum())); )*
+            )?;
+            $( writeln!(f, "{}{:<10}: {:>} quantum: {}", prefix, stringify!($c_get).split_at(8).1, self.$get(), self.$get_quantum())?; )*
             Ok(())
         }
     }

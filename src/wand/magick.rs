@@ -75,7 +75,7 @@ impl MagickWand {
         angle: f64,
         text: &str,
     ) -> Result<(), &'static str> {
-        let c_string = try!(CString::new(text).map_err(|_| "could not convert to cstring"));
+        let c_string = CString::new(text).map_err(|_| "could not convert to cstring")?;
         match unsafe {
             bindings::MagickAnnotateImage(
                 self.wand,
@@ -329,6 +329,16 @@ impl MagickWand {
 
     pub fn flip_image(&self) -> Result<(), &'static str> {
         let result = unsafe { bindings::MagickFlipImage(self.wand) };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to flip image"),
+        }
+    }
+
+    pub fn negate_image(&self) -> Result<(), &'static str> {
+        let result = unsafe {
+            bindings::MagickNegateImage(self.wand, bindings::MagickBooleanType_MagickTrue)
+        };
         match result {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err("failed to flip image"),
@@ -831,11 +841,11 @@ impl MagickWand {
 
 impl fmt::Debug for MagickWand {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        try!(writeln!(f, "MagickWand {{"));
-        try!(writeln!(f, "    Exception: {:?}", self.get_exception()));
-        try!(writeln!(f, "    IsWand: {:?}", self.is_wand()));
-        try!(self.fmt_string_settings(f, "    "));
-        try!(self.fmt_checked_settings(f, "    "));
+        writeln!(f, "MagickWand {{")?;
+        writeln!(f, "    Exception: {:?}", self.get_exception())?;
+        writeln!(f, "    IsWand: {:?}", self.is_wand())?;
+        self.fmt_string_settings(f, "    ")?;
+        self.fmt_checked_settings(f, "    ")?;
         writeln!(f, "}}")
     }
 }

@@ -346,3 +346,18 @@ fn test_clut_image() {
         )
         .is_ok());
 }
+
+#[test]
+fn test_negate_image() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/rust.png").is_ok());
+    wand.negate_image().unwrap();
+    let pixel_color = wand.get_image_pixel_color(0, 0).unwrap();
+    assert_eq!(
+        "srgb(255,255,255)",
+        pixel_color.get_color_as_string().unwrap()
+    );
+}

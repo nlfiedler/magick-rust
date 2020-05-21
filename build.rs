@@ -87,6 +87,37 @@ fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let bindings_path_str = out_dir.join("bindings.rs");
 
+    #[derive(Debug)]
+    struct IgnoreMacros(HashSet<String>);
+
+    impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
+        fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
+            if self.0.contains(name) {
+                bindgen::callbacks::MacroParsingBehavior::Ignore
+            } else {
+                bindgen::callbacks::MacroParsingBehavior::Default
+            }
+        }
+    }
+
+    let ignored_macros = IgnoreMacros(
+        vec![
+            "FP_INFINITE".into(),
+            "FP_NAN".into(),
+            "FP_NORMAL".into(),
+            "FP_SUBNORMAL".into(),
+            "FP_ZERO".into(),
+            "IPPORT_RESERVED".into(),
+            "FP_INT_UPWARD".into(),
+            "FP_INT_DOWNWARD".into(),
+            "FP_INT_TOWARDZERO".into(),
+            "FP_INT_TONEARESTFROMZERO".into(),
+            "FP_INT_TONEAREST".into(),
+        ]
+        .into_iter()
+        .collect(),
+    );
+
     if !Path::new(&bindings_path_str).exists() {
         // Create the header file that rust-bindgen needs as input.
         let gen_h_path = out_dir.join("gen.h");
@@ -101,17 +132,9 @@ fn main() {
             .ctypes_prefix("libc")
             .raw_line("extern crate libc;")
             .header(gen_h_path.to_str().unwrap())
-            // https://github.com/rust-lang-nursery/rust-bindgen/issues/687
-            .blacklist_type("FP_NAN")
-            .blacklist_type("FP_INFINITE")
-            .blacklist_type("FP_ZERO")
-            .blacklist_type("FP_SUBNORMAL")
-            .blacklist_type("FP_NORMAL")
-            .blacklist_type("FP_INT_UPWARD")
-            .blacklist_type("FP_INT_DOWNWARD")
-            .blacklist_type("FP_INT_TOWARDZERO")
-            .blacklist_type("FP_INT_TONEARESTFROMZERO")
-            .blacklist_type("FP_INT_TONEAREST");
+            .parse_callbacks(Box::new(ignored_macros))
+            .blacklist_type("timex")
+            .blacklist_function("clock_adjtime");
 
         for d in include_dirs {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));
