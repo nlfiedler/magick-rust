@@ -5,9 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.14.0] - 2020-5-21
 ### Added
-- npajkovsky: add negate_image() operation
+- npajkovsky: add `negate_image()` operation
+- danielronnkvist: add `MagickFxImage` binding
+- danielronnkvist: add `MagickLevelImage` binding
+- danielronnkvist: add `MagickSetImageAlpha` binding
+- danielronnkvist: add `MagickBlurImage` binding
+- danielronnkvist: add `MagickHaldClutImage` binding
 ### Changed
 - npajkovsky: remove use of deprecated item `try!`, use `?` instead
 - npajkovsky: fix multiple redefined values on linux build
