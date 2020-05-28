@@ -667,6 +667,23 @@ impl MagickWand {
         }
     }
 
+
+    /// Rescale the image using seam carving algorithm
+    pub fn liquid_rescale_image(&self, width: usize, height: usize, delta_x: f64, rigidity: f64) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickLiquidRescaleImage(self.wand, width, height, delta_x, rigidity) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to liquid-rescale image")
+        }
+    }
+
+    /// Implodes the image towards the center by the specified percentage
+    pub fn implode(&self, amount: f64, method: bindings::PixelInterpolateMethod) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickImplodeImage(self.wand, amount, method) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to implode image")
+        }
+    }
+
     /// Resize the image to fit within the given dimensions, maintaining
     /// the current aspect ratio.
     pub fn fit(&self, width: size_t, height: size_t) {
