@@ -16,3 +16,8 @@ libc = "0.2.70"
 [build-dependencies]
 bindgen = "0.53.2"
 pkg-config = "0.3.17"
+
+[features]
+
+# Workaround for bindgen bug when ImageMagick is compiled with disable-hdri
+disable-hdri = []

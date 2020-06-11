@@ -265,6 +265,26 @@ impl MagickWand {
         }
     }
 
+    // Define two 'quantum_range' functions because the bindings::QuantumRange symbol
+    // is not available if hdri is disabled in the compiled ImageMagick libs
+    #[cfg(not(feature="disable-hdri"))]
+    fn quantum_range(&self) -> Result<f64, &'static str> {
+        return Ok(bindings::QuantumRange);
+    }
+
+    // with disable-hdri enabled we define our own quantum_range
+    // values lifted directly from magick-type.h
+    #[cfg(feature="disable-hdri")]
+    fn quantum_range(&self) -> Result<f64, &'static str> {
+        match bindings::MAGICKCORE_QUANTUM_DEPTH {
+            8 => Ok(255.0f64),
+            16 => Ok(65535.0f64),
+            32 => Ok(4294967295.0f64),
+            64 => Ok(18446744073709551615.0f64),
+            _ => Err("Quantum depth must be one of 8, 16, 32 or 64")
+        }
+    }
+
     // Level an image. Black and white points are multiplied with QuantumRange to
     // decrease dependencies on the end user.
     pub fn level_image(
@@ -273,12 +293,14 @@ impl MagickWand {
         gamma: f64,
         white_point: f64,
     ) -> Result<(), &'static str> {
+        let quantum_range = self.quantum_range()?;
+
         let result = unsafe {
             bindings::MagickLevelImage(
                 self.wand,
-                black_point * bindings::QuantumRange,
+                black_point * quantum_range,
                 gamma,
-                white_point * bindings::QuantumRange,
+                white_point * quantum_range,
             )
         };
         match result {
@@ -286,6 +308,7 @@ impl MagickWand {
             _ => Err("failed to set size of wand"),
         }
     }
+
 
     /// Extend the image as defined by the geometry, gravity, and wand background color. Set the
     /// (x,y) offset of the geometry to move the original wand relative to the extended wand.
@@ -586,7 +609,7 @@ impl MagickWand {
     /// Returns the image resolution as a pair (horizontal resolution, vertical resolution)
     pub fn sepia_tone_image(&self, threshold: f64) -> Result<(), &'static str> {
         unsafe {
-            if bindings::MagickSepiaToneImage(self.wand, threshold * bindings::QuantumRange)
+            if bindings::MagickSepiaToneImage(self.wand, threshold * self.quantum_range()?)
                 == bindings::MagickBooleanType_MagickTrue
             {
                 Ok(())
