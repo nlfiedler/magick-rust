@@ -677,6 +677,18 @@ impl MagickWand {
         }
     }
 
+    /// Sample the image to the target resolution
+    ///
+    /// This is incredibly fast, as it does 1-1 pixel mapping for downscales, and box filtering for
+    /// upscales
+    pub fn sample_image(&self, width: usize, height: usize) -> Result<(), &'static str> {
+        let result = unsafe { bindings::MagickSampleImage(self.wand, width, height) };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to sample image"),
+        }
+    }
+
     /// Resample the image to the specified horizontal and vertical resolution, using the
     /// specified filter type.
     pub fn resample_image(
