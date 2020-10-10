@@ -26,7 +26,9 @@ use std::process::Command;
 const MIN_VERSION: &'static str = "7.0";
 const MAX_VERSION: &'static str = "7.1";
 
-static HEADER: &'static str = "#include <MagickWand/MagickWand.h>\n";
+static HEADER: &'static str = r#"#define MAGICKCORE_QUANTUM_DEPTH 8
+#include <MagickWand/MagickWand.h>
+"#;
 
 fn main() {
     if cfg!(target_os = "freebsd") {
