@@ -26,9 +26,7 @@ use std::process::Command;
 const MIN_VERSION: &'static str = "7.0";
 const MAX_VERSION: &'static str = "7.1";
 
-static HEADER: &'static str = r#"#define MAGICKCORE_QUANTUM_DEPTH 8
-#include <MagickWand/MagickWand.h>
-"#;
+static HEADER: &'static str = "#include <MagickWand/MagickWand.h>\n";
 
 fn main() {
     if cfg!(target_os = "freebsd") {
@@ -42,6 +40,15 @@ fn main() {
         env_var_set_default("IMAGE_MAGICK_LIB_DIRS", "/usr/local/lib");
         env_var_set_default("IMAGE_MAGICK_LIBS", "MagickWand-7");
     }
+
+    let cppflags = Command::new("MagickCore-config")
+        .arg("--cppflags")
+        .output()
+        .unwrap()
+        .stdout;
+    let cppflags = String::from_utf8(cppflags).unwrap();
+
+    env_var_set_default("BINDGEN_EXTRA_CLANG_ARGS", &cppflags);
 
     let lib_dirs = find_image_magick_lib_dirs();
     for d in &lib_dirs {
