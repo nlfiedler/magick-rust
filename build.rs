@@ -41,6 +41,15 @@ fn main() {
         env_var_set_default("IMAGE_MAGICK_LIBS", "MagickWand-7");
     }
 
+    let cppflags = Command::new("MagickCore-config")
+        .arg("--cppflags")
+        .output()
+        .unwrap()
+        .stdout;
+    let cppflags = String::from_utf8(cppflags).unwrap();
+
+    env_var_set_default("BINDGEN_EXTRA_CLANG_ARGS", &cppflags);
+
     let lib_dirs = find_image_magick_lib_dirs();
     for d in &lib_dirs {
         if !d.exists() {
