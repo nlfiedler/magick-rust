@@ -849,6 +849,9 @@ impl MagickWand {
 
         /// Discard all but one of any pixel color.
         MagickUniqueImageColors => unique_image_colors()
+
+        /// Applies k-means color reduction to the image.
+        MagickKmeansImage => kmeans(number_colors: size_t, max_iterations: size_t, tolerance: f64)
     );
 
     get!(get_image_colors, MagickGetImageColors, size_t);
