@@ -28,6 +28,12 @@ const MAX_VERSION: &'static str = "7.1";
 
 static HEADER: &'static str = "#include <MagickWand/MagickWand.h>\n";
 
+//on windows path env always contain : like c:
+pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
+    true => ";",
+    _ => ":",
+};
+
 fn main() {
     if cfg!(target_os = "freebsd") {
         // pkg_config does not seem to work properly on FreeBSD, so
@@ -41,14 +47,14 @@ fn main() {
         env_var_set_default("IMAGE_MAGICK_LIBS", "MagickWand-7");
     }
 
-    let cppflags = Command::new("MagickCore-config")
-        .arg("--cppflags")
-        .output()
-        .unwrap()
-        .stdout;
-    let cppflags = String::from_utf8(cppflags).unwrap();
+    let check_cppflags = Command::new("MagickCore-config").arg("--cppflags").output();
+    //on windows can not exec
+    if check_cppflags.is_ok() {
+        let cppflags = check_cppflags.unwrap().stdout;
+        let cppflags = String::from_utf8(cppflags).unwrap();
 
-    env_var_set_default("BINDGEN_EXTRA_CLANG_ARGS", &cppflags);
+        env_var_set_default("BINDGEN_EXTRA_CLANG_ARGS", &cppflags);
+    }
 
     let lib_dirs = find_image_magick_lib_dirs();
     for d in &lib_dirs {
@@ -75,7 +81,7 @@ fn main() {
     let target = env::var("TARGET").unwrap();
     let libs_env = env::var("IMAGE_MAGICK_LIBS").ok();
     let libs = match libs_env {
-        Some(ref v) => v.split(":").map(|x| x.to_owned()).collect(),
+        Some(ref v) => v.split(PATH_SEPARATOR).map(|x| x.to_owned()).collect(),
         None => {
             if target.contains("windows") {
                 vec!["CORE_RL_MagickWand_".to_string()]
@@ -172,7 +178,11 @@ fn env_var_set_default(name: &str, value: &str) {
 fn find_image_magick_lib_dirs() -> Vec<PathBuf> {
     println!("cargo:rerun-if-env-changed=IMAGE_MAGICK_LIB_DIRS");
     env::var("IMAGE_MAGICK_LIB_DIRS")
-        .map(|x| x.split(":").map(PathBuf::from).collect::<Vec<PathBuf>>())
+        .map(|x| {
+            x.split(PATH_SEPARATOR)
+                .map(PathBuf::from)
+                .collect::<Vec<PathBuf>>()
+        })
         .or_else(|_| Ok(vec![find_image_magick_dir()?.join("lib")]))
         .or_else(|_: env::VarError| -> Result<_, env::VarError> { Ok(run_pkg_config().link_paths) })
         .expect("Couldn't find ImageMagick library directory")
@@ -181,7 +191,11 @@ fn find_image_magick_lib_dirs() -> Vec<PathBuf> {
 fn find_image_magick_include_dirs() -> Vec<PathBuf> {
     println!("cargo:rerun-if-env-changed=IMAGE_MAGICK_INCLUDE_DIRS");
     env::var("IMAGE_MAGICK_INCLUDE_DIRS")
-        .map(|x| x.split(":").map(PathBuf::from).collect::<Vec<PathBuf>>())
+        .map(|x| {
+            x.split(PATH_SEPARATOR)
+                .map(PathBuf::from)
+                .collect::<Vec<PathBuf>>()
+        })
         .or_else(|_| Ok(vec![find_image_magick_dir()?.join("include")]))
         .or_else(|_: env::VarError| -> Result<_, env::VarError> {
             Ok(run_pkg_config().include_paths)
