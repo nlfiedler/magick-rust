@@ -272,10 +272,7 @@ fn run_pkg_config() -> pkg_config::Library {
         .unwrap()
         .success()
     {
-        panic!(format!(
-            "MagickWand version must be no higher than {}",
-            MAX_VERSION
-        ));
+        panic!("MagickWand version must be less than 7.1");
     }
     // We have to split the version check and the cflags/libs check because
     // you can't do both at the same time on RHEL (apparently).
