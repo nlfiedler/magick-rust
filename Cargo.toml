@@ -14,8 +14,8 @@ build = "build.rs"
 libc = "0.2.70"
 
 [build-dependencies]
-bindgen = "0.56.0"
-pkg-config = "0.3.17"
+bindgen = "0.58"
+pkg-config = "0.3"
 
 [features]
 

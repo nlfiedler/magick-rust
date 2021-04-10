@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 Nathan Fiedler
+ * Copyright 2016-2021 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,8 +149,8 @@ fn main() {
             .header(gen_h_path.to_str().unwrap())
             .size_t_is_usize(true)
             .parse_callbacks(Box::new(ignored_macros))
-            .blacklist_type("timex")
-            .blacklist_function("clock_adjtime");
+            .blocklist_type("timex")
+            .blocklist_function("clock_adjtime");
 
         for d in include_dirs {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));
