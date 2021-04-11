@@ -16,7 +16,7 @@
 
 extern crate magick_rust;
 
-use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand};
+use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand, ResourceType};
 
 use magick_rust::ToMagick;
 use std::error::Error;
@@ -360,4 +360,14 @@ fn test_negate_image() {
         "srgb(255,255,255)",
         pixel_color.get_color_as_string().unwrap()
     );
+}
+
+#[test]
+fn test_resource_limits() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    MagickWand::set_resource_limit(ResourceType::Thread, 1).unwrap();
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/rust.png").is_ok());
 }
