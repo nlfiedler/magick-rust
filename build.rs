@@ -24,7 +24,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 const MIN_VERSION: &'static str = "7.0";
-const MAX_VERSION: &'static str = "7.1";
+const MAX_VERSION: &'static str = "7.2";
 
 static HEADER: &'static str = "#include <MagickWand/MagickWand.h>\n";
 
