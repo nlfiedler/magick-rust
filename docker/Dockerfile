@@ -14,10 +14,16 @@ RUN curl https://download.imagemagick.org/ImageMagick/download/ImageMagick.tar.g
  && cd .. \
  && rm -r ImageMagick-${MAGICK_VERSION}*
 
+WORKDIR /magick
+COPY build.rs .
+COPY Cargo.toml .
+COPY src src
+COPY tests tests
+
 RUN adduser --disabled-password --gecos '' magick-rust
+RUN chown -R magick-rust .
 
 USER magick-rust
 
-ENV USER=magick-rust LD_LIBRARY_PATH=/usr/local/lib
-
-WORKDIR /src
+ENV USER=magick-rust
+ENV LD_LIBRARY_PATH=/usr/local/lib

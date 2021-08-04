@@ -3,9 +3,7 @@ version: '3'
 services:
   magick-rust:
     build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ..:/src
+      context: ..
+      dockerfile: docker/Dockerfile
     stdin_open: true
     tty: true
