@@ -1,6 +1,6 @@
 [package]
 name = "magick_rust"
-version = "0.14.0"
+version = "0.15.0"
 authors = ["Nathan Fiedler <nathanfiedler@fastmail.fm>"]
 description = "Selection of Rust bindings for the ImageMagick library."
 homepage = "https://github.com/nlfiedler/magick-rust"
@@ -18,6 +18,5 @@ bindgen = "0.59"
 pkg-config = "0.3"
 
 [features]
-
 # Workaround for bindgen bug when ImageMagick is compiled with disable-hdri
 disable-hdri = []

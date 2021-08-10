@@ -5,7 +5,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 ## Dependencies
 
 * Rust stable
-* ImageMagick (version 7.0.x)
+* ImageMagick (version 7.0.x to 7.1.x)
     - Does _not_ work with ImageMagick 6.x due to backward incompatible changes.
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
     - [Homebrew](http://brew.sh): `brew install imagemagick`

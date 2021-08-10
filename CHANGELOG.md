@@ -5,6 +5,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [0.15.0] - 2021-8-10
+### Added
+- glebpom: Support resource limits
+- lerouxrgd: Add kmeans
+- danielronnkvist: modulate image
+- asonix: Add quantum depth and sample method
+- Drevoed: Add MagickLiquidRescaleImage and MagickImplodeImage
+### Changed
+- brownjohnf: Update imagemmagick checks to support 7.1
+- liyunde: Fix path_separator on windows can not build
+- kz6wk9: Required version bump on bindgen.
+- asonix: Set environment variable with magickcore config flags
+- captainbland: Add workaround for QuantumRange not defined error when hdri is disabled
+
 ## [0.14.0] - 2020-5-21
 ### Added
 - npajkovsky: add `negate_image()` operation
