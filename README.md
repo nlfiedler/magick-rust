@@ -44,6 +44,29 @@ This is required for the proper functioning of `rust-bindgen`.
 > cargo test
 ```
 
+### Build Troubleshooting
+
+#### Error: cannot find value `QuantumRange` in module bindings
+
+When attempting to build the library, you might see an error like this one:
+
+```
+error[E0425]: cannot find value `QuantumRange` in module `bindings`
+   --> C:\Users\charlie\.cargo\registry\src\github.com-1ecc6299db9ec823\magick_rust-0.9.0\src\wand\magick.rs:337:80
+    |
+337 |             if bindings::MagickSepiaToneImage(self.wand, threshold * bindings::QuantumRange) == bindings::MagickBooleanType::MagickTrue {
+    |
+     ^^^^^^^^^^^^ not found in `bindings`
+
+error: aborting due to previous error
+```
+
+See [issue 40](https://github.com/nlfiedler/magick-rust/issues/40) on GitHub for some background. The issue seems to be that with HDRI disabled, rust-bindgen will not produce the bindings needed for the "quantum range" feature of ImageMagick (see [issue 316](https://github.com/rust-lang/rust-bindgen/issues/316)). To work-around this issue, you can disable HDRI support in your `Cargo.toml` file, like so:
+
+```
+magick_rust = { version = "0.15.0", features = ["disable-hdri"] }
+```
+
 ## Example Usage
 
 MagickWand has some global state that needs to be initialized prior to using the library, but fortunately Rust makes handling this pretty easy. In the example below, we read in an image from a file and resize it to fit a square of 240 by 240 pixels, then convert the image to JPEG.
