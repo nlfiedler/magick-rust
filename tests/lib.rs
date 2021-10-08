@@ -60,6 +60,29 @@ fn test_resize_image() {
 }
 
 #[test]
+fn test_thumbnail_image() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert_eq!(512, wand.get_image_width());
+    assert_eq!(384, wand.get_image_height());
+    let halfwidth = match wand.get_image_width() {
+        1 => 1,
+        width => width / 2,
+    };
+    let halfheight = match wand.get_image_height() {
+        1 => 1,
+        height => height / 2,
+    };
+    wand.thumbnail_image(halfwidth, halfheight);
+    assert_eq!(256, wand.get_image_width());
+    assert_eq!(192, wand.get_image_height());
+}
+
+
+#[test]
 fn test_read_from_blob() {
     START.call_once(|| {
         magick_wand_genesis();
