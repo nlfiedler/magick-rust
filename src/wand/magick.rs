@@ -691,6 +691,15 @@ impl MagickWand {
         }
     }
 
+    /// Resize the image to the specified width and height, using the
+    /// 'thumbnail' optimizations which remove a lot of image meta-data with the goal 
+    /// of producing small low cost images suited for display on the web.
+    pub fn thumbnail_image(&self, width: usize, height: usize) {
+        unsafe {
+            bindings::MagickThumbnailImage(self.wand, width as size_t, height as size_t);
+        }
+    }
+
     /// Extract a region of the image. The width and height is used as the size
     /// of the region. X and Y is the offset.
     pub fn crop_image(
