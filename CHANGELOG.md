@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- walterbm: Add support for thumbnail image resizing.
+
 ## [0.15.0] - 2021-8-10
 ### Added
 - glebpom: Support resource limits
