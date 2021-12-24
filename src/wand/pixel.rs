@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use bindings;
+use std::ffi::{CStr, CString};
+use std::fmt;
+
 #[cfg(target_os = "freebsd")]
 use libc::size_t;
 #[cfg(not(target_os = "freebsd"))]
 use size_t;
-use std::ffi::{CStr, CString};
-use std::fmt;
+
+use bindings;
+use result::MagickError;
+
+use crate::result::Result;
 
 #[derive(Default, Debug)]
 pub struct HSL {
@@ -41,10 +46,10 @@ wand_common!(
 );
 
 impl PixelWand {
-    pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> Result<(), &'static str> {
+    pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> Result<()> {
         match unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
-            _ => Err("not similar"),
+            _ => Err(MagickError("not similar")),
         }
     }
 
@@ -78,11 +83,11 @@ impl PixelWand {
         writeln!(f, "{}}}", prefix)
     }
 
-    pub fn set_color(&mut self, s: &str) -> Result<(), &'static str> {
+    pub fn set_color(&mut self, s: &str) -> Result<()> {
         let c_string = CString::new(s).map_err(|_| "could not convert to cstring")?;
         match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr()) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
-            _ => Err("failed to set color"),
+            _ => Err(MagickError("failed to set color")),
         }
     }
 

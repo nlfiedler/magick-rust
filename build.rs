@@ -23,10 +23,10 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-const MIN_VERSION: &'static str = "7.0";
-const MAX_VERSION: &'static str = "7.2";
+const MIN_VERSION: &str = "7.0";
+const MAX_VERSION: &str = "7.2";
 
-static HEADER: &'static str = "#include <MagickWand/MagickWand.h>\n";
+static HEADER: &str = "#include <MagickWand/MagickWand.h>\n";
 
 //on windows path env always contain : like c:
 pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
@@ -220,7 +220,7 @@ fn determine_mode<T: AsRef<str>>(libdirs: &Vec<PathBuf>, libs: &[T]) -> &'static
     // See what files we actually have to link against, and see what our
     // possibilities even are.
     let files = libdirs
-        .into_iter()
+        .iter()
         .flat_map(|d| d.read_dir().unwrap())
         .map(|e| e.unwrap())
         .map(|e| e.file_name())
