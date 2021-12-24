@@ -40,6 +40,12 @@ impl DrawingWand {
         Ok(())
     }
 
+    pub fn draw_circle(&mut self, ox: f64, oy: f64, px: f64, py: f64) {
+        unsafe {
+            bindings::DrawCircle(self.wand, ox, oy, px, py);
+        }
+    }
+
     string_set_get!(
         get_font,                   set_font,                     DrawGetFont,                  DrawSetFont
         get_font_family,            set_font_family,              DrawGetFontFamily,            DrawSetFontFamily

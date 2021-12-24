@@ -339,7 +339,6 @@ impl MagickWand {
         }
     }
 
-
     /// Extend the image as defined by the geometry, gravity, and wand background color. Set the
     /// (x,y) offset of the geometry to move the original wand relative to the extended wand.
     pub fn extend_image(
@@ -650,7 +649,7 @@ impl MagickWand {
     }
 
     /// Extracts pixel data from the image as a vector of 0..255 values defined by `map`.
-    /// See https://www.imagemagick.org/api/magick-image.php#MagickExportImagePixels for more information.
+    /// See <https://imagemagick.org/api/magick-image.php#MagickExportImagePixels> for more information.
     pub fn export_image_pixels(
         &self,
         x: isize,
@@ -692,7 +691,7 @@ impl MagickWand {
     }
 
     /// Resize the image to the specified width and height, using the
-    /// 'thumbnail' optimizations which remove a lot of image meta-data with the goal 
+    /// 'thumbnail' optimizations which remove a lot of image meta-data with the goal
     /// of producing small low cost images suited for display on the web.
     pub fn thumbnail_image(&self, width: usize, height: usize) {
         unsafe {
@@ -858,6 +857,125 @@ impl MagickWand {
             bindings::MagickRelinquishMemory(blob as *mut c_void);
         };
         Ok(bytes)
+    }
+
+    /// Return false if the image alpha channel is not activated.
+    /// That is, the image is RGB rather than RGBA or CMYK rather than CMYKA
+    pub fn get_image_alpha_channel(&self) -> bool {
+        let res = unsafe { bindings::MagickGetImageAlphaChannel(self.wand) };
+        return res == bindings::MagickBooleanType_MagickTrue;
+    }
+
+    /// Renders the drawing wand on the current image
+    pub fn draw_image(&mut self, drawing_wand: &DrawingWand) -> Result<(), &'static str> {
+        match unsafe { bindings::MagickDrawImage(self.wand, drawing_wand.wand) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("unable to draw image"),
+        }
+    }
+
+    /// Set image channel mask
+    pub fn set_image_channel_mask(
+        &mut self,
+        option: bindings::ChannelType,
+    ) -> bindings::ChannelType {
+        unsafe { bindings::MagickSetImageChannelMask(self.wand, option) }
+    }
+
+    /// Apply an arithmetic, relational, or logical
+    /// expression to an image.  Use these operators to lighten or darken an image,
+    /// to increase or decrease contrast in an image, or to produce the "negative"
+    /// of an image.
+    pub fn evaluate_image(
+        &mut self,
+        op: bindings::MagickEvaluateOperator,
+        val: f64,
+    ) -> Result<(), &'static str> {
+        let res = unsafe { bindings::MagickEvaluateImage(self.wand, op, val) };
+        match res {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("failed to evaluate image"),
+        }
+    }
+
+    /// Surround the image with a border of the color defined
+    /// by the `pixel_wand`.
+    pub fn border_image(
+        &self,
+        pixel_wand: &PixelWand,
+        width: usize,
+        height: usize,
+        compose: bindings::CompositeOperator,
+    ) -> Result<(), &'static str> {
+        match unsafe {
+            bindings::MagickBorderImage(self.wand, pixel_wand.wand, width, height, compose)
+        } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+
+            _ => Err("border image returned false"),
+        }
+    }
+
+    /// Simulate an image shadow
+    pub fn shadow_image(
+        &self,
+        alpha: f64,
+        sigma: f64,
+        x: isize,
+        y: isize,
+    ) -> Result<(), &'static str> {
+        unsafe {
+            if bindings::MagickShadowImage(self.wand, alpha, sigma, x, y)
+                == bindings::MagickBooleanType_MagickTrue
+            {
+                Ok(())
+            } else {
+                Err("ShadowImage returned false")
+            }
+        }
+    }
+
+    /// Accepts pixel datand stores it in the image at the location you specify.
+    /// See <https://imagemagick.org/api/magick-image.php#MagickImportImagePixels> for more information.
+    pub fn import_image_pixels(
+        &mut self,
+        x: isize,
+        y: isize,
+        columns: usize,
+        rows: usize,
+        pixels: &Vec<u8>,
+    ) -> Result<(), &'static str> {
+        let pixel_map = CString::new("RGBA").unwrap();
+        match unsafe {
+            bindings::MagickImportImagePixels(
+                self.wand,
+                x,
+                y,
+                columns,
+                rows,
+                pixel_map.as_ptr(),
+                bindings::StorageType_CharPixel,
+                pixels.as_ptr() as *const libc::c_void,
+            )
+        } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err("unable to import pixels"),
+        }
+    }
+
+    /// Set the wand iterator to the first image.
+    /// See <https://imagemagick.org/api/magick-wand.php#MagickSetFirstIterator> for more information.
+    pub fn set_first_iterator(&self) {
+        unsafe {
+            bindings::MagickSetFirstIterator(self.wand);
+        }
+    }
+
+    /// Set the next image in the wand as the current image.
+    /// See <https://imagemagick.org/api/magick-image.php#MagickNextImage> for more information.
+    pub fn next_image(&self) -> bool {
+        let res = unsafe { bindings::MagickNextImage(self.wand) };
+        res == bindings::MagickBooleanType_MagickTrue
     }
 
     mutations!(
