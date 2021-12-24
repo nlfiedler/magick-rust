@@ -32,19 +32,22 @@
 
 extern crate libc;
 
-mod conversions;
-mod wand;
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+use libc::size_t;
+#[cfg(not(target_os = "freebsd"))]
+use libc::ssize_t;
 
 pub use bindings::{
     ColorspaceType, CompositeOperator, DitherMethod, FilterType, GravityType, MetricType,
 };
 pub use conversions::ToMagick;
+pub use result::MagickError;
+use result::Result;
 pub use wand::*;
 
-use libc::size_t;
-#[cfg(not(target_os = "freebsd"))]
-use libc::ssize_t;
+mod conversions;
+mod result;
+mod wand;
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 /// This function must be called before any other ImageMagick operations
 /// are attempted. This function is safe to be called repeatedly.
@@ -67,13 +70,13 @@ pub fn magick_wand_terminus() {
     }
 }
 
-pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>, &'static str> {
+pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>> {
     let mut number_fonts: size_t = 0;
     let c_string = ::std::ffi::CString::new(pattern).map_err(|_| "could not convert to cstring")?;
     let ptr =
         unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut size_t) };
     if ptr.is_null() {
-        Err("null ptr returned by magick_query_fonts")
+        Err(MagickError("null ptr returned by magick_query_fonts"))
     } else {
         let mut v = Vec::new();
         let c_str_ptr_slice = unsafe { ::std::slice::from_raw_parts(ptr, number_fonts as usize) };

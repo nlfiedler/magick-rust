@@ -16,14 +16,14 @@
 
 extern crate magick_rust;
 
-use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand, ResourceType};
-
-use magick_rust::ToMagick;
 use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use std::sync::Once;
+
+use magick_rust::{MagickError, ToMagick};
+use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand, ResourceType};
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
@@ -80,7 +80,6 @@ fn test_thumbnail_image() {
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
-
 
 #[test]
 fn test_read_from_blob() {
@@ -172,7 +171,7 @@ fn test_get_image_property() {
     // retrieve a property that does not exist
     let missing_value = wand.get_image_property("exif:Foobar");
     assert!(missing_value.is_err());
-    assert_eq!("missing property", missing_value.unwrap_err());
+    assert_eq!(MagickError("missing property"), missing_value.unwrap_err());
 }
 
 #[test]

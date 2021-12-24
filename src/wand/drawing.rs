@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use bindings;
+use std::ffi::{CStr, CString};
+use std::fmt;
+
 #[cfg(target_os = "freebsd")]
 use libc::size_t;
 #[cfg(not(target_os = "freebsd"))]
 use size_t;
-use std::ffi::{CStr, CString};
-use std::fmt;
+
+use bindings;
+
+use crate::result::MagickError;
+use crate::result::Result;
 
 wand_common!(
     DrawingWand,
@@ -34,7 +39,7 @@ wand_common!(
 );
 
 impl DrawingWand {
-    pub fn draw_annotation(&mut self, x: f64, y: f64, text: &str) -> Result<(), &'static str> {
+    pub fn draw_annotation(&mut self, x: f64, y: f64, text: &str) -> Result<()> {
         let c_string = CString::new(text).map_err(|_| "could not convert to cstring")?;
         unsafe { bindings::DrawAnnotation(self.wand, x, y, c_string.as_ptr() as *const _) };
         Ok(())
