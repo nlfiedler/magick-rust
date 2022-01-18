@@ -374,6 +374,14 @@ impl MagickWand {
         }
     }
 
+    pub fn strip_image(&self) -> Result<()> {
+        let result = unsafe { bindings::MagickStripImage(self.wand) };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to strip image")),
+        }
+    }
+
     pub fn flip_image(&self) -> Result<()> {
         let result = unsafe { bindings::MagickFlipImage(self.wand) };
         match result {
