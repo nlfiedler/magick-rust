@@ -5,11 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.16.0] - 2022-04-09
 ### Added
 - walterbm: Add support for thumbnail image resizing.
+- DCjanus: add methods `get_image_alpha_channel`, `draw_image`, `set_image_channel_mask`,
+  `evaluate_image`, `border_image`, `shadow_image`, `import_image_pixels`, `set_first_iterator`,
+  `next_image`
+- DCjanus: feat: std error compatible error
+- davidwilemski: add binding for `MagickStripImage()`
 
-## [0.15.0] - 2021-8-10
+## [0.15.0] - 2021-08-10
 ### Added
 - glebpom: Support resource limits
 - lerouxrgd: Add kmeans
@@ -23,7 +28,7 @@ This file follows the convention described at
 - asonix: Set environment variable with magickcore config flags
 - captainbland: Add workaround for QuantumRange not defined error when hdri is disabled
 
-## [0.14.0] - 2020-5-21
+## [0.14.0] - 2020-05-21
 ### Added
 - npajkovsky: add `negate_image()` operation
 - danielronnkvist: add `MagickFxImage` binding

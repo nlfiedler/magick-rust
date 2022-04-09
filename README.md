@@ -64,7 +64,7 @@ error: aborting due to previous error
 See [issue 40](https://github.com/nlfiedler/magick-rust/issues/40) on GitHub for some background. The issue seems to be that with HDRI disabled, rust-bindgen will not produce the bindings needed for the "quantum range" feature of ImageMagick (see [issue 316](https://github.com/rust-lang/rust-bindgen/issues/316)). To work-around this issue, you can disable HDRI support in your `Cargo.toml` file, like so:
 
 ```
-magick_rust = { version = "0.15.0", features = ["disable-hdri"] }
+magick_rust = { version = "0.16.0", features = ["disable-hdri"] }
 ```
 
 ## Example Usage
@@ -102,12 +102,12 @@ There are still many missing functions, so if you find there is something you wo
 
 ## Docker
 
-[Docker](https://www.docker.com) can be used to build and test the code without affecting your development environment, which may have a different version of ImageMagick installed. The use of `docker-compose`, as shown in the example below, is optional, but it makes the process very simple.
+[Docker](https://www.docker.com) can be used to build and test the code without affecting your development environment, which may have a different version of ImageMagick installed. The use of `docker compose`, as shown in the example below, is optional, but it makes the process very simple.
 
 ```shell
 $ cd docker
-$ docker-compose build --pull
-$ docker-compose run magick-rust
+$ docker compose build --pull
+$ docker compose run magick-rust
 $ cargo clean
 $ cargo build
 $ cargo test
