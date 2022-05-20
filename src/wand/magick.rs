@@ -73,6 +73,7 @@ impl MagickWand {
         }
     }
 
+    #[cfg(not(windows))]
     pub fn set_resource_limit(resource: ResourceType, limit: u64) -> Result<()> {
         let result = unsafe {
             bindings::SetMagickResourceLimit(
