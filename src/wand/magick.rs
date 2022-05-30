@@ -875,6 +875,17 @@ impl MagickWand {
         }
     }
 
+    /// Removes skew from the image. Skew is an artifact that
+    /// occurs in scanned images because of the camera being misaligned,
+    /// imperfections in the scanning or surface, or simply because the paper was
+    /// not placed completely flat when scanned
+    pub fn deskew_image(&mut self, threshold: f64) -> Result<()> {
+        match unsafe { bindings::MagickDeskewImage(self.wand, threshold) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("unable to deskew image")),
+        }
+    }
+
     /// Set image channel mask
     pub fn set_image_channel_mask(
         &mut self,
