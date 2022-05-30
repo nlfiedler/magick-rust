@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+### Added
+- walterbm: Add support for image deskew.
+
 ## [0.16.0] - 2022-04-09
 ### Added
 - walterbm: Add support for thumbnail image resizing.
