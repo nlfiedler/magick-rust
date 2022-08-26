@@ -8,6 +8,7 @@ This file follows the convention described at
 ## Unreleased
 ### Added
 - walterbm: Add support for image deskew.
+- DCjanus: Upgrade dependency `bindgen` (0.59 -> 0.60)
 
 ## [0.16.0] - 2022-04-09
 ### Added
