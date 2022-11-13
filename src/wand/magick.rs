@@ -992,6 +992,9 @@ impl MagickWand {
         // Control the brightness, saturation, and hue of an image
         MagickModulateImage => modulate_image(brightness: f64, saturation: f64, hue: f64)
 
+        /// Control the brightness and contrast
+        MagickBrightnessContrastImage => brightness_contrast_image(brightness: f64, contrast: f64)
+
         /// Set the image alpha channel mode.
         MagickSetImageAlphaChannel => set_image_alpha_channel(
             alpha_channel: bindings::AlphaChannelOption)
