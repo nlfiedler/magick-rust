@@ -51,6 +51,24 @@ impl DrawingWand {
         }
     }
 
+    pub fn draw_rectangle(
+        &mut self,
+        upper_left_x: f64,
+        upper_left_y: f64,
+        lower_right_x: f64,
+        lower_right_y: f64,
+    ) {
+        unsafe {
+            bindings::DrawRectangle(
+                self.wand,
+                upper_left_x,
+                upper_left_y,
+                lower_right_x,
+                lower_right_y,
+            );
+        }
+    }
+
     string_set_get!(
         get_font,                   set_font,                     DrawGetFont,                  DrawSetFont
         get_font_family,            set_font_family,              DrawGetFontFamily,            DrawSetFontFamily
