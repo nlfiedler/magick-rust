@@ -64,7 +64,7 @@ error: aborting due to previous error
 See [issue 40](https://github.com/nlfiedler/magick-rust/issues/40) on GitHub for some background. The issue seems to be that with HDRI disabled, rust-bindgen will not produce the bindings needed for the "quantum range" feature of ImageMagick (see [issue 316](https://github.com/rust-lang/rust-bindgen/issues/316)). To work-around this issue, you can disable HDRI support in your `Cargo.toml` file, like so:
 
 ```
-magick_rust = { version = "0.16.0", features = ["disable-hdri"] }
+magick_rust = { version = "0.17.0", features = ["disable-hdri"] }
 ```
 
 ## Example Usage

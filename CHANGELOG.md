@@ -5,10 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [0.17.0] - 2022-12-10
 ### Added
 - walterbm: Add support for image deskew.
+- Upgrade dependency `bindgen` to 0.63
 - DCjanus: Upgrade dependency `bindgen` (0.59 -> 0.60)
+- MaksRawski: add `DrawRectangle` and `MagickBrightnessContrastImage` bindings
 
 ## [0.16.0] - 2022-04-09
 ### Added
