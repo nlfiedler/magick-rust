@@ -22,7 +22,7 @@ Pretty simple for now.
 
 ```shell
 $ cargo build
-$ cargo test
+$ cargo test --lib
 ```
 
 Optionally you can set some environment variables before building:
