@@ -22,8 +22,8 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::Once;
 
+use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand};
 use magick_rust::{MagickError, ToMagick};
-use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand, ResourceType};
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
@@ -385,7 +385,9 @@ fn test_negate_image() {
 }
 
 #[test]
+#[cfg(not(windows))]
 fn test_resource_limits() {
+    use magick_rust::ResourceType;
     START.call_once(|| {
         magick_wand_genesis();
     });

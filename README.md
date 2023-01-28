@@ -33,10 +33,7 @@ Optionally you can set some environment variables before building:
 
 ### Build on Windows
 
-On Windows you will need to launch build in Visual Studio Native Tools Command Prompt.
-It can be found in *Start menu -> Visual Studio < VERSION > -> Visual Studio Tools -> Windows Desktop Command Prompts*.
-Choose the architecture corresponding to architecture of your rust compiler.
-This is required for the proper functioning of `rust-bindgen`.
+When building on Windows, you will need to set the `IMAGE_MAGICK_DIR` environment variable to point to the ImageMagick installation path. Maybe this is possible with the `set` command, but it may be necessary to set the variable in the system preferences. Without setting `IMAGE_MAGICK_DIR`, the `build.rs` script will try to run `pkg-config` which is a tool generally found on Unix-based systems.
 
 ```shell
 > set IMAGE_MAGICK_DIR=<path to ImageMagick installation directory>
