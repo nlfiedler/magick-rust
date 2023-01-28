@@ -9,8 +9,8 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
     - Does _not_ work with ImageMagick 6.x due to backward incompatible changes.
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
     - [Homebrew](http://brew.sh): `brew install imagemagick`
-    - Linux may require building ImageMagick from source, see the `Dockerfile` for an example
-    - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/download.php#windows). Only MSVC version available. When installing, check the checkbox "Install development headers and libraries for C and C++".
+    - Linux may require building ImageMagick from source, see the `docker/Dockerfile` for an example
+    - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/download.php#windows). When installing, check the *Install development headers and libraries for C and C++* checkbox.
 * [Clang](https://clang.llvm.org) (version 3.5 or higher)
     - Or whatever version is dictated by [rust-bindgen](https://github.com/rust-lang/rust-bindgen)
 * Windows requires MSVC toolchain
@@ -22,14 +22,15 @@ Pretty simple for now.
 
 ```shell
 $ cargo build
-$ cargo test --lib
+$ cargo test
 ```
 
-Optionally you can set some environment variables before building:
-* `IMAGE_MAGICK_DIR` - installation directory of ImageMagick
-* `IMAGE_MAGICK_LIB_DIRS` - list of lib directories split by `:`
-* `IMAGE_MAGICK_INCLUDE_DIRS` - list of include directories split by `:`
-* `IMAGE_MAGICK_LIBS` - list of the libs to link to
+If `pkg-config` is not available, or you wish to override its behavior, you can set one or more environment variables before building. The `build.rs` script will pick these up and use them instead of trying to invoke the `pkg-config` utility.
+
+* `IMAGE_MAGICK_DIR` - installation path of ImageMagick
+* `IMAGE_MAGICK_LIB_DIRS` - list of `lib` directories split by `:`
+* `IMAGE_MAGICK_INCLUDE_DIRS` - list of `include` directories split by `:`
+* `IMAGE_MAGICK_LIBS` - list of the libraries with which to link
 
 ### Build on Windows
 
