@@ -73,7 +73,8 @@ impl MagickWand {
         }
     }
 
-    #[cfg(not(windows))]
+    // opt-in platforms that have resource limits support
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     pub fn set_resource_limit(resource: ResourceType, limit: u64) -> Result<()> {
         let result = unsafe {
             bindings::SetMagickResourceLimit(

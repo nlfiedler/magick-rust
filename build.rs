@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Nathan Fiedler
+ * Copyright 2016-2023 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,24 +35,10 @@ pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
 };
 
 fn main() {
-    if cfg!(target_os = "freebsd") {
-        // pkg_config does not seem to work properly on FreeBSD, so
-        // hard-code the builder settings for the time being.
-        env_var_set_default(
-            "IMAGE_MAGICK_INCLUDE_DIRS",
-            "/usr/local/include/ImageMagick-7",
-        );
-        // Need to hack the linker flags as well.
-        env_var_set_default("IMAGE_MAGICK_LIB_DIRS", "/usr/local/lib");
-        env_var_set_default("IMAGE_MAGICK_LIBS", "MagickWand-7");
-    }
-
     let check_cppflags = Command::new("MagickCore-config").arg("--cppflags").output();
-    //on windows can not exec
     if check_cppflags.is_ok() {
         let cppflags = check_cppflags.unwrap().stdout;
         let cppflags = String::from_utf8(cppflags).unwrap();
-
         env_var_set_default("BINDGEN_EXTRA_CLANG_ARGS", &cppflags);
     }
 
@@ -79,10 +65,10 @@ fn main() {
     println!("cargo:rerun-if-env-changed=IMAGE_MAGICK_LIBS");
 
     let target = env::var("TARGET").unwrap();
-    let libs_env = env::var("IMAGE_MAGICK_LIBS").ok();
+    let libs_env = env::var("IMAGE_MAGICK_LIBS");
     let libs = match libs_env {
-        Some(ref v) => v.split(PATH_SEPARATOR).map(|x| x.to_owned()).collect(),
-        None => {
+        Ok(ref v) => v.split(PATH_SEPARATOR).map(|x| x.to_owned()).collect(),
+        Err(_) => {
             if target.contains("windows") {
                 vec!["CORE_RL_MagickWand_".to_string()]
             } else if target.contains("freebsd") {
@@ -210,11 +196,11 @@ fn find_image_magick_dir() -> Result<PathBuf, env::VarError> {
 
 fn determine_mode<T: AsRef<str>>(libdirs: &Vec<PathBuf>, libs: &[T]) -> &'static str {
     println!("cargo:rerun-if-env-changed=IMAGE_MAGICK_STATIC");
-    let kind = env::var("IMAGE_MAGICK_STATIC").ok();
+    let kind = env::var("IMAGE_MAGICK_STATIC");
     match kind.as_ref().map(|s| &s[..]) {
-        Some("0") => return "dylib",
-        Some(_) => return "static",
-        None => {}
+        Ok("0") => return "dylib",
+        Ok(_) => return "static",
+        Err(_) => {}
     }
 
     // See what files we actually have to link against, and see what our
@@ -272,7 +258,7 @@ fn run_pkg_config() -> pkg_config::Library {
         .unwrap()
         .success()
     {
-        panic!("MagickWand version must be less than 7.1");
+        panic!("MagickWand version must be less than {}", MAX_VERSION);
     }
     // We have to split the version check and the cflags/libs check because
     // you can't do both at the same time on RHEL (apparently).

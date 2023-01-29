@@ -14,11 +14,11 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 * [Clang](https://clang.llvm.org) (version 3.5 or higher)
     - Or whatever version is dictated by [rust-bindgen](https://github.com/rust-lang/rust-bindgen)
 * Windows requires MSVC toolchain
-* Optionally `pkg-config`, to facilitate linking with ImageMagick. Or you can set linker parameters via environment variables.
+* Optionally `pkg-config`, to facilitate linking with ImageMagick. Or you can set linker parameters via environment variables as described in the next section.
 
 ## Build and Test
 
-Pretty simple for now.
+On FreeBSD, Linux, and macOS the following commands should suffice.
 
 ```shell
 $ cargo build

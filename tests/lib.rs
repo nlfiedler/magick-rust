@@ -385,7 +385,8 @@ fn test_negate_image() {
 }
 
 #[test]
-#[cfg(not(windows))]
+// opt-in platforms that have resource limits support
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 fn test_resource_limits() {
     use magick_rust::ResourceType;
     START.call_once(|| {
