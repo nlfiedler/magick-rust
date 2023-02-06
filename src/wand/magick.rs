@@ -938,7 +938,7 @@ impl MagickWand {
         }
     }
 
-    /// Accepts pixel datand stores it in the image at the location you specify.
+    /// Accepts pixel data and stores it in the image at the location you specify.
     /// See <https://imagemagick.org/api/magick-image.php#MagickImportImagePixels> for more information.
     pub fn import_image_pixels(
         &mut self,
@@ -946,9 +946,10 @@ impl MagickWand {
         y: isize,
         columns: usize,
         rows: usize,
-        pixels: &Vec<u8>,
+        pixels: &[u8],
+        map: &str,
     ) -> Result<()> {
-        let pixel_map = CString::new("RGBA").unwrap();
+        let pixel_map = CString::new(map).unwrap();
         match unsafe {
             bindings::MagickImportImagePixels(
                 self.wand,
