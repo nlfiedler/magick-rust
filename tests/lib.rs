@@ -398,6 +398,25 @@ fn test_resource_limits() {
 }
 
 #[test]
+fn test_auto_level() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert!(wand.auto_level().is_ok());
+}
+
+#[test]
+fn test_auto_gamma() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
+    assert!(wand.auto_gamma().is_ok());
+}
+
 fn test_import_export_pixels_roundtrip() {
     START.call_once(|| {
         magick_wand_genesis();
