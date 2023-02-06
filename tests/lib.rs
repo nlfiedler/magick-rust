@@ -396,3 +396,23 @@ fn test_resource_limits() {
     let wand = MagickWand::new();
     assert!(wand.read_image("tests/data/rust.png").is_ok());
 }
+
+#[test]
+fn test_import_export_pixels_roundtrip() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let w = 2;
+    let h = 2;
+    let map = "RGB";
+    let pixels = [0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255];
+    let mut wand = MagickWand::new();
+    wand.new_image(4, 4, &PixelWand::new()).unwrap();
+    assert!(wand.import_image_pixels(0, 0, w, h, &pixels, map).is_ok());
+    let exported_pixels = wand.export_image_pixels(0, 0, w, h, map).unwrap();
+    assert_eq!(exported_pixels.len(), pixels.len());
+    assert!(exported_pixels
+        .iter()
+        .zip(pixels.iter())
+        .all(|(a, b)| a == b));
+}
