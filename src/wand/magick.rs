@@ -1015,6 +1015,12 @@ impl MagickWand {
 
         /// Applies k-means color reduction to the image.
         MagickKmeansImage => kmeans(number_colors: size_t, max_iterations: size_t, tolerance: f64)
+
+        /// Extracts the 'mean' from the image and adjust the image to try make set its gamma appropriately.
+        MagickAutoGammaImage => auto_gamma()
+
+        /// Adjusts the levels of a particular image channel by scaling the minimum and maximum values to the full quantum range.
+        MagickAutoLevelImage => auto_level()
     );
 
     get!(get_image_colors, MagickGetImageColors, size_t);
