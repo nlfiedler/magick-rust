@@ -417,6 +417,7 @@ fn test_auto_gamma() {
     assert!(wand.auto_gamma().is_ok());
 }
 
+#[test]
 fn test_import_export_pixels_roundtrip() {
     START.call_once(|| {
         magick_wand_genesis();
