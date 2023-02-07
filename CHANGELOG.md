@@ -5,6 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Changed
+- **Breaking**: jshrake: Add `map` argument to `import_image_pixels()` and
+  change `pixels` argument to a byte slice rather than a vector reference.
+### Added
+- jshrake: Add `MagickAutoGammaImage` and `MagickAutoLevelImage`
+
 ## [0.17.0] - 2022-12-10
 ### Added
 - walterbm: Add support for image deskew.
