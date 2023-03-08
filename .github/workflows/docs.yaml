@@ -1,0 +1,54 @@
+name: Build and deploy docs
+
+on:
+  push:
+    branches:
+      - master
+    workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: deps
+        run: |
+          # sudo apt update && sudo apt install -y libmagickwand-dev
+          curl https://imagemagick.org/archive/ImageMagick.tar.gz | tar xz
+          cd ImageMagick-7.1*
+          ./configure --with-magick-plus-plus=no --with-perl=no 
+          make -j
+          sudo make install
+      - uses: Swatinem/rust-cache@v2
+      - name: build docs
+        run: |
+          cargo doc --no-deps
+          cp .github/static-files/index.html target/doc/
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./target/doc
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
+
+
+

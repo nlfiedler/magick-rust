@@ -2,6 +2,10 @@
 
 A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. Many of the functions in the MagickWand API are still missing, but over time more will be added. Pull requests are welcome.
 
+## Documentation
+
+Documentation for upstream is hosted on [github pages](https://nlfiedler.github.io/magick-rust).  To build locally run `cargo doc`.
+
 ## Dependencies
 
 * Rust stable
