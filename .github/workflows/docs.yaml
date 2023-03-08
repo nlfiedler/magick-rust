@@ -31,6 +31,7 @@ jobs:
       - name: build docs
         run: |
           cargo doc --no-deps
+          cp .github/static-files/index.html target/doc/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
@@ -43,8 +44,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Deploy to GitHub Pages
