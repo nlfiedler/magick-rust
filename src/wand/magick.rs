@@ -831,13 +831,17 @@ impl MagickWand {
             bindings::MagickSetImageFormat(self.wand, c_format.as_ptr());
             bindings::MagickGetImageBlob(self.wand, &mut length)
         };
-        let mut bytes = Vec::with_capacity(length as usize);
-        unsafe {
-            bytes.set_len(length as usize);
-            ptr::copy_nonoverlapping(blob, bytes.as_mut_ptr(), length as usize);
-            bindings::MagickRelinquishMemory(blob as *mut c_void);
-        };
-        Ok(bytes)
+        if blob.is_null() {
+            Err(MagickError("failed to write image blob"))
+        } else {
+            let mut bytes = Vec::with_capacity(length as usize);
+            unsafe {
+                bytes.set_len(length as usize);
+                ptr::copy_nonoverlapping(blob, bytes.as_mut_ptr(), length as usize);
+                bindings::MagickRelinquishMemory(blob as *mut c_void);
+            };
+            Ok(bytes)
+        }
     }
 
     /// Write the images in the desired format to a new blob.
