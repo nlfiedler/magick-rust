@@ -2,10 +2,6 @@
 
 A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. Many of the functions in the MagickWand API are still missing, but over time more will be added. Pull requests are welcome.
 
-## Documentation
-
-Documentation for upstream is hosted on [github pages](https://nlfiedler.github.io/magick-rust).  To build locally run `cargo doc`.
-
 ## Dependencies
 
 * Rust stable
@@ -66,8 +62,12 @@ error: aborting due to previous error
 See [issue 40](https://github.com/nlfiedler/magick-rust/issues/40) on GitHub for some background. The issue seems to be that with HDRI disabled, rust-bindgen will not produce the bindings needed for the "quantum range" feature of ImageMagick (see [issue 316](https://github.com/rust-lang/rust-bindgen/issues/316)). To work-around this issue, you can disable HDRI support in your `Cargo.toml` file, like so:
 
 ```
-magick_rust = { version = "0.17.0", features = ["disable-hdri"] }
+magick_rust = { version = "0.18.0", features = ["disable-hdri"] }
 ```
+
+## Documentation
+
+The API documentation is available at [github pages](https://nlfiedler.github.io/magick-rust) since the docs.rs system has a hard time building anything that requires an external library that is not wrapped in a "sys" style library. See [issue 57](https://github.com/nlfiedler/magick-rust/issues/57) for the "create a sys crate request."
 
 ## Example Usage
 
