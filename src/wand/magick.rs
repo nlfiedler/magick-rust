@@ -262,6 +262,18 @@ impl MagickWand {
         }
     }
 
+    /// Rebuilds image sequence with each frame size the same as first frame, and composites each frame atop of previous.
+    /// Only affects GIF, and other formats with multiple pages/layers.
+    pub fn coalesce(&mut self) -> Result<()> {
+        let result = unsafe { bindings::MagickCoalesceImages(self.wand) };
+        if result.is_null() {
+            Err(MagickError("failed to coalesce images"))
+        } else {
+            self.wand = result;
+            Ok(())
+        }
+    }
+
     // Replaces colors in the image from a color lookup table.
     pub fn clut_image(
         &self,
