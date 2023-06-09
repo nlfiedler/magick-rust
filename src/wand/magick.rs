@@ -262,6 +262,27 @@ impl MagickWand {
         }
     }
 
+    /// Compose another image onto self with gravity using composition_operator
+    pub fn compose_images_gravity(
+        &self,
+        reference: &MagickWand,
+        composition_operator: bindings::CompositeOperator,
+        gravity_type: bindings::GravityType,
+    ) -> Result<()> {
+        let result = unsafe {
+            bindings::MagickCompositeImageGravity(
+                self.wand,
+                reference.wand,
+                composition_operator,
+                gravity_type,
+            )
+        };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to compose images")),
+        }
+    }
+
     /// Rebuilds image sequence with each frame size the same as first frame, and composites each frame atop of previous.
     /// Only affects GIF, and other formats with multiple pages/layers.
     pub fn coalesce(&mut self) -> Result<()> {
