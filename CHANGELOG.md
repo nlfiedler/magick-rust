@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [0.19.0] - 2023-06-19
+### Added
+- walterbm: Add `coalesce()` for image coalesce.
+- FaithBeam: Add `compose_images_gravity()` for image composition.
+- Upgrade dependency `bindgen` to 0.66.1
+
 ## [0.18.0] - 2023-04-15
 ### Changed
 - **Breaking**: jshrake: Add `map` argument to `import_image_pixels()` and
