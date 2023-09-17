@@ -487,12 +487,12 @@ impl MagickWand {
 
     /// Retrieve the width of the image.
     pub fn get_image_width(&self) -> usize {
-        unsafe { bindings::MagickGetImageWidth(self.wand) as usize }
+        unsafe { bindings::MagickGetImageWidth(self.wand) }
     }
 
     /// Retrieve the height of the image.
     pub fn get_image_height(&self) -> usize {
-        unsafe { bindings::MagickGetImageHeight(self.wand) as usize }
+        unsafe { bindings::MagickGetImageHeight(self.wand) }
     }
 
     /// Retrieve the page geometry (width, height, x offset, y offset) of the image.
@@ -695,9 +695,9 @@ impl MagickWand {
         let c_map = CString::new(map).unwrap();
         let capacity = width * height * map.len();
         let mut pixels = Vec::with_capacity(capacity);
+        pixels.resize(capacity, 0);
 
         unsafe {
-            pixels.set_len(capacity as usize);
             if bindings::MagickExportImagePixels(
                 self.wand,
                 x,
@@ -868,8 +868,8 @@ impl MagickWand {
             Err(MagickError("failed to write image blob"))
         } else {
             let mut bytes = Vec::with_capacity(length as usize);
+            bytes.resize(length, 0);
             unsafe {
-                bytes.set_len(length as usize);
                 ptr::copy_nonoverlapping(blob, bytes.as_mut_ptr(), length as usize);
                 bindings::MagickRelinquishMemory(blob as *mut c_void);
             };
@@ -890,8 +890,8 @@ impl MagickWand {
             bindings::MagickGetImagesBlob(self.wand, &mut length)
         };
         let mut bytes = Vec::with_capacity(length as usize);
+        bytes.resize(length, 0);
         unsafe {
-            bytes.set_len(length as usize);
             ptr::copy_nonoverlapping(blob, bytes.as_mut_ptr(), length as usize);
             bindings::MagickRelinquishMemory(blob as *mut c_void);
         };

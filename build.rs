@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Nathan Fiedler
+ * Copyright 2023 Nathan Fiedler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@ pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
 
 fn main() {
     let check_cppflags = Command::new("MagickCore-config").arg("--cppflags").output();
-    if check_cppflags.is_ok() {
-        let cppflags = check_cppflags.unwrap().stdout;
+    if let Ok(ok_cppflags) = check_cppflags {
+        let cppflags = ok_cppflags.stdout;
         let cppflags = String::from_utf8(cppflags).unwrap();
         env_var_set_default("BINDGEN_EXTRA_CLANG_ARGS", &cppflags);
     }
@@ -147,9 +147,9 @@ fn main() {
         // Work around the include! issue in rustc (as described in the
         // rust-bindgen README file) by wrapping the generated code in a
         // `pub mod` declaration; see issue #359 in (old) rust-bindgen.
-        file.write(b"pub mod bindings {\n").unwrap();
-        file.write(bindings.to_string().as_bytes()).unwrap();
-        file.write(b"\n}").unwrap();
+        file.write_all(b"pub mod bindings {\n").unwrap();
+        file.write_all(bindings.to_string().as_bytes()).unwrap();
+        file.write_all(b"\n}").unwrap();
 
         std::fs::remove_file(&gen_h_path).expect("could not remove header file");
     }
