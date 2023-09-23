@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Changed
+- Feature `disable-hdri` is now enabled by default to work around an apparent
+  bug with rust-bindgen that cannot discover the `QuantumRange` constant which
+  is conditionally computed during compile-time in the MagickCore library.
+
 ## [0.19.0] - 2023-06-19
 ### Added
 - walterbm: Add `coalesce()` for image coalesce.
@@ -49,7 +55,7 @@ This file follows the convention described at
 - liyunde: Fix path_separator on windows can not build
 - kz6wk9: Required version bump on bindgen.
 - asonix: Set environment variable with magickcore config flags
-- captainbland: Add workaround for QuantumRange not defined error when hdri is disabled
+- captainbland: Add workaround for `QuantumRange` not defined error when hdri is disabled
 
 ## [0.14.0] - 2020-05-21
 ### Added

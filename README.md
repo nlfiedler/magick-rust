@@ -42,29 +42,6 @@ When building on Windows, you will need to set the `IMAGE_MAGICK_DIR` environmen
 > cargo test
 ```
 
-### Build Troubleshooting
-
-#### Error: cannot find value `QuantumRange` in module bindings
-
-When attempting to build the library, you might see an error like this one:
-
-```
-error[E0425]: cannot find value `QuantumRange` in module `bindings`
-   --> C:\Users\charlie\.cargo\registry\src\github.com-1ecc6299db9ec823\magick_rust-0.9.0\src\wand\magick.rs:337:80
-    |
-337 |             if bindings::MagickSepiaToneImage(self.wand, threshold * bindings::QuantumRange) == bindings::MagickBooleanType::MagickTrue {
-    |
-     ^^^^^^^^^^^^ not found in `bindings`
-
-error: aborting due to previous error
-```
-
-See [issue 40](https://github.com/nlfiedler/magick-rust/issues/40) on GitHub for some background. The issue seems to be that with HDRI disabled, rust-bindgen will not produce the bindings needed for the "quantum range" feature of ImageMagick (see [issue 316](https://github.com/rust-lang/rust-bindgen/issues/316)). To work-around this issue, you can disable HDRI support in your `Cargo.toml` file, like so:
-
-```
-magick_rust = { version = "0.18.0", features = ["disable-hdri"] }
-```
-
 ## Documentation
 
 The API documentation is available at [github pages](https://nlfiedler.github.io/magick-rust) since the docs.rs system has a hard time building anything that requires an external library that is not wrapped in a "sys" style library. See [issue 57](https://github.com/nlfiedler/magick-rust/issues/57) for the "create a sys crate request."

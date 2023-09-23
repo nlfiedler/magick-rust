@@ -18,5 +18,8 @@ bindgen = "0.68.1"
 pkg-config = "0.3"
 
 [features]
+# Work-around for bindgen(?) not finding the QuantumRange definition ever since
+# MagickWand 7.1.1.17 (or .16) when this suddenly stopped working.
+default = ["disable-hdri"]
 # Workaround for bindgen bug when ImageMagick is compiled with disable-hdri
 disable-hdri = []

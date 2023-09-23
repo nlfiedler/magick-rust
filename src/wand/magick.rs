@@ -350,9 +350,7 @@ impl MagickWand {
             16 => Ok(65535.0f64),
             32 => Ok(4294967295.0f64),
             64 => Ok(18446744073709551615.0f64),
-            _ => Err(MagickError(
-                ("Quantum depth must be one of 8, 16, 32 or 64"),
-            )),
+            _ => Err(MagickError("Quantum depth must be one of 8, 16, 32 or 64")),
         }
     }
 
