@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.19.1] - 2023-09-23
 ### Changed
 - Feature `disable-hdri` is now enabled by default to work around an apparent
   bug with rust-bindgen that cannot discover the `QuantumRange` constant which
