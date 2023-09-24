@@ -14,6 +14,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 * [Clang](https://clang.llvm.org) (version 3.5 or higher)
     - Or whatever version is dictated by [rust-bindgen](https://github.com/rust-lang/rust-bindgen)
 * Windows requires MSVC toolchain
+    - Download the [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) and select the `MSVC ... build tools` (latest version with appropriate architecture) and `Windows 10 SDK` (or 11 if using Windows 11) at a minimum.
 * Optionally `pkg-config`, to facilitate linking with ImageMagick. Or you can set linker parameters via environment variables as described in the next section.
 
 ## Build and Test
