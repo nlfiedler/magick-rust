@@ -1017,6 +1017,17 @@ impl MagickWand {
         res == bindings::MagickBooleanType_MagickTrue
     }
 
+    /// Automatically performs threshold method to reduce grayscale data
+    /// down to a binary black & white image. Included algorithms are
+    /// Kapur, Otsu, and Triangle methods.
+    /// See <https://imagemagick.org/api/magick-image.php#MagickAutoThresholdImage> for more information.
+    pub fn auto_threshold(&self, method: bindings::AutoThresholdMethod) -> Result<()> {
+        match unsafe { bindings::MagickAutoThresholdImage(self.wand, method) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("unable to auto threshold image")),
+        }
+    }
+
     mutations!(
         /// Set the image colorspace, transforming (unlike `set_image_colorspace`) image data in
         /// the process.
