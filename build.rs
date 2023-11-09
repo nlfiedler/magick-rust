@@ -142,7 +142,17 @@ fn main() {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));
         }
 
-        let bindings = builder.generate().unwrap();
+        let bindings = if cfg!(all(windows, target_pointer_width = "64")) {
+            match builder.clone().generate() {
+                Ok(bindings) => bindings,
+                Err(bindgen::BindgenError::ClangDiagnostic(err_msg)) if err_msg.contains("C++") => {
+                    builder.clang_arg("-xc++").generate().unwrap()
+                }
+                Err(err) => panic!("{:?}", err),
+            }
+        } else {
+            builder.generate().unwrap()
+        };
         let mut file = File::create(&bindings_path_str).expect("could not create bindings file");
         // Work around the include! issue in rustc (as described in the
         // rust-bindgen README file) by wrapping the generated code in a
