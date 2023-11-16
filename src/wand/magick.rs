@@ -373,6 +373,30 @@ impl MagickWand {
         }
     }
 
+    /// Apply sigmoidal contrast to the image
+    /// Midpoint is a number in range [0, 1]
+    pub fn sigmoidal_contrast_image(
+        &self,
+        sharpen: bool,
+        contrast: f64,
+        midpoint: f64,
+    ) -> Result<()> {
+        let quantum_range = self.quantum_range()?;
+
+        let result = unsafe {
+            bindings::MagickSigmoidalContrastImage(
+                self.wand,
+                sharpen.to_magick(),
+                contrast,
+                midpoint * quantum_range,
+            )
+        };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("Failed to apply sigmoidal contrast to image")),
+        }
+    }
+
     /// Extend the image as defined by the geometry, gravity, and wand background color. Set the
     /// (x,y) offset of the geometry to move the original wand relative to the extended wand.
     pub fn extend_image(&self, width: usize, height: usize, x: isize, y: isize) -> Result<()> {
