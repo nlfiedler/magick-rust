@@ -1,320 +1,209 @@
 pub enum CompositeOperator {
-    UndefinedCompositeOp,
-    AlphaCompositeOp,
-    AtopCompositeOp,
-    BlendCompositeOp,
-    BlurCompositeOp,
-    BumpmapCompositeOp,
-    ChangeMaskCompositeOp,
-    ClearCompositeOp,
-    ColorBurnCompositeOp,
-    ColorDodgeCompositeOp,
-    ColorizeCompositeOp,
-    CopyBlackCompositeOp,
-    CopyBlueCompositeOp,
-    CopyCompositeOp,
-    CopyCyanCompositeOp,
-    CopyGreenCompositeOp,
-    CopyMagentaCompositeOp,
-    CopyAlphaCompositeOp,
-    CopyRedCompositeOp,
-    CopyYellowCompositeOp,
-    DarkenCompositeOp,
-    DarkenIntensityCompositeOp,
-    DifferenceCompositeOp,
-    DisplaceCompositeOp,
-    DissolveCompositeOp,
-    DistortCompositeOp,
-    DivideDstCompositeOp,
-    DivideSrcCompositeOp,
-    DstAtopCompositeOp,
-    DstCompositeOp,
-    DstInCompositeOp,
-    DstOutCompositeOp,
-    DstOverCompositeOp,
-    ExclusionCompositeOp,
-    HardLightCompositeOp,
-    HardMixCompositeOp,
-    HueCompositeOp,
-    InCompositeOp,
-    IntensityCompositeOp,
-    LightenCompositeOp,
-    LightenIntensityCompositeOp,
-    LinearBurnCompositeOp,
-    LinearDodgeCompositeOp,
-    LinearLightCompositeOp,
-    LuminizeCompositeOp,
-    MathematicsCompositeOp,
-    MinusDstCompositeOp,
-    MinusSrcCompositeOp,
-    ModulateCompositeOp,
-    ModulusAddCompositeOp,
-    ModulusSubtractCompositeOp,
-    MultiplyCompositeOp,
-    NoCompositeOp,
-    OutCompositeOp,
-    OverCompositeOp,
-    OverlayCompositeOp,
-    PegtopLightCompositeOp,
-    PinLightCompositeOp,
-    PlusCompositeOp,
-    ReplaceCompositeOp,
-    SaturateCompositeOp,
-    ScreenCompositeOp,
-    SoftLightCompositeOp,
-    SrcAtopCompositeOp,
-    SrcCompositeOp,
-    SrcInCompositeOp,
-    SrcOutCompositeOp,
-    SrcOverCompositeOp,
-    ThresholdCompositeOp,
-    VividLightCompositeOp,
-    XorCompositeOp,
-    StereoCompositeOp,
-    FreezeCompositeOp,
-    InterpolateCompositeOp,
-    NegateCompositeOp,
-    ReflectCompositeOp,
-    SoftBurnCompositeOp,
-    SoftDodgeCompositeOp,
-    StampCompositeOp,
-    RMSECompositeOp,
-    SaliencyBlendCompositeOp,
-    SeamlessBlendCompositeOp,
+    Undefined,
+    Alpha,
+    Atop,
+    Blend,
+    Blur,
+    Bumpmap,
+    ChangeMask,
+    Clear,
+    ColorBurn,
+    ColorDodge,
+    Colorize,
+    CopyBlack,
+    CopyBlue,
+    Copy,
+    CopyCyan,
+    CopyGreen,
+    CopyMagenta,
+    CopyAlpha,
+    CopyRed,
+    CopyYellow,
+    Darken,
+    DarkenIntensity,
+    Difference,
+    Displace,
+    Dissolve,
+    Distort,
+    DivideDst,
+    DivideSrc,
+    DstAtop,
+    Dst,
+    DstIn,
+    DstOut,
+    DstOver,
+    Exclusion,
+    HardLight,
+    HardMix,
+    Hue,
+    In,
+    Intensity,
+    Lighten,
+    LightenIntensity,
+    LinearBurn,
+    LinearDodge,
+    LinearLight,
+    Luminize,
+    Mathematics,
+    MinusDst,
+    MinusSrc,
+    Modulate,
+    ModulusAdd,
+    ModulusSubtract,
+    Multiply,
+    No,
+    Out,
+    Over,
+    Overlay,
+    PegtopLight,
+    PinLight,
+    Plus,
+    Replace,
+    Saturate,
+    Screen,
+    SoftLight,
+    SrcAtop,
+    Src,
+    SrcIn,
+    SrcOut,
+    SrcOver,
+    Threshold,
+    VividLight,
+    Xor,
+    Stereo,
+    Freeze,
+    Interpolate,
+    Negate,
+    Reflect,
+    SoftBurn,
+    SoftDodge,
+    Stamp,
+    RMSE,
+    SaliencyBlend,
+    SeamlessBlend,
 }
 
 impl From<CompositeOperator> for crate::bindings::CompositeOperator {
     fn from(value: CompositeOperator) -> Self {
         match value {
-            CompositeOperator::UndefinedCompositeOp => {
-                crate::bindings::CompositeOperator_UndefinedCompositeOp
-            }
-            CompositeOperator::AlphaCompositeOp => {
-                crate::bindings::CompositeOperator_AlphaCompositeOp
-            }
-            CompositeOperator::AtopCompositeOp => {
-                crate::bindings::CompositeOperator_AtopCompositeOp
-            }
-            CompositeOperator::BlendCompositeOp => {
-                crate::bindings::CompositeOperator_BlendCompositeOp
-            }
-            CompositeOperator::BlurCompositeOp => {
-                crate::bindings::CompositeOperator_BlurCompositeOp
-            }
-            CompositeOperator::BumpmapCompositeOp => {
-                crate::bindings::CompositeOperator_BumpmapCompositeOp
-            }
-            CompositeOperator::ChangeMaskCompositeOp => {
+            CompositeOperator::Undefined => crate::bindings::CompositeOperator_UndefinedCompositeOp,
+            CompositeOperator::Alpha => crate::bindings::CompositeOperator_AlphaCompositeOp,
+            CompositeOperator::Atop => crate::bindings::CompositeOperator_AtopCompositeOp,
+            CompositeOperator::Blend => crate::bindings::CompositeOperator_BlendCompositeOp,
+            CompositeOperator::Blur => crate::bindings::CompositeOperator_BlurCompositeOp,
+            CompositeOperator::Bumpmap => crate::bindings::CompositeOperator_BumpmapCompositeOp,
+            CompositeOperator::ChangeMask => {
                 crate::bindings::CompositeOperator_ChangeMaskCompositeOp
             }
-            CompositeOperator::ClearCompositeOp => {
-                crate::bindings::CompositeOperator_ClearCompositeOp
-            }
-            CompositeOperator::ColorBurnCompositeOp => {
-                crate::bindings::CompositeOperator_ColorBurnCompositeOp
-            }
-            CompositeOperator::ColorDodgeCompositeOp => {
+            CompositeOperator::Clear => crate::bindings::CompositeOperator_ClearCompositeOp,
+            CompositeOperator::ColorBurn => crate::bindings::CompositeOperator_ColorBurnCompositeOp,
+            CompositeOperator::ColorDodge => {
                 crate::bindings::CompositeOperator_ColorDodgeCompositeOp
             }
-            CompositeOperator::ColorizeCompositeOp => { crate::bindings::CompositeOperator_ColorizeCompositeOp
-            }
-            CompositeOperator::CopyBlackCompositeOp => {
+            CompositeOperator::Colorize => crate::bindings::CompositeOperator_ColorizeCompositeOp,
+            CompositeOperator::CopyBlack=> {
                 crate::bindings::CompositeOperator_CopyBlackCompositeOp
             }
-            CompositeOperator::CopyBlueCompositeOp => {
-                crate::bindings::CompositeOperator_CopyBlueCompositeOp
-            }
-            CompositeOperator::CopyCompositeOp => {
-                crate::bindings::CompositeOperator_CopyCompositeOp
-            }
-            CompositeOperator::CopyCyanCompositeOp => {
-                crate::bindings::CompositeOperator_CopyCyanCompositeOp
-            }
-            CompositeOperator::CopyGreenCompositeOp => {
-                crate::bindings::CompositeOperator_CopyGreenCompositeOp
-            }
-            CompositeOperator::CopyMagentaCompositeOp => {
+            CompositeOperator::CopyBlue => crate::bindings::CompositeOperator_CopyBlueCompositeOp,
+            CompositeOperator::Copy => crate::bindings::CompositeOperator_CopyCompositeOp,
+            CompositeOperator::CopyCyan => crate::bindings::CompositeOperator_CopyCyanCompositeOp,
+            CompositeOperator::CopyGreen => crate::bindings::CompositeOperator_CopyGreenCompositeOp,
+            CompositeOperator::CopyMagenta => {
                 crate::bindings::CompositeOperator_CopyMagentaCompositeOp
             }
-            CompositeOperator::CopyAlphaCompositeOp => {
-                crate::bindings::CompositeOperator_CopyAlphaCompositeOp
-            }
-            CompositeOperator::CopyRedCompositeOp => {
-                crate::bindings::CompositeOperator_CopyRedCompositeOp
-            }
-            CompositeOperator::CopyYellowCompositeOp => {
+            CompositeOperator::CopyAlpha => crate::bindings::CompositeOperator_CopyAlphaCompositeOp,
+            CompositeOperator::CopyRed => crate::bindings::CompositeOperator_CopyRedCompositeOp,
+            CompositeOperator::CopyYellow => {
                 crate::bindings::CompositeOperator_CopyYellowCompositeOp
             }
-            CompositeOperator::DarkenCompositeOp => {
-                crate::bindings::CompositeOperator_DarkenCompositeOp
-            }
-            CompositeOperator::DarkenIntensityCompositeOp => {
+            CompositeOperator::Darken => crate::bindings::CompositeOperator_DarkenCompositeOp,
+            CompositeOperator::DarkenIntensity => {
                 crate::bindings::CompositeOperator_DarkenIntensityCompositeOp
             }
-            CompositeOperator::DifferenceCompositeOp => {
+            CompositeOperator::Difference => {
                 crate::bindings::CompositeOperator_DifferenceCompositeOp
             }
-            CompositeOperator::DisplaceCompositeOp => {
-                crate::bindings::CompositeOperator_DisplaceCompositeOp
-            }
-            CompositeOperator::DissolveCompositeOp => {
-                crate::bindings::CompositeOperator_DissolveCompositeOp
-            }
-            CompositeOperator::DistortCompositeOp => {
-                crate::bindings::CompositeOperator_DistortCompositeOp
-            }
-            CompositeOperator::DivideDstCompositeOp => {
-                crate::bindings::CompositeOperator_DivideDstCompositeOp
-            }
-            CompositeOperator::DivideSrcCompositeOp => {
-                crate::bindings::CompositeOperator_DivideSrcCompositeOp
-            }
-            CompositeOperator::DstAtopCompositeOp => {
-                crate::bindings::CompositeOperator_DstAtopCompositeOp
-            }
-            CompositeOperator::DstCompositeOp => crate::bindings::CompositeOperator_DstCompositeOp,
-            CompositeOperator::DstInCompositeOp => {
-                crate::bindings::CompositeOperator_DstInCompositeOp
-            }
-            CompositeOperator::DstOutCompositeOp => {
-                crate::bindings::CompositeOperator_DstOutCompositeOp
-            }
-            CompositeOperator::DstOverCompositeOp => {
-                crate::bindings::CompositeOperator_DstOverCompositeOp
-            }
-            CompositeOperator::ExclusionCompositeOp => {
-                crate::bindings::CompositeOperator_ExclusionCompositeOp
-            }
-            CompositeOperator::HardLightCompositeOp => {
-                crate::bindings::CompositeOperator_HardLightCompositeOp
-            }
-            CompositeOperator::HardMixCompositeOp => {
-                crate::bindings::CompositeOperator_HardMixCompositeOp
-            }
-            CompositeOperator::HueCompositeOp => crate::bindings::CompositeOperator_HueCompositeOp,
-            CompositeOperator::InCompositeOp => crate::bindings::CompositeOperator_InCompositeOp,
-            CompositeOperator::IntensityCompositeOp => {
-                crate::bindings::CompositeOperator_IntensityCompositeOp
-            }
-            CompositeOperator::LightenCompositeOp => {
-                crate::bindings::CompositeOperator_LightenCompositeOp
-            }
-            CompositeOperator::LightenIntensityCompositeOp => {
+            CompositeOperator::Displace => crate::bindings::CompositeOperator_DisplaceCompositeOp,
+            CompositeOperator::Dissolve => crate::bindings::CompositeOperator_DissolveCompositeOp,
+            CompositeOperator::Distort => crate::bindings::CompositeOperator_DistortCompositeOp,
+            CompositeOperator::DivideDst => crate::bindings::CompositeOperator_DivideDstCompositeOp,
+            CompositeOperator::DivideSrc => crate::bindings::CompositeOperator_DivideSrcCompositeOp,
+            CompositeOperator::DstAtop => crate::bindings::CompositeOperator_DstAtopCompositeOp,
+            CompositeOperator::Dst => crate::bindings::CompositeOperator_DstCompositeOp,
+            CompositeOperator::DstIn => crate::bindings::CompositeOperator_DstInCompositeOp,
+            CompositeOperator::DstOut => crate::bindings::CompositeOperator_DstOutCompositeOp,
+            CompositeOperator::DstOver => crate::bindings::CompositeOperator_DstOverCompositeOp,
+            CompositeOperator::Exclusion => crate::bindings::CompositeOperator_ExclusionCompositeOp,
+            CompositeOperator::HardLight => crate::bindings::CompositeOperator_HardLightCompositeOp,
+            CompositeOperator::HardMix => crate::bindings::CompositeOperator_HardMixCompositeOp,
+            CompositeOperator::Hue => crate::bindings::CompositeOperator_HueCompositeOp,
+            CompositeOperator::In => crate::bindings::CompositeOperator_InCompositeOp,
+            CompositeOperator::Intensity => crate::bindings::CompositeOperator_IntensityCompositeOp,
+            CompositeOperator::Lighten => crate::bindings::CompositeOperator_LightenCompositeOp,
+            CompositeOperator::LightenIntensity => {
                 crate::bindings::CompositeOperator_LightenIntensityCompositeOp
             }
-            CompositeOperator::LinearBurnCompositeOp => {
+            CompositeOperator::LinearBurn => {
                 crate::bindings::CompositeOperator_LinearBurnCompositeOp
             }
-            CompositeOperator::LinearDodgeCompositeOp => {
+            CompositeOperator::LinearDodge => {
                 crate::bindings::CompositeOperator_LinearDodgeCompositeOp
             }
-            CompositeOperator::LinearLightCompositeOp => {
+            CompositeOperator::LinearLight => {
                 crate::bindings::CompositeOperator_LinearLightCompositeOp
             }
-            CompositeOperator::LuminizeCompositeOp => {
-                crate::bindings::CompositeOperator_LuminizeCompositeOp
-            }
-            CompositeOperator::MathematicsCompositeOp => {
+            CompositeOperator::Luminize => crate::bindings::CompositeOperator_LuminizeCompositeOp,
+            CompositeOperator::Mathematics => {
                 crate::bindings::CompositeOperator_MathematicsCompositeOp
             }
-            CompositeOperator::MinusDstCompositeOp => {
-                crate::bindings::CompositeOperator_MinusDstCompositeOp
-            }
-            CompositeOperator::MinusSrcCompositeOp => {
-                crate::bindings::CompositeOperator_MinusSrcCompositeOp
-            }
-            CompositeOperator::ModulateCompositeOp => {
-                crate::bindings::CompositeOperator_ModulateCompositeOp
-            }
-            CompositeOperator::ModulusAddCompositeOp => {
+            CompositeOperator::MinusDst => crate::bindings::CompositeOperator_MinusDstCompositeOp,
+            CompositeOperator::MinusSrc => crate::bindings::CompositeOperator_MinusSrcCompositeOp,
+            CompositeOperator::Modulate => crate::bindings::CompositeOperator_ModulateCompositeOp,
+            CompositeOperator::ModulusAdd => {
                 crate::bindings::CompositeOperator_ModulusAddCompositeOp
             }
-            CompositeOperator::ModulusSubtractCompositeOp => {
+            CompositeOperator::ModulusSubtract => {
                 crate::bindings::CompositeOperator_ModulusSubtractCompositeOp
             }
-            CompositeOperator::MultiplyCompositeOp => {
-                crate::bindings::CompositeOperator_MultiplyCompositeOp
-            }
-            CompositeOperator::NoCompositeOp => crate::bindings::CompositeOperator_NoCompositeOp,
-            CompositeOperator::OutCompositeOp => crate::bindings::CompositeOperator_OutCompositeOp,
-            CompositeOperator::OverCompositeOp => {
-                crate::bindings::CompositeOperator_OverCompositeOp
-            }
-            CompositeOperator::OverlayCompositeOp => {
-                crate::bindings::CompositeOperator_OverlayCompositeOp
-            }
-            CompositeOperator::PegtopLightCompositeOp => {
+            CompositeOperator::Multiply => crate::bindings::CompositeOperator_MultiplyCompositeOp,
+            CompositeOperator::No => crate::bindings::CompositeOperator_NoCompositeOp,
+            CompositeOperator::Out => crate::bindings::CompositeOperator_OutCompositeOp,
+            CompositeOperator::Over => crate::bindings::CompositeOperator_OverCompositeOp,
+            CompositeOperator::Overlay => crate::bindings::CompositeOperator_OverlayCompositeOp,
+            CompositeOperator::PegtopLight => {
                 crate::bindings::CompositeOperator_PegtopLightCompositeOp
             }
-            CompositeOperator::PinLightCompositeOp => {
-                crate::bindings::CompositeOperator_PinLightCompositeOp
-            }
-            CompositeOperator::PlusCompositeOp => {
-                crate::bindings::CompositeOperator_PlusCompositeOp
-            }
-            CompositeOperator::ReplaceCompositeOp => {
-                crate::bindings::CompositeOperator_ReplaceCompositeOp
-            }
-            CompositeOperator::SaturateCompositeOp => {
-                crate::bindings::CompositeOperator_SaturateCompositeOp
-            }
-            CompositeOperator::ScreenCompositeOp => {
-                crate::bindings::CompositeOperator_ScreenCompositeOp
-            }
-            CompositeOperator::SoftLightCompositeOp => {
-                crate::bindings::CompositeOperator_SoftLightCompositeOp
-            }
-            CompositeOperator::SrcAtopCompositeOp => {
-                crate::bindings::CompositeOperator_SrcAtopCompositeOp
-            }
-            CompositeOperator::SrcCompositeOp => crate::bindings::CompositeOperator_SrcCompositeOp,
-            CompositeOperator::SrcInCompositeOp => {
-                crate::bindings::CompositeOperator_SrcInCompositeOp
-            }
-            CompositeOperator::SrcOutCompositeOp => {
-                crate::bindings::CompositeOperator_SrcOutCompositeOp
-            }
-            CompositeOperator::SrcOverCompositeOp => {
-                crate::bindings::CompositeOperator_SrcOverCompositeOp
-            }
-            CompositeOperator::ThresholdCompositeOp => {
-                crate::bindings::CompositeOperator_ThresholdCompositeOp
-            }
-            CompositeOperator::VividLightCompositeOp => {
+            CompositeOperator::PinLight => crate::bindings::CompositeOperator_PinLightCompositeOp,
+            CompositeOperator::Plus => crate::bindings::CompositeOperator_PlusCompositeOp,
+            CompositeOperator::Replace => crate::bindings::CompositeOperator_ReplaceCompositeOp,
+            CompositeOperator::Saturate => crate::bindings::CompositeOperator_SaturateCompositeOp,
+            CompositeOperator::Screen => crate::bindings::CompositeOperator_ScreenCompositeOp,
+            CompositeOperator::SoftLight => crate::bindings::CompositeOperator_SoftLightCompositeOp,
+            CompositeOperator::SrcAtop => crate::bindings::CompositeOperator_SrcAtopCompositeOp,
+            CompositeOperator::Src => crate::bindings::CompositeOperator_SrcCompositeOp,
+            CompositeOperator::SrcIn => crate::bindings::CompositeOperator_SrcInCompositeOp,
+            CompositeOperator::SrcOut => crate::bindings::CompositeOperator_SrcOutCompositeOp,
+            CompositeOperator::SrcOver => crate::bindings::CompositeOperator_SrcOverCompositeOp,
+            CompositeOperator::Threshold => crate::bindings::CompositeOperator_ThresholdCompositeOp,
+            CompositeOperator::VividLight => {
                 crate::bindings::CompositeOperator_VividLightCompositeOp
             }
-            CompositeOperator::XorCompositeOp => crate::bindings::CompositeOperator_XorCompositeOp,
-            CompositeOperator::StereoCompositeOp => {
-                crate::bindings::CompositeOperator_StereoCompositeOp
-            }
-            CompositeOperator::FreezeCompositeOp => {
-                crate::bindings::CompositeOperator_FreezeCompositeOp
-            }
-            CompositeOperator::InterpolateCompositeOp => {
+            CompositeOperator::Xor => crate::bindings::CompositeOperator_XorCompositeOp,
+            CompositeOperator::Stereo => crate::bindings::CompositeOperator_StereoCompositeOp,
+            CompositeOperator::Freeze => crate::bindings::CompositeOperator_FreezeCompositeOp,
+            CompositeOperator::Interpolate => {
                 crate::bindings::CompositeOperator_InterpolateCompositeOp
             }
-            CompositeOperator::NegateCompositeOp => {
-                crate::bindings::CompositeOperator_NegateCompositeOp
-            }
-            CompositeOperator::ReflectCompositeOp => {
-                crate::bindings::CompositeOperator_ReflectCompositeOp
-            }
-            CompositeOperator::SoftBurnCompositeOp => {
-                crate::bindings::CompositeOperator_SoftBurnCompositeOp
-            }
-            CompositeOperator::SoftDodgeCompositeOp => {
-                crate::bindings::CompositeOperator_SoftDodgeCompositeOp
-            }
-            CompositeOperator::StampCompositeOp => {
-                crate::bindings::CompositeOperator_StampCompositeOp
-            }
-            CompositeOperator::RMSECompositeOp => {
-                crate::bindings::CompositeOperator_RMSECompositeOp
-            }
-            CompositeOperator::SaliencyBlendCompositeOp => {
+            CompositeOperator::Negate => crate::bindings::CompositeOperator_NegateCompositeOp,
+            CompositeOperator::Reflect => crate::bindings::CompositeOperator_ReflectCompositeOp,
+            CompositeOperator::SoftBurn => crate::bindings::CompositeOperator_SoftBurnCompositeOp,
+            CompositeOperator::SoftDodge => crate::bindings::CompositeOperator_SoftDodgeCompositeOp,
+            CompositeOperator::Stamp => crate::bindings::CompositeOperator_StampCompositeOp,
+            CompositeOperator::RMSE => crate::bindings::CompositeOperator_RMSECompositeOp,
+            CompositeOperator::SaliencyBlend => {
                 crate::bindings::CompositeOperator_SaliencyBlendCompositeOp
             }
-            CompositeOperator::SeamlessBlendCompositeOp => {
+            CompositeOperator::SeamlessBlend => {
                 crate::bindings::CompositeOperator_SeamlessBlendCompositeOp
             }
         }
