@@ -170,7 +170,6 @@ impl From<CompositeOperator> for crate::bindings::CompositeOperator {
             CompositeOperator::RMSE             => crate::bindings::CompositeOperator_RMSECompositeOp,
             CompositeOperator::SaliencyBlend    => crate::bindings::CompositeOperator_SaliencyBlendCompositeOp,
             CompositeOperator::SeamlessBlend    => crate::bindings::CompositeOperator_SeamlessBlendCompositeOp,
-
         }
     }
 }
