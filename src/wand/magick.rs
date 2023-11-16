@@ -28,7 +28,7 @@ use {size_t, ssize_t};
 
 use crate::result::Result;
 
-use super::{DrawingWand, PixelWand, CompositeOperator};
+use super::{CompositeOperator, DrawingWand, PixelWand};
 
 wand_common!(
     MagickWand,
@@ -230,6 +230,19 @@ impl MagickWand {
             Some(MagickWand { wand: result })
         };
         (distortion, wand)
+    }
+
+    pub fn get_image_compose(&self) -> CompositeOperator {
+        unsafe { bindings::MagickGetImageCompose(self.wand).into() }
+    }
+
+    pub fn set_image_compose(&self, composite_operator: CompositeOperator) -> Result<()> {
+        match unsafe { bindings::MagickSetImageCompose(self.wand, composite_operator.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError(
+                "Failed to set the image composite operator type",
+            )),
+        }
     }
 
     /// Compose another image onto self at (x, y) using composition_operator
@@ -1086,7 +1099,6 @@ impl MagickWand {
         get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      size_t
         get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 bindings::GravityType
         get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         bindings::ColorspaceType
-        get_image_compose,               set_image_compose,               MagickGetImageCompose,             MagickSetImageCompose,            bindings::CompositeOperator
         get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        bindings::CompressionType
         get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, size_t
         get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              size_t
