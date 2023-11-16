@@ -369,7 +369,7 @@ impl MagickWand {
         };
         match result {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
-            _ => Err(MagickError("failed to set size of wand")),
+            _ => Err(MagickError("Failed to level the image")),
         }
     }
 
