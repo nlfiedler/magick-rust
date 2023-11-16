@@ -15,10 +15,12 @@
  */
 #[macro_use]
 mod macros;
+mod composite_operator;
 mod drawing;
 mod magick;
 mod pixel;
 
+pub use self::composite_operator::CompositeOperator;
 pub use self::drawing::DrawingWand;
 pub use self::magick::{MagickWand, ResourceType};
 pub use self::pixel::{PixelWand, HSL};

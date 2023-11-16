@@ -36,9 +36,7 @@ use libc::size_t;
 #[cfg(not(target_os = "freebsd"))]
 use libc::ssize_t;
 
-pub use bindings::{
-    ColorspaceType, CompositeOperator, DitherMethod, FilterType, GravityType, MetricType,
-};
+pub use bindings::{ColorspaceType, DitherMethod, FilterType, GravityType, MetricType};
 pub use conversions::ToMagick;
 pub use result::MagickError;
 use result::Result;

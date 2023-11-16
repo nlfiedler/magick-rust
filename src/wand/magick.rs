@@ -28,7 +28,7 @@ use {size_t, ssize_t};
 
 use crate::result::Result;
 
-use super::{DrawingWand, PixelWand};
+use super::{DrawingWand, PixelWand, CompositeOperator};
 
 wand_common!(
     MagickWand,
@@ -236,7 +236,7 @@ impl MagickWand {
     pub fn compose_images(
         &self,
         reference: &MagickWand,
-        composition_operator: bindings::CompositeOperator,
+        composition_operator: CompositeOperator,
         clip_to_self: bool,
         x: isize,
         y: isize,
@@ -250,7 +250,7 @@ impl MagickWand {
             bindings::MagickCompositeImage(
                 self.wand,
                 reference.wand,
-                composition_operator,
+                composition_operator.into(),
                 native_clip_to_self,
                 x,
                 y,
@@ -266,14 +266,14 @@ impl MagickWand {
     pub fn compose_images_gravity(
         &self,
         reference: &MagickWand,
-        composition_operator: bindings::CompositeOperator,
+        composition_operator: CompositeOperator,
         gravity_type: bindings::GravityType,
     ) -> Result<()> {
         let result = unsafe {
             bindings::MagickCompositeImageGravity(
                 self.wand,
                 reference.wand,
-                composition_operator,
+                composition_operator.into(),
                 gravity_type,
             )
         };
@@ -949,10 +949,10 @@ impl MagickWand {
         pixel_wand: &PixelWand,
         width: usize,
         height: usize,
-        compose: bindings::CompositeOperator,
+        compose: CompositeOperator,
     ) -> Result<()> {
         match unsafe {
-            bindings::MagickBorderImage(self.wand, pixel_wand.wand, width, height, compose)
+            bindings::MagickBorderImage(self.wand, pixel_wand.wand, width, height, compose.into())
         } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
 
