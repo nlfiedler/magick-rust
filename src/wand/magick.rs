@@ -369,7 +369,31 @@ impl MagickWand {
         };
         match result {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
-            _ => Err(MagickError("failed to set size of wand")),
+            _ => Err(MagickError("Failed to level the image")),
+        }
+    }
+
+    /// Apply sigmoidal contrast to the image
+    /// Midpoint is a number in range [0, 1]
+    pub fn sigmoidal_contrast_image(
+        &self,
+        sharpen: bool,
+        contrast: f64,
+        midpoint: f64,
+    ) -> Result<()> {
+        let quantum_range = self.quantum_range()?;
+
+        let result = unsafe {
+            bindings::MagickSigmoidalContrastImage(
+                self.wand,
+                sharpen.to_magick(),
+                contrast,
+                midpoint * quantum_range,
+            )
+        };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("Failed to apply sigmoidal contrast to image")),
         }
     }
 
