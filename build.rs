@@ -26,6 +26,19 @@ use std::process::Command;
 const MIN_VERSION: &str = "7.0";
 const MAX_VERSION: &str = "7.2";
 
+#[cfg(windows)]
+static HEADER: &str = r#"
+#if !defined(ssize_t) && !defined(__MINGW32__)
+#if defined(_WIN64)
+typedef __int64 ssize_t;
+#else
+typedef long ssize_t;
+#endif
+#endif
+
+#include <MagickWand/MagickWand.h>
+"#;
+#[cfg(not(windows))]
 static HEADER: &str = "#include <MagickWand/MagickWand.h>\n";
 
 //on windows path env always contain : like c:
@@ -35,7 +48,18 @@ pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
 };
 
 fn main() {
-    let check_cppflags = Command::new("MagickCore-config").arg("--cppflags").output();
+    let check_cppflags = if cfg!(target_os = "windows") {
+        // Resolve bash from directories listed in the PATH environment variable in the
+        // order they appear.
+        Command::new("cmd")
+            .arg("/C")
+            .arg("bash")
+            .arg("MagickCore-config")
+            .arg("--cppflags")
+            .output()
+    } else {
+        Command::new("MagickCore-config").arg("--cppflags").output()
+    };
     if let Ok(ok_cppflags) = check_cppflags {
         let cppflags = ok_cppflags.stdout;
         let cppflags = String::from_utf8(cppflags).unwrap();
