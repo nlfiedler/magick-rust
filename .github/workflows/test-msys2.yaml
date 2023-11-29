@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_MAGICK_LIBS: "MagickCore-7.Q16HDRI;MagickWand-7.Q16HDRI"
+  IMAGE_MAGICK_LIBS: "libMagickCore-7.Q16HDRI.dll.a;libMagickWand-7.Q16HDRI.dll.a"
 
 jobs:
   build:
@@ -16,21 +16,10 @@ jobs:
         run: |
           export PATH="/mingw64/bin:$PATH"
           pacman --noconfirm -S mingw-w64-x86_64-imagemagick mingw-w64-x86_64-pkg-config
-          cd /mingw64/lib
-          mv libMagickCore-7.Q16HDRI.dll.a MagickCore-7.Q16HDRI.lib
-          mv libMagickWand-7.Q16HDRI.dll.a MagickWand-7.Q16HDRI.lib
-
-      - name: Set environment variables
-        shell: C:\msys64\usr\bin\bash.exe --login '{0}'
-        run: |
-          export PATH="/mingw64/bin:$PATH"
-          echo "BINDGEN_EXTRA_CLANG_ARGS=$(MagickCore-config --cppflags)" >> $GITHUB_ENV
-
       - uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
       - name: Test
         run: |
-          echo $env:BINDGEN_EXTRA_CLANG_ARGS
-          $env:PATH = "C:\msys64\mingw64\bin;C:\msys64\usr\bin;$env:PATH"
-          cargo test test_new_drop -- --nocapture
+          $env:PATH = "C:\msys64\usr\bin;C:\msys64\mingw64\bin;$env:PATH"
+          cargo test -- --skip test_set_background_color

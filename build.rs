@@ -260,6 +260,11 @@ fn determine_mode<T: AsRef<str>>(libdirs: &Vec<PathBuf>, libs: &[T]) -> &'static
         (true, false) => return "static",
         (false, true) => return "dylib",
         (false, false) => {
+            let can_static_verbatim = libs.iter().all(|l| files.contains(l.as_ref()));
+            if can_static_verbatim {
+                return "static:+verbatim";
+            }
+
             panic!(
                 "ImageMagick libdirs at `{:?}` do not contain the required files \
                  to either statically or dynamically link ImageMagick",
