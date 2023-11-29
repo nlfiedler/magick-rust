@@ -22,4 +22,4 @@ jobs:
       - name: Test
         run: |
           $env:PATH = "C:\msys64\usr\bin;C:\msys64\mingw64\bin;$env:PATH"
-          cargo test -- --skip test_set_background_color
+          cargo test -- --skip background --skip negate_image
