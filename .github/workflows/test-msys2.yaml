@@ -1,0 +1,25 @@
+name: Run tests on Windows
+
+on:
+  workflow_dispatch:
+
+env:
+  IMAGE_MAGICK_LIBS: "libMagickCore-7.Q16HDRI.dll.a;libMagickWand-7.Q16HDRI.dll.a"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        shell: C:\msys64\usr\bin\bash.exe --login '{0}'
+        run: |
+          export PATH="/mingw64/bin:$PATH"
+          pacman --noconfirm -S mingw-w64-x86_64-imagemagick mingw-w64-x86_64-pkg-config
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      - name: Test
+        run: |
+          $env:PATH = "C:\msys64\usr\bin;C:\msys64\mingw64\bin;$env:PATH"
+          cargo test -- --skip background --skip negate_image
