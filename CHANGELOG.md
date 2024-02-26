@@ -5,11 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.20.0] - 2024-02-25
 ### Changed
-- **Breaking**: 5ohue: added `CompositeOperator` in place of `bindings::CompositeOperator`.
-  Instead of using `bindings::CompositeOperator_LightenIntensityCompositeOp` one must now
-  use `CompositeOperator::LightenIntensity`.
+- **BREAKING CHANGES**
+    * 5ohue: added `CompositeOperator` in place of `bindings::CompositeOperator`. Instead of using `bindings::CompositeOperator_LightenIntensityCompositeOp` one must now use `CompositeOperator::LightenIntensity`.
 ### Added
 - 5ohue: added `sigmoidal_contrast_image()` function to the wand API.
 
@@ -27,8 +26,8 @@ This file follows the convention described at
 
 ## [0.18.0] - 2023-04-15
 ### Changed
-- **Breaking**: jshrake: Add `map` argument to `import_image_pixels()` and
-  change `pixels` argument to a byte slice rather than a vector reference.
+- **BREAKING CHANGEs**
+    * jshrake: Add `map` argument to `import_image_pixels()` and change `pixels` argument to a byte slice rather than a vector reference.
 ### Added
 - jshrake: Add `MagickAutoGammaImage` and `MagickAutoLevelImage`
 - 2e0by0: add API documentation and setup automated build of docs.
