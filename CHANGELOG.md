@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [0.21.0] - 2024-04-17
+### Added
+- yoghurt-x86: added `MagickNormalizeImage()` and `MagickOrderedDitherImage()`
+
 ## [0.20.0] - 2024-02-25
 ### Changed
 - **BREAKING CHANGES**
