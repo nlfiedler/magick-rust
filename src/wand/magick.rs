@@ -386,6 +386,43 @@ impl MagickWand {
         }
     }
 
+    //MagickNormalizeImage enhances the contrast of a color image by adjusting the pixels color
+    //to span the entire range of colors available
+    pub fn normalize_image(
+        &self,
+    ) -> Result<()> {
+        let result = unsafe {
+            bindings::MagickNormalizeImage(
+                self.wand,
+            )
+        };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("Failed to apply contrast stretch to image")),
+        }
+    }
+
+    //MagickOrderedDitherImage performs an ordered dither based on a number of pre-defined
+    //dithering threshold maps, but over multiple intensity levels, which can be different for
+    //different channels, according to the input arguments.
+    pub fn ordered_dither_image(
+        &self,
+        threshold_map: &str,
+    ) -> Result<()> {
+        let c_threshold_map = CString::new(threshold_map).unwrap();
+
+        let result = unsafe {
+            bindings::MagickOrderedDitherImage(
+                self.wand,
+                c_threshold_map.as_ptr(),
+            )
+        };
+        match result {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("Failed to apply ordered dither to image")),
+        }
+    }
+
     /// Apply sigmoidal contrast to the image
     /// Midpoint is a number in range [0, 1]
     pub fn sigmoidal_contrast_image(
