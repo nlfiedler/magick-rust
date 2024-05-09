@@ -3,7 +3,7 @@ use std::convert::TryInto;
 use crate::bindings;
 
 /// Resource type to use with [set_resource_limit](crate::MagickWand::set_resource_limit)
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResourceType {
     Undefined  = bindings::ResourceType_UndefinedResource  as isize,
     Area       = bindings::ResourceType_AreaResource       as isize,

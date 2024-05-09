@@ -250,18 +250,18 @@ fn test_transform_image_colorspace() {
     assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
     assert_eq!(
         wand.get_image_colorspace(),
-        bindings::ColorspaceType_sRGBColorspace
+        magick_rust::ColorspaceType::sRGB
     );
 
     let pixel_color = wand.get_image_pixel_color(10, 10).unwrap();
     assert_ne!(pixel_color.get_hsl().hue, 0.0);
 
     assert!(wand
-        .transform_image_colorspace(bindings::ColorspaceType_GRAYColorspace)
+        .transform_image_colorspace(magick_rust::ColorspaceType::GRAY)
         .is_ok());
     assert_eq!(
         wand.get_image_colorspace(),
-        bindings::ColorspaceType_GRAYColorspace
+        magick_rust::ColorspaceType::GRAY
     );
 
     let pixel_grayscale = wand.get_image_pixel_color(10, 10).unwrap();
@@ -290,10 +290,10 @@ fn test_color_reduction() {
     assert!(wand
         .quantize_image(
             6,
-            bindings::ColorspaceType_RGBColorspace,
+            magick_rust::ColorspaceType::RGB,
             1,
             bindings::DitherMethod_UndefinedDitherMethod,
-            false.to_magick()
+            false
         )
         .is_ok());
     assert_eq!(6, wand.get_image_colors());

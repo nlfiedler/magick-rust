@@ -29,7 +29,12 @@ use {size_t, ssize_t};
 use crate::result::Result;
 
 use super::{DrawingWand, PixelWand};
-use crate::{CompositeOperator, MetricType, ResourceType};
+use crate::{
+    ColorspaceType,
+    CompositeOperator,
+    MetricType,
+    ResourceType
+};
 
 wand_common!(
     MagickWand,
@@ -1086,12 +1091,78 @@ impl MagickWand {
         }
     }
 
-    mutations!(
-        /// Set the image colorspace, transforming (unlike `set_image_colorspace`) image data in
-        /// the process.
-        MagickTransformImageColorspace => transform_image_colorspace(
-            colorspace: bindings::ColorspaceType)
+    /// Set the image colorspace, transforming (unlike `set_image_colorspace`) image data in
+    /// the process.
+    pub fn transform_image_colorspace(&self, colorspace: ColorspaceType) -> Result<()> {
+        match unsafe { bindings::MagickTransformImageColorspace(self.wand, colorspace.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to transform image colorspace")),
+        }
+    }
 
+    /// Reduce the number of colors in the image.
+    pub fn quantize_image(
+        &self,
+        number_of_colors: size_t,
+        colorspace: ColorspaceType,
+        tree_depth: size_t,
+        dither_method: bindings::DitherMethod,
+        measure_error: bool) -> Result<()> {
+        match unsafe { bindings::MagickQuantizeImage(
+                self.wand,
+                number_of_colors,
+                colorspace.into(),
+                tree_depth,
+                dither_method,
+                measure_error.to_magick()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to quantize image")),
+        }
+    }
+
+    /// Reduce the number of colors in the images.
+    pub fn quantize_images(
+        &self,
+        number_of_colors: size_t,
+        colorspace: ColorspaceType,
+        tree_depth: size_t,
+        dither_method: bindings::DitherMethod,
+        measure_error: bool) -> Result<()> {
+        match unsafe { bindings::MagickQuantizeImages(
+                self.wand,
+                number_of_colors,
+                colorspace.into(),
+                tree_depth,
+                dither_method,
+                measure_error.to_magick()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to quantize images")),
+        }
+    }
+
+    pub fn get_colorspace(&self) -> ColorspaceType {
+        return unsafe { bindings::MagickGetColorspace(self.wand).into() };
+    }
+
+    pub fn set_colorspace(&mut self, colorspace: ColorspaceType) -> Result<()> {
+        match unsafe { bindings::MagickSetColorspace(self.wand, colorspace.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set colorspace")),
+        }
+    }
+
+    pub fn get_image_colorspace(&self) -> ColorspaceType {
+        return unsafe { bindings::MagickGetImageColorspace(self.wand).into() };
+    }
+
+    pub fn set_image_colorspace(&self, colorspace: ColorspaceType) -> Result<()> {
+        match unsafe { bindings::MagickSetImageColorspace(self.wand, colorspace.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set image colorspace")),
+        }
+    }
+
+    mutations!(
         /// Sets the image to the specified alpha level.
         MagickSetImageAlpha => set_image_alpha(alpha: f64)
 
@@ -1104,16 +1175,6 @@ impl MagickWand {
         /// Set the image alpha channel mode.
         MagickSetImageAlphaChannel => set_image_alpha_channel(
             alpha_channel: bindings::AlphaChannelOption)
-
-        /// Reduce the number of colors in the image.
-        MagickQuantizeImage => quantize_image(
-            number_of_colors: size_t, colorspace: bindings::ColorspaceType,
-            tree_depth: size_t, dither_method: bindings::DitherMethod, measure_error: bindings::MagickBooleanType)
-
-        /// Reduce the number of colors in the image.
-        MagickQuantizeImages => quantize_images(
-            number_of_colors: size_t, colorspace: bindings::ColorspaceType,
-            tree_depth: size_t, dither_method: bindings::DitherMethod, measure_error: bindings::MagickBooleanType)
 
         /// Discard all but one of any pixel color.
         MagickUniqueImageColors => unique_image_colors()
@@ -1139,11 +1200,9 @@ impl MagickWand {
     );
 
     set_get!(
-        get_colorspace,                  set_colorspace,                  MagickGetColorspace,               MagickSetColorspace,              bindings::ColorspaceType
         get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             bindings::CompressionType
         get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      size_t
         get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 bindings::GravityType
-        get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         bindings::ColorspaceType
         get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        bindings::CompressionType
         get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, size_t
         get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              size_t
