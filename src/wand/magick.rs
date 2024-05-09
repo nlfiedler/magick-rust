@@ -28,7 +28,8 @@ use {size_t, ssize_t};
 
 use crate::result::Result;
 
-use super::{CompositeOperator, DrawingWand, PixelWand};
+use super::{DrawingWand, PixelWand};
+use crate::{CompositeOperator, ResourceType};
 
 wand_common!(
     MagickWand,
@@ -41,23 +42,6 @@ wand_common!(
     MagickGetExceptionType,
     MagickGetException
 );
-
-/// Resource type to use with [set_resource_limit](MagickWand::set_resource_limit)
-#[derive(Debug, Clone, Copy)]
-pub enum ResourceType {
-    Undefined = bindings::ResourceType_UndefinedResource as isize,
-    Area = bindings::ResourceType_AreaResource as isize,
-    Disk = bindings::ResourceType_DiskResource as isize,
-    File = bindings::ResourceType_FileResource as isize,
-    Height = bindings::ResourceType_HeightResource as isize,
-    Map = bindings::ResourceType_MapResource as isize,
-    Memory = bindings::ResourceType_MemoryResource as isize,
-    Thread = bindings::ResourceType_ThreadResource as isize,
-    Throttle = bindings::ResourceType_ThrottleResource as isize,
-    Time = bindings::ResourceType_TimeResource as isize,
-    Width = bindings::ResourceType_WidthResource as isize,
-    ListLength = bindings::ResourceType_ListLengthResource as isize,
-}
 
 /// MagickWand is a Rustic wrapper to the Rust bindings to ImageMagick.
 ///
@@ -78,7 +62,7 @@ impl MagickWand {
     pub fn set_resource_limit(resource: ResourceType, limit: u64) -> Result<()> {
         let result = unsafe {
             bindings::SetMagickResourceLimit(
-                resource as bindings::ResourceType,
+                resource.into(),
                 limit as bindings::MagickSizeType,
             )
         };

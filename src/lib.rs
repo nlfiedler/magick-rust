@@ -41,10 +41,12 @@ pub use conversions::ToMagick;
 pub use result::MagickError;
 use result::Result;
 pub use wand::*;
+pub use types::*;
 
 mod conversions;
 mod result;
 mod wand;
+mod types;
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 /// This function must be called before any other ImageMagick operations
