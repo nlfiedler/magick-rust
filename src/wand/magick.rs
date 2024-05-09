@@ -33,6 +33,7 @@ use crate::{
     ColorspaceType,
     CompositeOperator,
     DitherMethod,
+    FilterType,
     MetricType,
     ResourceType
 };
@@ -780,9 +781,9 @@ impl MagickWand {
 
     /// Resize the image to the specified width and height, using the
     /// specified filter type.
-    pub fn resize_image(&self, width: usize, height: usize, filter: bindings::FilterType) {
+    pub fn resize_image(&self, width: usize, height: usize, filter: FilterType) {
         unsafe {
-            bindings::MagickResizeImage(self.wand, width as size_t, height as size_t, filter);
+            bindings::MagickResizeImage(self.wand, width as size_t, height as size_t, filter.into());
         }
     }
 
@@ -823,10 +824,10 @@ impl MagickWand {
         &self,
         x_resolution: f64,
         y_resolution: f64,
-        filter: bindings::FilterType,
+        filter: FilterType,
     ) {
         unsafe {
-            bindings::MagickResampleImage(self.wand, x_resolution, y_resolution, filter);
+            bindings::MagickResampleImage(self.wand, x_resolution, y_resolution, filter.into());
         }
     }
 

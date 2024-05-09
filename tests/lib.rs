@@ -54,7 +54,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2,
     };
-    wand.resize_image(halfwidth, halfheight, bindings::FilterType_LanczosFilter);
+    wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos);
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
