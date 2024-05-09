@@ -34,6 +34,7 @@ use crate::{
     CompositeOperator,
     DitherMethod,
     FilterType,
+    GravityType,
     MetricType,
     ResourceType
 };
@@ -271,14 +272,14 @@ impl MagickWand {
         &self,
         reference: &MagickWand,
         composition_operator: CompositeOperator,
-        gravity_type: bindings::GravityType,
+        gravity_type: GravityType,
     ) -> Result<()> {
         let result = unsafe {
             bindings::MagickCompositeImageGravity(
                 self.wand,
                 reference.wand,
                 composition_operator.into(),
-                gravity_type,
+                gravity_type.into(),
             )
         };
         match result {
@@ -1164,6 +1165,28 @@ impl MagickWand {
         }
     }
 
+    pub fn get_gravity(&self) -> GravityType {
+        return unsafe { bindings::MagickGetGravity(self.wand).into() };
+    }
+
+    pub fn set_gravity(&mut self, gravity: GravityType) -> Result<()> {
+        match unsafe { bindings::MagickSetGravity(self.wand, gravity.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set gravity")),
+        }
+    }
+
+    pub fn get_image_gravity(&self) -> GravityType {
+        return unsafe { bindings::MagickGetImageGravity(self.wand).into() };
+    }
+
+    pub fn set_image_gravity(&mut self, gravity: GravityType) -> Result<()> {
+        match unsafe { bindings::MagickSetImageGravity(self.wand, gravity.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set image gravity")),
+        }
+    }
+
     mutations!(
         /// Sets the image to the specified alpha level.
         MagickSetImageAlpha => set_image_alpha(alpha: f64)
@@ -1204,7 +1227,6 @@ impl MagickWand {
     set_get!(
         get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             bindings::CompressionType
         get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      size_t
-        get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 bindings::GravityType
         get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        bindings::CompressionType
         get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, size_t
         get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              size_t
@@ -1213,7 +1235,6 @@ impl MagickWand {
         get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             bindings::EndianType
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
         get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
-        get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            bindings::GravityType
         get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    bindings::InterlaceType
         get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  bindings::PixelInterpolateMethod
         get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         size_t
