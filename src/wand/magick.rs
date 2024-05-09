@@ -29,7 +29,7 @@ use {size_t, ssize_t};
 use crate::result::Result;
 
 use super::{DrawingWand, PixelWand};
-use crate::{CompositeOperator, ResourceType};
+use crate::{CompositeOperator, MetricType, ResourceType};
 
 wand_common!(
     MagickWand,
@@ -202,11 +202,11 @@ impl MagickWand {
     pub fn compare_images(
         &self,
         reference: &MagickWand,
-        metric: bindings::MetricType,
+        metric: MetricType,
     ) -> (f64, Option<MagickWand>) {
         let mut distortion: f64 = 0.0;
         let result = unsafe {
-            bindings::MagickCompareImages(self.wand, reference.wand, metric, &mut distortion)
+            bindings::MagickCompareImages(self.wand, reference.wand, metric.into(), &mut distortion)
         };
         let wand = if result.is_null() {
             None

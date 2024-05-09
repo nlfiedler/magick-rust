@@ -22,7 +22,7 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::Once;
 
-use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand};
+use magick_rust::{bindings, magick_wand_genesis, CompositeOperator, MagickWand, PixelWand};
 use magick_rust::{MagickError, ToMagick};
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
@@ -209,7 +209,7 @@ fn test_compare_images() {
     wand2.auto_orient();
 
     let (distortion, diff) =
-        wand1.compare_images(&wand2, bindings::MetricType_RootMeanSquaredErrorMetric);
+        wand1.compare_images(&wand2, magick_rust::MetricType::RootMeanSquared);
     assert!(distortion < 0.01);
     assert!(diff.is_some());
 }
@@ -415,6 +415,48 @@ fn test_auto_gamma() {
     let wand = MagickWand::new();
     assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
     assert!(wand.auto_gamma().is_ok());
+}
+
+#[test]
+fn test_image_compose() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    wand.new_image(4, 4, &PixelWand::new()).unwrap();
+
+    let operators = [
+        CompositeOperator::Alpha,
+        CompositeOperator::MinusDst,
+        CompositeOperator::Over,
+        CompositeOperator::Xor,
+        CompositeOperator::Bumpmap,
+        CompositeOperator::ChangeMask,
+        CompositeOperator::Clear,
+        CompositeOperator::ColorBurn,
+        CompositeOperator::ColorDodge,
+        CompositeOperator::Colorize,
+        CompositeOperator::CopyBlack,
+        CompositeOperator::CopyBlue,
+        CompositeOperator::Copy,
+        CompositeOperator::CopyCyan,
+        CompositeOperator::CopyGreen,
+        CompositeOperator::CopyMagenta,
+        CompositeOperator::CopyAlpha,
+        CompositeOperator::CopyRed,
+        CompositeOperator::CopyYellow,
+        CompositeOperator::Darken,
+        CompositeOperator::DarkenIntensity,
+        CompositeOperator::Difference,
+        CompositeOperator::Displace,
+        CompositeOperator::Dissolve,
+        CompositeOperator::Distort,
+        CompositeOperator::DivideDst,
+    ];
+    for op in operators.iter() {
+        wand.set_image_compose(*op).unwrap();
+        assert_eq!(*op, wand.get_image_compose());
+    }
 }
 
 #[test]
