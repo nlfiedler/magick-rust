@@ -32,6 +32,7 @@ use super::{DrawingWand, PixelWand};
 use crate::{
     ColorspaceType,
     CompositeOperator,
+    DitherMethod,
     MetricType,
     ResourceType
 };
@@ -1106,14 +1107,14 @@ impl MagickWand {
         number_of_colors: size_t,
         colorspace: ColorspaceType,
         tree_depth: size_t,
-        dither_method: bindings::DitherMethod,
+        dither_method: DitherMethod,
         measure_error: bool) -> Result<()> {
         match unsafe { bindings::MagickQuantizeImage(
                 self.wand,
                 number_of_colors,
                 colorspace.into(),
                 tree_depth,
-                dither_method,
+                dither_method.into(),
                 measure_error.to_magick()) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err(MagickError("failed to quantize image")),
@@ -1126,14 +1127,14 @@ impl MagickWand {
         number_of_colors: size_t,
         colorspace: ColorspaceType,
         tree_depth: size_t,
-        dither_method: bindings::DitherMethod,
+        dither_method: DitherMethod,
         measure_error: bool) -> Result<()> {
         match unsafe { bindings::MagickQuantizeImages(
                 self.wand,
                 number_of_colors,
                 colorspace.into(),
                 tree_depth,
-                dither_method,
+                dither_method.into(),
                 measure_error.to_magick()) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err(MagickError("failed to quantize images")),

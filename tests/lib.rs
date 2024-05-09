@@ -292,7 +292,7 @@ fn test_color_reduction() {
             6,
             magick_rust::ColorspaceType::RGB,
             1,
-            bindings::DitherMethod_UndefinedDitherMethod,
+            magick_rust::DitherMethod::Undefined,
             false
         )
         .is_ok());
