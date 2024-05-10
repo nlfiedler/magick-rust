@@ -23,7 +23,7 @@ use std::path::Path;
 use std::sync::Once;
 
 use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand};
-use magick_rust::{MagickError, ToMagick};
+use magick_rust::MagickError;
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
@@ -54,7 +54,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2,
     };
-    wand.resize_image(halfwidth, halfheight, bindings::FilterType_LanczosFilter);
+    wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos);
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -209,7 +209,7 @@ fn test_compare_images() {
     wand2.auto_orient();
 
     let (distortion, diff) =
-        wand1.compare_images(&wand2, bindings::MetricType_RootMeanSquaredErrorMetric);
+        wand1.compare_images(&wand2, magick_rust::MetricType::RootMeanSquared);
     assert!(distortion < 0.01);
     assert!(diff.is_some());
 }
@@ -250,18 +250,18 @@ fn test_transform_image_colorspace() {
     assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
     assert_eq!(
         wand.get_image_colorspace(),
-        bindings::ColorspaceType_sRGBColorspace
+        magick_rust::ColorspaceType::sRGB
     );
 
     let pixel_color = wand.get_image_pixel_color(10, 10).unwrap();
     assert_ne!(pixel_color.get_hsl().hue, 0.0);
 
     assert!(wand
-        .transform_image_colorspace(bindings::ColorspaceType_GRAYColorspace)
+        .transform_image_colorspace(magick_rust::ColorspaceType::GRAY)
         .is_ok());
     assert_eq!(
         wand.get_image_colorspace(),
-        bindings::ColorspaceType_GRAYColorspace
+        magick_rust::ColorspaceType::GRAY
     );
 
     let pixel_grayscale = wand.get_image_pixel_color(10, 10).unwrap();
@@ -290,10 +290,10 @@ fn test_color_reduction() {
     assert!(wand
         .quantize_image(
             6,
-            bindings::ColorspaceType_RGBColorspace,
+            magick_rust::ColorspaceType::RGB,
             1,
-            bindings::DitherMethod_UndefinedDitherMethod,
-            false.to_magick()
+            magick_rust::DitherMethod::Undefined,
+            false
         )
         .is_ok());
     assert_eq!(6, wand.get_image_colors());
@@ -415,6 +415,48 @@ fn test_auto_gamma() {
     let wand = MagickWand::new();
     assert!(wand.read_image("tests/data/IMG_5745.JPG").is_ok());
     assert!(wand.auto_gamma().is_ok());
+}
+
+#[test]
+fn test_image_compose() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let wand = MagickWand::new();
+    wand.new_image(4, 4, &PixelWand::new()).unwrap();
+
+    let operators = [
+        magick_rust::CompositeOperator::Alpha,
+        magick_rust::CompositeOperator::MinusDst,
+        magick_rust::CompositeOperator::Over,
+        magick_rust::CompositeOperator::Xor,
+        magick_rust::CompositeOperator::Bumpmap,
+        magick_rust::CompositeOperator::ChangeMask,
+        magick_rust::CompositeOperator::Clear,
+        magick_rust::CompositeOperator::ColorBurn,
+        magick_rust::CompositeOperator::ColorDodge,
+        magick_rust::CompositeOperator::Colorize,
+        magick_rust::CompositeOperator::CopyBlack,
+        magick_rust::CompositeOperator::CopyBlue,
+        magick_rust::CompositeOperator::Copy,
+        magick_rust::CompositeOperator::CopyCyan,
+        magick_rust::CompositeOperator::CopyGreen,
+        magick_rust::CompositeOperator::CopyMagenta,
+        magick_rust::CompositeOperator::CopyAlpha,
+        magick_rust::CompositeOperator::CopyRed,
+        magick_rust::CompositeOperator::CopyYellow,
+        magick_rust::CompositeOperator::Darken,
+        magick_rust::CompositeOperator::DarkenIntensity,
+        magick_rust::CompositeOperator::Difference,
+        magick_rust::CompositeOperator::Displace,
+        magick_rust::CompositeOperator::Dissolve,
+        magick_rust::CompositeOperator::Distort,
+        magick_rust::CompositeOperator::DivideDst,
+    ];
+    for op in operators.iter() {
+        wand.set_image_compose(*op).unwrap();
+        assert_eq!(*op, wand.get_image_compose());
+    }
 }
 
 #[test]

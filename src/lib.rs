@@ -36,15 +36,16 @@ use libc::size_t;
 #[cfg(not(target_os = "freebsd"))]
 use libc::ssize_t;
 
-pub use bindings::{ColorspaceType, DitherMethod, FilterType, GravityType, MetricType};
 pub use conversions::ToMagick;
 pub use result::MagickError;
 use result::Result;
 pub use wand::*;
+pub use types::*;
 
 mod conversions;
 mod result;
 mod wand;
+mod types;
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 /// This function must be called before any other ImageMagick operations

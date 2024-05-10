@@ -28,7 +28,16 @@ use {size_t, ssize_t};
 
 use crate::result::Result;
 
-use super::{CompositeOperator, DrawingWand, PixelWand};
+use super::{DrawingWand, PixelWand};
+use crate::{
+    ColorspaceType,
+    CompositeOperator,
+    DitherMethod,
+    FilterType,
+    GravityType,
+    MetricType,
+    ResourceType
+};
 
 wand_common!(
     MagickWand,
@@ -41,23 +50,6 @@ wand_common!(
     MagickGetExceptionType,
     MagickGetException
 );
-
-/// Resource type to use with [set_resource_limit](MagickWand::set_resource_limit)
-#[derive(Debug, Clone, Copy)]
-pub enum ResourceType {
-    Undefined = bindings::ResourceType_UndefinedResource as isize,
-    Area = bindings::ResourceType_AreaResource as isize,
-    Disk = bindings::ResourceType_DiskResource as isize,
-    File = bindings::ResourceType_FileResource as isize,
-    Height = bindings::ResourceType_HeightResource as isize,
-    Map = bindings::ResourceType_MapResource as isize,
-    Memory = bindings::ResourceType_MemoryResource as isize,
-    Thread = bindings::ResourceType_ThreadResource as isize,
-    Throttle = bindings::ResourceType_ThrottleResource as isize,
-    Time = bindings::ResourceType_TimeResource as isize,
-    Width = bindings::ResourceType_WidthResource as isize,
-    ListLength = bindings::ResourceType_ListLengthResource as isize,
-}
 
 /// MagickWand is a Rustic wrapper to the Rust bindings to ImageMagick.
 ///
@@ -78,7 +70,7 @@ impl MagickWand {
     pub fn set_resource_limit(resource: ResourceType, limit: u64) -> Result<()> {
         let result = unsafe {
             bindings::SetMagickResourceLimit(
-                resource as bindings::ResourceType,
+                resource.into(),
                 limit as bindings::MagickSizeType,
             )
         };
@@ -218,11 +210,11 @@ impl MagickWand {
     pub fn compare_images(
         &self,
         reference: &MagickWand,
-        metric: bindings::MetricType,
+        metric: MetricType,
     ) -> (f64, Option<MagickWand>) {
         let mut distortion: f64 = 0.0;
         let result = unsafe {
-            bindings::MagickCompareImages(self.wand, reference.wand, metric, &mut distortion)
+            bindings::MagickCompareImages(self.wand, reference.wand, metric.into(), &mut distortion)
         };
         let wand = if result.is_null() {
             None
@@ -280,14 +272,14 @@ impl MagickWand {
         &self,
         reference: &MagickWand,
         composition_operator: CompositeOperator,
-        gravity_type: bindings::GravityType,
+        gravity_type: GravityType,
     ) -> Result<()> {
         let result = unsafe {
             bindings::MagickCompositeImageGravity(
                 self.wand,
                 reference.wand,
                 composition_operator.into(),
-                gravity_type,
+                gravity_type.into(),
             )
         };
         match result {
@@ -790,9 +782,9 @@ impl MagickWand {
 
     /// Resize the image to the specified width and height, using the
     /// specified filter type.
-    pub fn resize_image(&self, width: usize, height: usize, filter: bindings::FilterType) {
+    pub fn resize_image(&self, width: usize, height: usize, filter: FilterType) {
         unsafe {
-            bindings::MagickResizeImage(self.wand, width as size_t, height as size_t, filter);
+            bindings::MagickResizeImage(self.wand, width as size_t, height as size_t, filter.into());
         }
     }
 
@@ -833,10 +825,10 @@ impl MagickWand {
         &self,
         x_resolution: f64,
         y_resolution: f64,
-        filter: bindings::FilterType,
+        filter: FilterType,
     ) {
         unsafe {
-            bindings::MagickResampleImage(self.wand, x_resolution, y_resolution, filter);
+            bindings::MagickResampleImage(self.wand, x_resolution, y_resolution, filter.into());
         }
     }
 
@@ -1102,12 +1094,100 @@ impl MagickWand {
         }
     }
 
-    mutations!(
-        /// Set the image colorspace, transforming (unlike `set_image_colorspace`) image data in
-        /// the process.
-        MagickTransformImageColorspace => transform_image_colorspace(
-            colorspace: bindings::ColorspaceType)
+    /// Set the image colorspace, transforming (unlike `set_image_colorspace`) image data in
+    /// the process.
+    pub fn transform_image_colorspace(&self, colorspace: ColorspaceType) -> Result<()> {
+        match unsafe { bindings::MagickTransformImageColorspace(self.wand, colorspace.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to transform image colorspace")),
+        }
+    }
 
+    /// Reduce the number of colors in the image.
+    pub fn quantize_image(
+        &self,
+        number_of_colors: size_t,
+        colorspace: ColorspaceType,
+        tree_depth: size_t,
+        dither_method: DitherMethod,
+        measure_error: bool) -> Result<()> {
+        match unsafe { bindings::MagickQuantizeImage(
+                self.wand,
+                number_of_colors,
+                colorspace.into(),
+                tree_depth,
+                dither_method.into(),
+                measure_error.to_magick()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to quantize image")),
+        }
+    }
+
+    /// Reduce the number of colors in the images.
+    pub fn quantize_images(
+        &self,
+        number_of_colors: size_t,
+        colorspace: ColorspaceType,
+        tree_depth: size_t,
+        dither_method: DitherMethod,
+        measure_error: bool) -> Result<()> {
+        match unsafe { bindings::MagickQuantizeImages(
+                self.wand,
+                number_of_colors,
+                colorspace.into(),
+                tree_depth,
+                dither_method.into(),
+                measure_error.to_magick()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to quantize images")),
+        }
+    }
+
+    pub fn get_colorspace(&self) -> ColorspaceType {
+        return unsafe { bindings::MagickGetColorspace(self.wand).into() };
+    }
+
+    pub fn set_colorspace(&mut self, colorspace: ColorspaceType) -> Result<()> {
+        match unsafe { bindings::MagickSetColorspace(self.wand, colorspace.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set colorspace")),
+        }
+    }
+
+    pub fn get_image_colorspace(&self) -> ColorspaceType {
+        return unsafe { bindings::MagickGetImageColorspace(self.wand).into() };
+    }
+
+    pub fn set_image_colorspace(&self, colorspace: ColorspaceType) -> Result<()> {
+        match unsafe { bindings::MagickSetImageColorspace(self.wand, colorspace.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set image colorspace")),
+        }
+    }
+
+    pub fn get_gravity(&self) -> GravityType {
+        return unsafe { bindings::MagickGetGravity(self.wand).into() };
+    }
+
+    pub fn set_gravity(&mut self, gravity: GravityType) -> Result<()> {
+        match unsafe { bindings::MagickSetGravity(self.wand, gravity.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set gravity")),
+        }
+    }
+
+    pub fn get_image_gravity(&self) -> GravityType {
+        return unsafe { bindings::MagickGetImageGravity(self.wand).into() };
+    }
+
+    pub fn set_image_gravity(&mut self, gravity: GravityType) -> Result<()> {
+        match unsafe { bindings::MagickSetImageGravity(self.wand, gravity.into()) } {
+            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set image gravity")),
+        }
+    }
+
+    mutations!(
         /// Sets the image to the specified alpha level.
         MagickSetImageAlpha => set_image_alpha(alpha: f64)
 
@@ -1120,16 +1200,6 @@ impl MagickWand {
         /// Set the image alpha channel mode.
         MagickSetImageAlphaChannel => set_image_alpha_channel(
             alpha_channel: bindings::AlphaChannelOption)
-
-        /// Reduce the number of colors in the image.
-        MagickQuantizeImage => quantize_image(
-            number_of_colors: size_t, colorspace: bindings::ColorspaceType,
-            tree_depth: size_t, dither_method: bindings::DitherMethod, measure_error: bindings::MagickBooleanType)
-
-        /// Reduce the number of colors in the image.
-        MagickQuantizeImages => quantize_images(
-            number_of_colors: size_t, colorspace: bindings::ColorspaceType,
-            tree_depth: size_t, dither_method: bindings::DitherMethod, measure_error: bindings::MagickBooleanType)
 
         /// Discard all but one of any pixel color.
         MagickUniqueImageColors => unique_image_colors()
@@ -1155,11 +1225,8 @@ impl MagickWand {
     );
 
     set_get!(
-        get_colorspace,                  set_colorspace,                  MagickGetColorspace,               MagickSetColorspace,              bindings::ColorspaceType
         get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             bindings::CompressionType
         get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      size_t
-        get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 bindings::GravityType
-        get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         bindings::ColorspaceType
         get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        bindings::CompressionType
         get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, size_t
         get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              size_t
@@ -1168,7 +1235,6 @@ impl MagickWand {
         get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             bindings::EndianType
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
         get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
-        get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            bindings::GravityType
         get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    bindings::InterlaceType
         get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  bindings::PixelInterpolateMethod
         get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         size_t
