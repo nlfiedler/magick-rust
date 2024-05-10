@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 use crate::bindings;
 
 /// Resource type to use with [set_resource_limit](crate::MagickWand::set_resource_limit)

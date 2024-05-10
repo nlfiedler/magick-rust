@@ -22,8 +22,8 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::Once;
 
-use magick_rust::{bindings, magick_wand_genesis, CompositeOperator, MagickWand, PixelWand};
-use magick_rust::{MagickError, ToMagick};
+use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand};
+use magick_rust::MagickError;
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
@@ -426,32 +426,32 @@ fn test_image_compose() {
     wand.new_image(4, 4, &PixelWand::new()).unwrap();
 
     let operators = [
-        CompositeOperator::Alpha,
-        CompositeOperator::MinusDst,
-        CompositeOperator::Over,
-        CompositeOperator::Xor,
-        CompositeOperator::Bumpmap,
-        CompositeOperator::ChangeMask,
-        CompositeOperator::Clear,
-        CompositeOperator::ColorBurn,
-        CompositeOperator::ColorDodge,
-        CompositeOperator::Colorize,
-        CompositeOperator::CopyBlack,
-        CompositeOperator::CopyBlue,
-        CompositeOperator::Copy,
-        CompositeOperator::CopyCyan,
-        CompositeOperator::CopyGreen,
-        CompositeOperator::CopyMagenta,
-        CompositeOperator::CopyAlpha,
-        CompositeOperator::CopyRed,
-        CompositeOperator::CopyYellow,
-        CompositeOperator::Darken,
-        CompositeOperator::DarkenIntensity,
-        CompositeOperator::Difference,
-        CompositeOperator::Displace,
-        CompositeOperator::Dissolve,
-        CompositeOperator::Distort,
-        CompositeOperator::DivideDst,
+        magick_rust::CompositeOperator::Alpha,
+        magick_rust::CompositeOperator::MinusDst,
+        magick_rust::CompositeOperator::Over,
+        magick_rust::CompositeOperator::Xor,
+        magick_rust::CompositeOperator::Bumpmap,
+        magick_rust::CompositeOperator::ChangeMask,
+        magick_rust::CompositeOperator::Clear,
+        magick_rust::CompositeOperator::ColorBurn,
+        magick_rust::CompositeOperator::ColorDodge,
+        magick_rust::CompositeOperator::Colorize,
+        magick_rust::CompositeOperator::CopyBlack,
+        magick_rust::CompositeOperator::CopyBlue,
+        magick_rust::CompositeOperator::Copy,
+        magick_rust::CompositeOperator::CopyCyan,
+        magick_rust::CompositeOperator::CopyGreen,
+        magick_rust::CompositeOperator::CopyMagenta,
+        magick_rust::CompositeOperator::CopyAlpha,
+        magick_rust::CompositeOperator::CopyRed,
+        magick_rust::CompositeOperator::CopyYellow,
+        magick_rust::CompositeOperator::Darken,
+        magick_rust::CompositeOperator::DarkenIntensity,
+        magick_rust::CompositeOperator::Difference,
+        magick_rust::CompositeOperator::Displace,
+        magick_rust::CompositeOperator::Dissolve,
+        magick_rust::CompositeOperator::Distort,
+        magick_rust::CompositeOperator::DivideDst,
     ];
     for op in operators.iter() {
         wand.set_image_compose(*op).unwrap();
