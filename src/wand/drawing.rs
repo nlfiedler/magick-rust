@@ -20,7 +20,10 @@ use bindings;
 
 use crate::result::MagickError;
 use crate::result::Result;
-use crate::GravityType;
+use crate::{
+    FillRule,
+    GravityType,
+};
 
 wand_common!(
     DrawingWand,
@@ -89,9 +92,9 @@ impl DrawingWand {
     set_get_unchecked!(
         get_gravity,                set_gravity,                  DrawGetGravity,               DrawSetGravity,               GravityType
         get_opacity,                set_opacity,                  DrawGetOpacity,               DrawSetOpacity,               f64
-        get_clip_rule,              set_clip_rule,                DrawGetClipRule,              DrawSetClipRule,              bindings::FillRule
+        get_clip_rule,              set_clip_rule,                DrawGetClipRule,              DrawSetClipRule,              FillRule
         get_clip_units,             set_clip_units,               DrawGetClipUnits,             DrawSetClipUnits,             bindings::ClipPathUnits
-        get_fill_rule,              set_fill_rule,                DrawGetFillRule,              DrawSetFillRule,              bindings::FillRule
+        get_fill_rule,              set_fill_rule,                DrawGetFillRule,              DrawSetFillRule,              FillRule
         get_fill_opacity,           set_fill_opacity,             DrawGetFillOpacity,           DrawSetFillOpacity,           f64
 
         get_font_size,              set_font_size,                DrawGetFontSize,              DrawSetFontSize,              f64
