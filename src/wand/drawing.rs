@@ -21,8 +21,10 @@ use bindings;
 use crate::result::MagickError;
 use crate::result::Result;
 use crate::{
+    ClipPathUnits,
     FillRule,
     GravityType,
+    StyleType,
 };
 
 wand_common!(
@@ -93,12 +95,12 @@ impl DrawingWand {
         get_gravity,                set_gravity,                  DrawGetGravity,               DrawSetGravity,               GravityType
         get_opacity,                set_opacity,                  DrawGetOpacity,               DrawSetOpacity,               f64
         get_clip_rule,              set_clip_rule,                DrawGetClipRule,              DrawSetClipRule,              FillRule
-        get_clip_units,             set_clip_units,               DrawGetClipUnits,             DrawSetClipUnits,             bindings::ClipPathUnits
+        get_clip_units,             set_clip_units,               DrawGetClipUnits,             DrawSetClipUnits,             ClipPathUnits
         get_fill_rule,              set_fill_rule,                DrawGetFillRule,              DrawSetFillRule,              FillRule
         get_fill_opacity,           set_fill_opacity,             DrawGetFillOpacity,           DrawSetFillOpacity,           f64
 
         get_font_size,              set_font_size,                DrawGetFontSize,              DrawSetFontSize,              f64
-        get_font_style,             set_font_style,               DrawGetFontStyle,             DrawSetFontStyle,             bindings::StyleType
+        get_font_style,             set_font_style,               DrawGetFontStyle,             DrawSetFontStyle,             StyleType
         get_font_weight,            set_font_weight,              DrawGetFontWeight,            DrawSetFontWeight,            usize
         get_font_stretch,           set_font_stretch,             DrawGetFontStretch,           DrawSetFontStretch,           bindings::StretchType
 

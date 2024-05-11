@@ -1,4 +1,5 @@
 mod alpha_channel_option;
+mod clip_path_units;
 mod colorspace_type;
 mod composite_operator;
 mod compression_type;
@@ -17,8 +18,10 @@ mod rendering_intent;
 mod resolution_type;
 mod resource_type;
 mod statistic_type;
+mod style_type;
 
 pub use self::alpha_channel_option::AlphaChannelOption;
+pub use self::clip_path_units::ClipPathUnits;
 pub use self::colorspace_type::ColorspaceType;
 pub use self::composite_operator::CompositeOperator;
 pub use self::compression_type::CompressionType;
@@ -37,3 +40,4 @@ pub use self::rendering_intent::RenderingIntent;
 pub use self::resolution_type::ResolutionType;
 pub use self::resource_type::ResourceType;
 pub use self::statistic_type::StatisticType;
+pub use self::style_type::StyleType;
