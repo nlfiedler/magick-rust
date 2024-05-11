@@ -1,3 +1,4 @@
+mod alpha_channel_option;
 mod colorspace_type;
 mod composite_operator;
 mod dither_method;
@@ -7,6 +8,7 @@ mod pixel_interpolate_method;
 mod metric_type;
 mod resource_type;
 
+pub use self::alpha_channel_option::AlphaChannelOption;
 pub use self::colorspace_type::ColorspaceType;
 pub use self::composite_operator::CompositeOperator;
 pub use self::dither_method::DitherMethod;

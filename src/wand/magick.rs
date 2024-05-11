@@ -30,6 +30,7 @@ use crate::result::Result;
 
 use super::{DrawingWand, PixelWand};
 use crate::{
+    AlphaChannelOption,
     ColorspaceType,
     CompositeOperator,
     DitherMethod,
@@ -1142,8 +1143,7 @@ impl MagickWand {
         MagickBrightnessContrastImage => brightness_contrast_image(brightness: f64, contrast: f64)
 
         /// Set the image alpha channel mode.
-        MagickSetImageAlphaChannel => set_image_alpha_channel(
-            alpha_channel: bindings::AlphaChannelOption)
+        MagickSetImageAlphaChannel => set_image_alpha_channel(alpha_channel: AlphaChannelOption)
 
         /// Discard all but one of any pixel color.
         MagickUniqueImageColors => unique_image_colors()

@@ -317,7 +317,7 @@ fn test_set_image_background_color() {
     let mut pw = PixelWand::new();
     pw.set_color("#0000FF").unwrap();
     wand.set_image_background_color(&pw).unwrap();
-    wand.set_image_alpha_channel(bindings::AlphaChannelOption_RemoveAlphaChannel)
+    wand.set_image_alpha_channel(magick_rust::AlphaChannelOption::Remove)
         .unwrap();
     let blob = wand.write_image_blob("rgb").unwrap();
     assert_eq!(0u8, blob[0]);

@@ -258,7 +258,7 @@ macro_rules! mutations {
         $(
             $(#[$attr])*
             pub fn $fun(&self $(, $arg: $ty)*) -> Result<()> {
-                match unsafe { bindings::$c_fun(self.wand $(, $arg)*) } {
+                match unsafe { bindings::$c_fun(self.wand $(, $arg.into())*) } {
                     bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(MagickError(concat!(stringify!($c_fun), " invocation failed")))
                 }
