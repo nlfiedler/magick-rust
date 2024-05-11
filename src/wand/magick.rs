@@ -32,6 +32,7 @@ use super::{MagickTrue, MagickFalse};
 use super::{DrawingWand, PixelWand};
 use crate::{
     AlphaChannelOption,
+    AutoThresholdMethod,
     ColorspaceType,
     CompositeOperator,
     CompressionType,
@@ -1286,8 +1287,8 @@ impl MagickWand {
     /// down to a binary black & white image. Included algorithms are
     /// Kapur, Otsu, and Triangle methods.
     /// See <https://imagemagick.org/api/magick-image.php#MagickAutoThresholdImage> for more information.
-    pub fn auto_threshold(&self, method: bindings::AutoThresholdMethod) -> Result<()> {
-        match unsafe { bindings::MagickAutoThresholdImage(self.wand, method) } {
+    pub fn auto_threshold(&self, method: AutoThresholdMethod) -> Result<()> {
+        match unsafe { bindings::MagickAutoThresholdImage(self.wand, method.into()) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError("unable to auto threshold image")),
         }
