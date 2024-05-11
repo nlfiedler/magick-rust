@@ -16,11 +16,6 @@
 use std::ffi::{CStr, CString};
 use std::fmt;
 
-#[cfg(target_os = "freebsd")]
-use libc::size_t;
-#[cfg(not(target_os = "freebsd"))]
-use size_t;
-
 use bindings;
 use result::MagickError;
 
@@ -99,7 +94,7 @@ impl PixelWand {
     );
 
     set_get_unchecked!(
-        get_color_count, set_color_count, PixelGetColorCount, PixelSetColorCount,   size_t
+        get_color_count, set_color_count, PixelGetColorCount, PixelSetColorCount,   usize
         get_index,       set_index,       PixelGetIndex,      PixelSetIndex,        f32
         get_fuzz,        set_fuzz,        PixelGetFuzz,       PixelSetFuzz,         f64
     );

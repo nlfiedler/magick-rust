@@ -41,8 +41,9 @@ use crate::{
     FilterType,
     GravityType,
     InterlaceType,
-    PixelInterpolateMethod,
     MetricType,
+    OrientationType,
+    PixelInterpolateMethod,
     ResourceType
 };
 
@@ -884,10 +885,7 @@ impl MagickWand {
     /// Detect if the loaded image is not in top-left orientation, and
     /// hence should be "auto" oriented so it is suitable for viewing.
     pub fn requires_orientation(&self) -> bool {
-        unsafe {
-            bindings::MagickGetImageOrientation(self.wand)
-                != bindings::OrientationType_TopLeftOrientation
-        }
+        return self.get_image_orientation() != OrientationType::TopLeft;
     }
 
     /// Automatically adjusts the loaded image so that its orientation is
@@ -1192,7 +1190,7 @@ impl MagickWand {
         get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    InterlaceType
         get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  PixelInterpolateMethod
         get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         usize
-        get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        bindings::OrientationType
+        get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        OrientationType
         get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    bindings::RenderingIntent
         get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              usize
         get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               bindings::ImageType
@@ -1200,7 +1198,7 @@ impl MagickWand {
         get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         InterlaceType
         get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       PixelInterpolateMethod
         get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           isize
-        get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             bindings::OrientationType
+        get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             OrientationType
         get_pointsize,                   set_pointsize,                   MagickGetPointsize,                MagickSetPointsize,               f64
         get_type,                        set_type,                        MagickGetType,                     MagickSetType,                    bindings::ImageType
     );
