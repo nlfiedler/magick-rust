@@ -47,7 +47,8 @@ use crate::{
     PixelInterpolateMethod,
     RenderingIntent,
     ResolutionType,
-    ResourceType
+    ResourceType,
+    StatisticType,
 };
 
 wand_common!(
@@ -414,11 +415,21 @@ impl MagickWand {
     }
 
     /// Apply sigmoidal contrast to the image
-    /// Midpoint is a number in range [0, 1]
+    ///
+    /// Adjusts the contrast of an image with a non-linear sigmoidal contrast algorithm. Increase
+    /// the contrast of the image using a sigmoidal transfer function without saturating highlights
+    /// or shadows. Contrast indicates how much to increase the contrast (0 is none; 3 is typical;
+    /// 20 is pushing it); mid-point indicates where midtones fall in the resultant image (0.0 is
+    /// white; 0.5 is middle-gray; 1.0 is black). Set sharpen to `true` to increase the image
+    /// contrast otherwise the contrast is reduced.
+    ///
+    /// * `sharpen`: increase or decrease image contrast
+    /// * `strength`: strength of the contrast, the larger the number the more 'threshold-like' it becomes.
+    /// * `midpoint`: midpoint of the function as a number in range [0, 1]
     pub fn sigmoidal_contrast_image(
         &self,
         sharpen: bool,
-        contrast: f64,
+        strength: f64,
         midpoint: f64,
     ) -> Result<()> {
         let quantum_range = self.quantum_range()?;
@@ -427,7 +438,7 @@ impl MagickWand {
             bindings::MagickSigmoidalContrastImage(
                 self.wand,
                 sharpen.to_magick(),
-                contrast,
+                strength,
                 midpoint * quantum_range,
             )
         };
@@ -521,6 +532,37 @@ impl MagickWand {
         }
     }
 
+    /// Replace each pixel with corresponding statistic from the neighborhood of the specified width and height.
+    ///
+    /// * `statistic_type`: the statistic type (e.g. `StatisticType::Median`, `StatisticType::Mode`, etc.).
+    /// * `width`: the width of the pixel neighborhood.
+    /// * `height`: the height of the pixel neighborhood.
+    pub fn statistic_image(
+        &self,
+        statistic_type: StatisticType,
+        width: usize,
+        height: usize,
+    ) -> Result<()> {
+        match unsafe {
+            bindings::MagickStatisticImage(
+                self.wand,
+                statistic_type.into(),
+                width.into(),
+                height.into()
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to calculate statistics for image")),
+        }
+    }
+
+    /// Calculate median for each pixel's neighborhood.
+    ///
+    /// See [statistic_image](Self::statistic_image)
+    pub fn median_blur_image(&self, width: usize, height: usize) -> Result<()> {
+        return self.statistic_image(StatisticType::Median, width, height);
+    }
+
     /// Adaptively resize the currently selected image.
     pub fn adaptive_resize_image(&self, width: usize, height: usize) -> Result<()> {
         match unsafe { bindings::MagickAdaptiveResizeImage(self.wand, width, height) } {
@@ -577,6 +619,131 @@ impl MagickWand {
         }
     }
 
+    /// Returns a value associated with the specified artifact.
+    ///
+    /// * `artifact`: the artifact.
+    pub fn get_image_artifact(&self, artifact: &str) -> Result<String> {
+        let c_artifact = CString::new(artifact).map_err(|_| MagickError("artifact string contains null byte"))?;
+
+        let result = unsafe {
+            bindings::MagickGetImageArtifact(
+                self.wand,
+                c_artifact.as_ptr()
+            )
+        };
+
+        let value = if result.is_null() {
+            Err(MagickError("missing artifact"))
+        } else {
+            // convert (and copy) the C string to a Rust string
+            let cstr = unsafe { CStr::from_ptr(result) };
+            Ok(cstr.to_string_lossy().into_owned())
+        };
+
+        unsafe {
+            bindings::MagickRelinquishMemory(result as *mut c_void);
+        }
+
+        value
+    }
+
+    pub fn get_image_artifacts(&self, pattern: &str) -> Result<Vec<String>> {
+        let c_pattern = CString::new(pattern).map_err(|_| MagickError("artifact string contains null byte"))?;
+        let mut num_of_artifacts: size_t = 0;
+
+        let result = unsafe {
+            bindings::MagickGetImageArtifacts(
+                self.wand,
+                c_pattern.as_ptr(),
+                &mut num_of_artifacts
+            )
+        };
+
+        let value = if result.is_null() {
+            Err(MagickError("no artifacts found"))
+        } else {
+            let mut artifacts: Vec<String> = Vec::with_capacity(num_of_artifacts);
+            for i in 0..num_of_artifacts {
+                // convert (and copy) the C string to a Rust string
+                let cstr = unsafe { CStr::from_ptr(*result.add(i)) };
+                artifacts.push(cstr.to_string_lossy().into_owned());
+            }
+
+            Ok(artifacts)
+        };
+
+        unsafe {
+            bindings::MagickRelinquishMemory(result as *mut c_void);
+        }
+
+        value
+    }
+
+    /// Sets a key-value pair in the image artifact namespace. Artifacts differ from properties.
+    /// Properties are public and are generally exported to an external image format if the format
+    /// supports it. Artifacts are private and are utilized by the internal ImageMagick API to
+    /// modify the behavior of certain algorithms.
+    ///
+    /// * `artifact`: the artifact.
+    /// * `value`: the value.
+    ///
+    /// # Example
+    ///
+    /// This example shows how you can blend an image with its blurred copy with 50% opacity by
+    /// setting "compose:args" to "50". This is equivalent to having `-define compose:args=50` when
+    /// using imagemagick cli.
+    ///
+    /// ```
+    /// let mut wand1 = MagickWand::new();
+    /// wand1.read_image("test.jpg")?;
+    /// let wand2 = wand1.clone();
+    ///
+    /// wand1.median_blur_image(10, 10)?;
+    ///
+    /// wand1.set_image_artifact("compose:args", "50")?;
+    /// wand1.compose_images(&wand2, CompositeOperator::Blend, false, 0, 0)?;
+    ///
+    /// wand1.write_image("res.jpeg")?;
+    /// ```
+    pub fn set_image_artifact(
+        &mut self,
+        artifact: &str,
+        value: &str
+    ) -> Result<()> {
+        let c_artifact = CString::new(artifact).map_err(|_| MagickError("artifact string contains null byte"))?;
+        let c_value = CString::new(value).map_err(|_| MagickError("value string contains null byte"))?;
+
+        let result = unsafe {
+            bindings::MagickSetImageArtifact(
+                self.wand,
+                c_artifact.as_ptr(),
+                c_value.as_ptr()
+            )
+        };
+
+        match result {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set image artifact")),
+        }
+    }
+
+    /// Deletes a wand artifact.
+    ///
+    /// * `artifact`: the artifact.
+    pub fn delete_image_artifact(&mut self, artifact: &str) -> Result<()> {
+        let c_artifact = CString::new(artifact).map_err(|_| MagickError("artifact string contains null byte"))?;
+
+        match unsafe {
+            bindings::MagickDeleteImageArtifact(
+                self.wand,
+                c_artifact.as_ptr()
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to delete image artifact")),
+        }
+    }
+
     /// Retrieve the named image property value.
     pub fn get_image_property(&self, name: &str) -> Result<String> {
         let c_name = CString::new(name).unwrap();
@@ -591,6 +758,38 @@ impl MagickWand {
         unsafe {
             bindings::MagickRelinquishMemory(result as *mut c_void);
         }
+        value
+    }
+
+    pub fn get_image_properties(&self, pattern: &str) -> Result<Vec<String>> {
+        let c_pattern = CString::new(pattern).map_err(|_| MagickError("artifact string contains null byte"))?;
+        let mut num_of_artifacts: size_t = 0;
+
+        let result = unsafe {
+            bindings::MagickGetImageProperties(
+                self.wand,
+                c_pattern.as_ptr(),
+                &mut num_of_artifacts
+            )
+        };
+
+        let value = if result.is_null() {
+            Err(MagickError("no artifacts found"))
+        } else {
+            let mut artifacts: Vec<String> = Vec::with_capacity(num_of_artifacts);
+            for i in 0..num_of_artifacts {
+                // convert (and copy) the C string to a Rust string
+                let cstr = unsafe { CStr::from_ptr(*result.add(i)) };
+                artifacts.push(cstr.to_string_lossy().into_owned());
+            }
+
+            Ok(artifacts)
+        };
+
+        unsafe {
+            bindings::MagickRelinquishMemory(result as *mut c_void);
+        }
+
         value
     }
 

@@ -15,6 +15,7 @@ mod pixel_interpolate_method;
 mod rendering_intent;
 mod resolution_type;
 mod resource_type;
+mod statistic_type;
 
 pub use self::alpha_channel_option::AlphaChannelOption;
 pub use self::colorspace_type::ColorspaceType;
@@ -33,3 +34,4 @@ pub use self::pixel_interpolate_method::PixelInterpolateMethod;
 pub use self::rendering_intent::RenderingIntent;
 pub use self::resolution_type::ResolutionType;
 pub use self::resource_type::ResourceType;
+pub use self::statistic_type::StatisticType;
