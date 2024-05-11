@@ -11,6 +11,7 @@ mod interlace_type;
 mod metric_type;
 mod orientation_type;
 mod pixel_interpolate_method;
+mod rendering_intent;
 mod resource_type;
 
 pub use self::alpha_channel_option::AlphaChannelOption;
@@ -26,4 +27,5 @@ pub use self::interlace_type::InterlaceType;
 pub use self::metric_type::MetricType;
 pub use self::orientation_type::OrientationType;
 pub use self::pixel_interpolate_method::PixelInterpolateMethod;
+pub use self::rendering_intent::RenderingIntent;
 pub use self::resource_type::ResourceType;

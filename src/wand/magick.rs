@@ -44,6 +44,7 @@ use crate::{
     MetricType,
     OrientationType,
     PixelInterpolateMethod,
+    RenderingIntent,
     ResourceType
 };
 
@@ -1191,7 +1192,7 @@ impl MagickWand {
         get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  PixelInterpolateMethod
         get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         usize
         get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        OrientationType
-        get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    bindings::RenderingIntent
+        get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    RenderingIntent
         get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              usize
         get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               bindings::ImageType
         get_image_units,                 set_image_units,                 MagickGetImageUnits,               MagickSetImageUnits,              bindings::ResolutionType
