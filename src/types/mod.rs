@@ -18,6 +18,7 @@ mod rendering_intent;
 mod resolution_type;
 mod resource_type;
 mod statistic_type;
+mod stretch_type;
 mod style_type;
 
 pub use self::alpha_channel_option::AlphaChannelOption;
@@ -40,4 +41,5 @@ pub use self::rendering_intent::RenderingIntent;
 pub use self::resolution_type::ResolutionType;
 pub use self::resource_type::ResourceType;
 pub use self::statistic_type::StatisticType;
+pub use self::stretch_type::StretchType;
 pub use self::style_type::StyleType;

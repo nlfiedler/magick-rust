@@ -24,6 +24,7 @@ use crate::{
     ClipPathUnits,
     FillRule,
     GravityType,
+    StretchType,
     StyleType,
 };
 
@@ -102,7 +103,7 @@ impl DrawingWand {
         get_font_size,              set_font_size,                DrawGetFontSize,              DrawSetFontSize,              f64
         get_font_style,             set_font_style,               DrawGetFontStyle,             DrawSetFontStyle,             StyleType
         get_font_weight,            set_font_weight,              DrawGetFontWeight,            DrawSetFontWeight,            usize
-        get_font_stretch,           set_font_stretch,             DrawGetFontStretch,           DrawSetFontStretch,           bindings::StretchType
+        get_font_stretch,           set_font_stretch,             DrawGetFontStretch,           DrawSetFontStretch,           StretchType
 
         get_stroke_dash_offset,     set_stroke_dash_offset,       DrawGetStrokeDashOffset,      DrawSetStrokeDashOffset,      f64
         get_stroke_line_cap,        set_stroke_line_cap,          DrawGetStrokeLineCap,         DrawSetStrokeLineCap,         bindings::LineCap
