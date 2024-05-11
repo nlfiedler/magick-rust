@@ -100,7 +100,7 @@ macro_rules! get {
     ($($get:ident, $c_get:ident, $typ:ty )*) => {
         $(
             pub fn $get(&self) -> $typ {
-                unsafe { ::bindings::$c_get(self.wand) }
+                unsafe { ::bindings::$c_get(self.wand).into() }
             }
         )*
     }

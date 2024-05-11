@@ -18,13 +18,13 @@ use std::{fmt, ptr, slice};
 
 use libc::c_void;
 #[cfg(target_os = "freebsd")]
-use libc::{size_t, ssize_t};
+use libc::size_t;
 
 use bindings;
 use conversions::*;
 use result::MagickError;
 #[cfg(not(target_os = "freebsd"))]
-use {size_t, ssize_t};
+use size_t;
 
 use crate::result::Result;
 
@@ -59,8 +59,8 @@ wand_common!(
 /// When the `MagickWand` is dropped, the ImageMagick wand will be
 /// destroyed as well.
 impl MagickWand {
-    pub fn new_image(&self, columns: size_t, rows: size_t, pixel_wand: &PixelWand) -> Result<()> {
-        match unsafe { bindings::MagickNewImage(self.wand, columns, rows, pixel_wand.wand) } {
+    pub fn new_image(&self, columns: usize, rows: usize, pixel_wand: &PixelWand) -> Result<()> {
+        match unsafe { bindings::MagickNewImage(self.wand, columns.into(), rows.into(), pixel_wand.wand) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err(MagickError("Could not create image")),
         }
@@ -168,7 +168,7 @@ impl MagickWand {
             bindings::MagickReadImageBlob(
                 self.wand,
                 int_slice.as_ptr() as *const c_void,
-                size as size_t,
+                size.into(),
             )
         };
         match result {
@@ -197,7 +197,7 @@ impl MagickWand {
             bindings::MagickPingImageBlob(
                 self.wand,
                 int_slice.as_ptr() as *const c_void,
-                size as size_t,
+                size.into(),
             )
         };
         match result {
@@ -319,8 +319,8 @@ impl MagickWand {
         MagickWand::new_from_wand(wand)
     }
 
-    pub fn set_size(&self, columns: size_t, rows: size_t) -> Result<()> {
-        let result = unsafe { bindings::MagickSetSize(self.wand, columns, rows) };
+    pub fn set_size(&self, columns: usize, rows: usize) -> Result<()> {
+        let result = unsafe { bindings::MagickSetSize(self.wand, columns.into(), rows.into()) };
         match result {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err(MagickError("failed to set size of wand")),
@@ -772,7 +772,7 @@ impl MagickWand {
     /// specified filter type.
     pub fn resize_image(&self, width: usize, height: usize, filter: FilterType) {
         unsafe {
-            bindings::MagickResizeImage(self.wand, width as size_t, height as size_t, filter.into());
+            bindings::MagickResizeImage(self.wand, width.into(), height.into(), filter.into());
         }
     }
 
@@ -781,7 +781,7 @@ impl MagickWand {
     /// of producing small low cost images suited for display on the web.
     pub fn thumbnail_image(&self, width: usize, height: usize) {
         unsafe {
-            bindings::MagickThumbnailImage(self.wand, width as size_t, height as size_t);
+            bindings::MagickThumbnailImage(self.wand, width.into(), height.into());
         }
     }
 
@@ -846,7 +846,7 @@ impl MagickWand {
 
     /// Resize the image to fit within the given dimensions, maintaining
     /// the current aspect ratio.
-    pub fn fit(&self, width: size_t, height: size_t) {
+    pub fn fit(&self, width: usize, height: usize) {
         let mut width_ratio = width as f64;
         width_ratio /= self.get_image_width() as f64;
         let mut height_ratio = height as f64;
@@ -854,11 +854,11 @@ impl MagickWand {
         let (new_width, new_height) = if width_ratio < height_ratio {
             (
                 width,
-                (self.get_image_height() as f64 * width_ratio) as size_t,
+                (self.get_image_height() as f64 * width_ratio) as usize,
             )
         } else {
             (
-                (self.get_image_width() as f64 * height_ratio) as size_t,
+                (self.get_image_width() as f64 * height_ratio) as usize,
                 height,
             )
         };
@@ -867,8 +867,8 @@ impl MagickWand {
             while bindings::MagickNextImage(self.wand) != bindings::MagickBooleanType_MagickFalse {
                 bindings::MagickResizeImage(
                     self.wand,
-                    new_width,
-                    new_height,
+                    new_width.into(),
+                    new_height.into(),
                     bindings::FilterType_LanczosFilter,
                 );
             }
@@ -1094,16 +1094,16 @@ impl MagickWand {
     /// Reduce the number of colors in the image.
     pub fn quantize_image(
         &self,
-        number_of_colors: size_t,
+        number_of_colors: usize,
         colorspace: ColorspaceType,
-        tree_depth: size_t,
+        tree_depth: usize,
         dither_method: DitherMethod,
         measure_error: bool) -> Result<()> {
         match unsafe { bindings::MagickQuantizeImage(
                 self.wand,
-                number_of_colors,
+                number_of_colors.into(),
                 colorspace.into(),
-                tree_depth,
+                tree_depth.into(),
                 dither_method.into(),
                 measure_error.to_magick()) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
@@ -1114,16 +1114,16 @@ impl MagickWand {
     /// Reduce the number of colors in the images.
     pub fn quantize_images(
         &self,
-        number_of_colors: size_t,
+        number_of_colors: usize,
         colorspace: ColorspaceType,
-        tree_depth: size_t,
+        tree_depth: usize,
         dither_method: DitherMethod,
         measure_error: bool) -> Result<()> {
         match unsafe { bindings::MagickQuantizeImages(
                 self.wand,
-                number_of_colors,
+                number_of_colors.into(),
                 colorspace.into(),
-                tree_depth,
+                tree_depth.into(),
                 dither_method.into(),
                 measure_error.to_magick()) } {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
@@ -1149,7 +1149,7 @@ impl MagickWand {
         MagickUniqueImageColors => unique_image_colors()
 
         /// Applies k-means color reduction to the image.
-        MagickKmeansImage => kmeans(number_colors: size_t, max_iterations: size_t, tolerance: f64)
+        MagickKmeansImage => kmeans(number_colors: usize, max_iterations: usize, tolerance: f64)
 
         /// Extracts the 'mean' from the image and adjust the image to try make set its gamma appropriately.
         MagickAutoGammaImage => auto_gamma()
@@ -1158,7 +1158,7 @@ impl MagickWand {
         MagickAutoLevelImage => auto_level()
     );
 
-    get!(get_image_colors, MagickGetImageColors, size_t);
+    get!(get_image_colors, MagickGetImageColors, usize);
 
     string_set_get!(
         get_filename,                    set_filename,                    MagickGetFilename,                 MagickSetFilename
@@ -1172,13 +1172,13 @@ impl MagickWand {
         get_colorspace,                  set_colorspace,                  MagickGetColorspace,               MagickSetColorspace,              ColorspaceType
         get_image_compose,               set_image_compose,               MagickGetImageCompose,             MagickSetImageCompose,            CompositeOperator
         get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             bindings::CompressionType
-        get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      size_t
+        get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      usize
         get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 GravityType
         get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         ColorspaceType
         get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        bindings::CompressionType
-        get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, size_t
-        get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              size_t
-        get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              size_t
+        get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, usize
+        get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              usize
+        get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              usize
         get_image_dispose,               set_image_dispose,               MagickGetImageDispose,             MagickSetImageDispose,            bindings::DisposeType
         get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             bindings::EndianType
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
@@ -1186,15 +1186,15 @@ impl MagickWand {
         get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            GravityType
         get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    bindings::InterlaceType
         get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  PixelInterpolateMethod
-        get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         size_t
+        get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         usize
         get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        bindings::OrientationType
         get_image_rendering_intent,      set_image_rendering_intent,      MagickGetImageRenderingIntent,     MagickSetImageRenderingIntent,    bindings::RenderingIntent
-        get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              size_t
+        get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              usize
         get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               bindings::ImageType
         get_image_units,                 set_image_units,                 MagickGetImageUnits,               MagickSetImageUnits,              bindings::ResolutionType
         get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         bindings::InterlaceType
         get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       bindings::PixelInterpolateMethod
-        get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           ssize_t
+        get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           isize
         get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             bindings::OrientationType
         get_pointsize,                   set_pointsize,                   MagickGetPointsize,                MagickSetPointsize,               f64
         get_type,                        set_type,                        MagickGetType,                     MagickSetType,                    bindings::ImageType

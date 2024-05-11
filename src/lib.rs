@@ -33,8 +33,6 @@
 extern crate libc;
 
 use libc::size_t;
-#[cfg(not(target_os = "freebsd"))]
-use libc::ssize_t;
 
 pub use conversions::ToMagick;
 pub use result::MagickError;
