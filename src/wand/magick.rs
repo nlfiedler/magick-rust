@@ -293,9 +293,9 @@ impl MagickWand {
     pub fn clut_image(
         &self,
         clut_wand: &MagickWand,
-        method: bindings::PixelInterpolateMethod,
+        method: PixelInterpolateMethod,
     ) -> Result<()> {
-        let result = unsafe { bindings::MagickClutImage(self.wand, clut_wand.wand, method) };
+        let result = unsafe { bindings::MagickClutImage(self.wand, clut_wand.wand, method.into()) };
         match result {
             bindings::MagickBooleanType_MagickTrue => Ok(()),
             _ => Err(MagickError(

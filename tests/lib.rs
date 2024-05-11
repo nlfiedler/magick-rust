@@ -364,7 +364,7 @@ fn test_clut_image() {
     assert!(wand
         .clut_image(
             &gradient,
-            bindings::PixelInterpolateMethod_BilinearInterpolatePixel
+            magick_rust::PixelInterpolateMethod::Bilinear
         )
         .is_ok());
 }
