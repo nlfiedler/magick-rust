@@ -21,6 +21,7 @@ use bindings;
 use crate::result::MagickError;
 use crate::result::Result;
 use crate::{
+    AlignType,
     ClipPathUnits,
     FillRule,
     GravityType,
@@ -115,7 +116,7 @@ impl DrawingWand {
         get_stroke_width,           set_stroke_width,             DrawGetStrokeWidth,           DrawSetStrokeWidth,           f64
         get_stroke_antialias,       set_stroke_antialias,         DrawGetStrokeAntialias,       DrawSetStrokeAntialias,       bindings::MagickBooleanType
 
-        get_text_alignment,         set_text_alignment,           DrawGetTextAlignment,         DrawSetTextAlignment,         bindings::AlignType
+        get_text_alignment,         set_text_alignment,           DrawGetTextAlignment,         DrawSetTextAlignment,         AlignType
         get_text_antialias,         set_text_antialias,           DrawGetTextAntialias,         DrawSetTextAntialias,         bindings::MagickBooleanType
         get_text_decoration,        set_text_decoration,          DrawGetTextDecoration,        DrawSetTextDecoration,        bindings::DecorationType
         get_text_direction,         set_text_direction,           DrawGetTextDirection,         DrawSetTextDirection,         bindings::DirectionType

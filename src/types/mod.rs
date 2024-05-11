@@ -1,3 +1,4 @@
+mod align_type;
 mod alpha_channel_option;
 mod clip_path_units;
 mod colorspace_type;
@@ -23,6 +24,7 @@ mod statistic_type;
 mod stretch_type;
 mod style_type;
 
+pub use self::align_type::AlignType;
 pub use self::alpha_channel_option::AlphaChannelOption;
 pub use self::clip_path_units::ClipPathUnits;
 pub use self::colorspace_type::ColorspaceType;
