@@ -422,7 +422,7 @@ fn test_image_compose() {
     START.call_once(|| {
         magick_wand_genesis();
     });
-    let wand = MagickWand::new();
+    let mut wand = MagickWand::new();
     wand.new_image(4, 4, &PixelWand::new()).unwrap();
 
     let operators = [

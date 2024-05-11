@@ -110,10 +110,10 @@ macro_rules! set_get {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident, $typ:ty )*) => {
         $(
             pub fn $get(&self) -> $typ {
-                unsafe { ::bindings::$c_get(self.wand) }
+                unsafe { ::bindings::$c_get(self.wand).into() }
             }
             pub fn $set(&mut self, v: $typ) -> Result<()> {
-                match unsafe { ::bindings::$c_set(self.wand, v) } {
+                match unsafe { ::bindings::$c_set(self.wand, v.into()) } {
                     ::bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(MagickError(concat!(stringify!($set), " returned false")))
                 }
