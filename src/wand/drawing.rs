@@ -23,6 +23,7 @@ use crate::result::Result;
 use crate::{
     AlignType,
     ClipPathUnits,
+    DecorationType,
     FillRule,
     GravityType,
     LineCap,
@@ -118,7 +119,7 @@ impl DrawingWand {
 
         get_text_alignment,         set_text_alignment,           DrawGetTextAlignment,         DrawSetTextAlignment,         AlignType
         get_text_antialias,         set_text_antialias,           DrawGetTextAntialias,         DrawSetTextAntialias,         bindings::MagickBooleanType
-        get_text_decoration,        set_text_decoration,          DrawGetTextDecoration,        DrawSetTextDecoration,        bindings::DecorationType
+        get_text_decoration,        set_text_decoration,          DrawGetTextDecoration,        DrawSetTextDecoration,        DecorationType
         get_text_direction,         set_text_direction,           DrawGetTextDirection,         DrawSetTextDirection,         bindings::DirectionType
         get_text_kerning,           set_text_kerning,             DrawGetTextKerning,           DrawSetTextKerning,           f64
         get_text_interline_spacing, set_text_interline_spacing,   DrawGetTextInterlineSpacing,  DrawSetTextInterlineSpacing,  f64
