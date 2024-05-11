@@ -44,6 +44,7 @@ use crate::{
     GravityType,
     ImageType,
     InterlaceType,
+    MagickEvaluateOperator,
     MagickFunction,
     MetricType,
     OrientationType,
@@ -1201,8 +1202,8 @@ impl MagickWand {
     /// expression to an image.  Use these operators to lighten or darken an image,
     /// to increase or decrease contrast in an image, or to produce the "negative"
     /// of an image.
-    pub fn evaluate_image(&mut self, op: bindings::MagickEvaluateOperator, val: f64) -> Result<()> {
-        let res = unsafe { bindings::MagickEvaluateImage(self.wand, op, val) };
+    pub fn evaluate_image(&mut self, op: MagickEvaluateOperator, val: f64) -> Result<()> {
+        let res = unsafe { bindings::MagickEvaluateImage(self.wand, op.into(), val) };
         match res {
             MagickTrue => Ok(()),
             _ => Err(MagickError("failed to evaluate image")),
