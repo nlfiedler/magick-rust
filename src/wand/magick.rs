@@ -42,6 +42,7 @@ use crate::{
     GravityType,
     ImageType,
     InterlaceType,
+    MagickFunction,
     MetricType,
     OrientationType,
     PixelInterpolateMethod,
@@ -698,7 +699,7 @@ impl MagickWand {
     ///
     /// fn main() -> Result<(), magick_rust::MagickError> {
     ///     let mut wand1 = MagickWand::new();
-    ///     wand1.new_image(4, 4, &PixelWand::new())?;
+    ///     wand1.new_image(4, 4, &PixelWand::new())?; // Replace with `read_image` to open your image file
     ///     let wand2 = wand1.clone();
     ///
     ///     wand1.median_blur_image(10, 10)?;
@@ -1338,6 +1339,71 @@ impl MagickWand {
                 measure_error.to_magick()) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError("failed to quantize images")),
+        }
+    }
+
+    /// Applies an arithmetic, relational, or logical expression to an image. Use these operators
+    /// to lighten or darken an image, to increase or decrease contrast in an image, or to produce
+    /// the "negative" of an image.
+    ///
+    /// * `function`: the image function.
+    /// * `args`: the function arguments.
+    ///
+    /// # Example
+    ///
+    /// This example show how you can apply smoothstep function (a polynomial `-2x^3 + 3x^2`) to
+    /// every image pixel.
+    ///
+    /// ```
+    /// use magick_rust::{MagickWand, PixelWand, MagickFunction};
+    ///
+    /// fn main() -> Result<(), magick_rust::MagickError> {
+    ///     let mut wand1 = MagickWand::new();
+    ///     wand1.new_image(4, 4, &PixelWand::new())?; // Replace with `read_image` to open your image file
+    ///
+    ///     // Apply smoothstep polynomial
+    ///     wand1.function_image(MagickFunction::Polynomial, &[-2.0, 3.0, 0.0, 0.0])?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn function_image(
+        &self,
+        function: MagickFunction,
+        args: &[f64]
+    ) -> Result<()> {
+        let num_of_args: size_t = args.len().into();
+        match unsafe {
+            bindings::MagickFunctionImage(
+                self.wand,
+                function.into(),
+                num_of_args,
+                args.as_ptr()
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to apply function to image")),
+        }
+    }
+
+    /// Returns an image where each pixel is the sum of the pixels in the image sequence after
+    /// applying its corresponding terms (coefficient and degree pairs).
+    ///
+    /// * `terms`: the list of polynomial coefficients and degree pairs and a constant.
+    pub fn polynomial_image(&self, terms: &[f64]) -> Result<()> {
+        if terms.len() & 1 != 1 {
+            return Err(MagickError("no constant coefficient given"));
+        }
+        let num_of_terms: size_t = (terms.len() >> 1).into();
+        match unsafe {
+            bindings::MagickPolynomialImage(
+                self.wand,
+                num_of_terms,
+                terms.as_ptr()
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to apply polynomial to image")),
         }
     }
 
