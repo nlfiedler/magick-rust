@@ -70,8 +70,8 @@ wand_common!(
 /// When the `MagickWand` is dropped, the ImageMagick wand will be
 /// destroyed as well.
 impl MagickWand {
-    pub fn new_image(&self, columns: usize, rows: usize, pixel_wand: &PixelWand) -> Result<()> {
-        match unsafe { bindings::MagickNewImage(self.wand, columns.into(), rows.into(), pixel_wand.wand) } {
+    pub fn new_image(&self, columns: usize, rows: usize, background: &PixelWand) -> Result<()> {
+        match unsafe { bindings::MagickNewImage(self.wand, columns.into(), rows.into(), background.wand) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError("Could not create image")),
         }
@@ -694,16 +694,20 @@ impl MagickWand {
     /// using imagemagick cli.
     ///
     /// ```
-    /// let mut wand1 = MagickWand::new();
-    /// wand1.read_image("test.jpg")?;
-    /// let wand2 = wand1.clone();
+    /// use magick_rust::{MagickWand, PixelWand, CompositeOperator};
     ///
-    /// wand1.median_blur_image(10, 10)?;
+    /// fn main() -> Result<(), magick_rust::MagickError> {
+    ///     let mut wand1 = MagickWand::new();
+    ///     wand1.new_image(4, 4, &PixelWand::new())?;
+    ///     let wand2 = wand1.clone();
     ///
-    /// wand1.set_image_artifact("compose:args", "50")?;
-    /// wand1.compose_images(&wand2, CompositeOperator::Blend, false, 0, 0)?;
+    ///     wand1.median_blur_image(10, 10)?;
     ///
-    /// wand1.write_image("res.jpeg")?;
+    ///     wand1.set_image_artifact("compose:args", "50")?;
+    ///     wand1.compose_images(&wand2, CompositeOperator::Blend, false, 0, 0)?;
+    ///
+    ///     Ok(())
+    /// }
     /// ```
     pub fn set_image_artifact(
         &mut self,
