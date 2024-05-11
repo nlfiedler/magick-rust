@@ -24,6 +24,7 @@ use crate::{
     ClipPathUnits,
     FillRule,
     GravityType,
+    LineJoin,
     StretchType,
     StyleType,
 };
@@ -107,7 +108,7 @@ impl DrawingWand {
 
         get_stroke_dash_offset,     set_stroke_dash_offset,       DrawGetStrokeDashOffset,      DrawSetStrokeDashOffset,      f64
         get_stroke_line_cap,        set_stroke_line_cap,          DrawGetStrokeLineCap,         DrawSetStrokeLineCap,         bindings::LineCap
-        get_stroke_line_join,       set_stroke_line_join,         DrawGetStrokeLineJoin,        DrawSetStrokeLineJoin,        bindings::LineJoin
+        get_stroke_line_join,       set_stroke_line_join,         DrawGetStrokeLineJoin,        DrawSetStrokeLineJoin,        LineJoin
         get_stroke_miter_limit,     set_stroke_miter_limit,       DrawGetStrokeMiterLimit,      DrawSetStrokeMiterLimit,      usize
         get_stroke_opacity,         set_stroke_opacity,           DrawGetStrokeOpacity,         DrawSetStrokeOpacity,         f64
         get_stroke_width,           set_stroke_width,             DrawGetStrokeWidth,           DrawSetStrokeWidth,           f64
