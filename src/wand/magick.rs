@@ -37,6 +37,7 @@ use crate::{
     CompressionType,
     DisposeType,
     DitherMethod,
+    EndianType,
     FilterType,
     GravityType,
     InterlaceType,
@@ -1184,7 +1185,7 @@ impl MagickWand {
         get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              usize
         get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              usize
         get_image_dispose,               set_image_dispose,               MagickGetImageDispose,             MagickSetImageDispose,            DisposeType
-        get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             bindings::EndianType
+        get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             EndianType
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
         get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
         get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            GravityType
