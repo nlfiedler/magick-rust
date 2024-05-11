@@ -35,6 +35,7 @@ use crate::{
     ColorspaceType,
     CompositeOperator,
     CompressionType,
+    DisposeType,
     DitherMethod,
     FilterType,
     GravityType,
@@ -1181,7 +1182,7 @@ impl MagickWand {
         get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, usize
         get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              usize
         get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              usize
-        get_image_dispose,               set_image_dispose,               MagickGetImageDispose,             MagickSetImageDispose,            bindings::DisposeType
+        get_image_dispose,               set_image_dispose,               MagickGetImageDispose,             MagickSetImageDispose,            DisposeType
         get_image_endian,                set_image_endian,                MagickGetImageEndian,              MagickSetImageEndian,             bindings::EndianType
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
         get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
