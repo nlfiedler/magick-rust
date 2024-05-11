@@ -39,6 +39,7 @@ use crate::{
     DitherMethod,
     FilterType,
     GravityType,
+    InterlaceType,
     PixelInterpolateMethod,
     MetricType,
     ResourceType
@@ -1187,7 +1188,7 @@ impl MagickWand {
         get_image_fuzz,                  set_image_fuzz,                  MagickGetImageFuzz,                MagickSetImageFuzz,               f64
         get_image_gamma,                 set_image_gamma,                 MagickGetImageGamma,               MagickSetImageGamma,              f64
         get_image_gravity,               set_image_gravity,               MagickGetImageGravity,             MagickSetImageGravity,            GravityType
-        get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    bindings::InterlaceType
+        get_image_interlace_scheme,      set_image_interlace_scheme,      MagickGetImageInterlaceScheme,     MagickSetImageInterlaceScheme,    InterlaceType
         get_image_interpolate_method,    set_image_interpolate_method,    MagickGetImageInterpolateMethod,   MagickSetImageInterpolateMethod,  PixelInterpolateMethod
         get_image_iterations,            set_image_iterations,            MagickGetImageIterations,          MagickSetImageIterations,         usize
         get_image_orientation,           set_image_orientation,           MagickGetImageOrientation,         MagickSetImageOrientation,        bindings::OrientationType
@@ -1195,8 +1196,8 @@ impl MagickWand {
         get_image_scene,                 set_image_scene,                 MagickGetImageScene,               MagickSetImageScene,              usize
         get_image_type,                  set_image_type,                  MagickGetImageType,                MagickSetImageType,               bindings::ImageType
         get_image_units,                 set_image_units,                 MagickGetImageUnits,               MagickSetImageUnits,              bindings::ResolutionType
-        get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         bindings::InterlaceType
-        get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       bindings::PixelInterpolateMethod
+        get_interlace_scheme,            set_interlace_scheme,            MagickGetInterlaceScheme,          MagickSetInterlaceScheme,         InterlaceType
+        get_interpolate_method,          set_interpolate_method,          MagickGetInterpolateMethod,        MagickSetInterpolateMethod,       PixelInterpolateMethod
         get_iterator_index,              set_iterator_index,              MagickGetIteratorIndex,            MagickSetIteratorIndex,           isize
         get_orientation,                 set_orientation,                 MagickGetOrientation,              MagickSetOrientation,             bindings::OrientationType
         get_pointsize,                   set_pointsize,                   MagickGetPointsize,                MagickSetPointsize,               f64
