@@ -34,6 +34,7 @@ use crate::{
     AlphaChannelOption,
     ColorspaceType,
     CompositeOperator,
+    CompressionType,
     DitherMethod,
     FilterType,
     GravityType,
@@ -1172,11 +1173,11 @@ impl MagickWand {
     set_get!(
         get_colorspace,                  set_colorspace,                  MagickGetColorspace,               MagickSetColorspace,              ColorspaceType
         get_image_compose,               set_image_compose,               MagickGetImageCompose,             MagickSetImageCompose,            CompositeOperator
-        get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             bindings::CompressionType
+        get_compression,                 set_compression,                 MagickGetCompression,              MagickSetCompression,             CompressionType
         get_compression_quality,         set_compression_quality,         MagickGetCompressionQuality,       MagickSetCompressionQuality,      usize
         get_gravity,                     set_gravity,                     MagickGetGravity,                  MagickSetGravity,                 GravityType
         get_image_colorspace,            set_image_colorspace,            MagickGetImageColorspace,          MagickSetImageColorspace,         ColorspaceType
-        get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        bindings::CompressionType
+        get_image_compression,           set_image_compression,           MagickGetImageCompression,         MagickSetImageCompression,        CompressionType
         get_image_compression_quality,   set_image_compression_quality,   MagickGetImageCompressionQuality,  MagickSetImageCompressionQuality, usize
         get_image_delay,                 set_image_delay,                 MagickGetImageDelay,               MagickSetImageDelay,              usize
         get_image_depth,                 set_image_depth,                 MagickGetImageDepth,               MagickSetImageDepth,              usize

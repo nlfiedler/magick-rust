@@ -1,6 +1,7 @@
 mod alpha_channel_option;
 mod colorspace_type;
 mod composite_operator;
+mod compression_type;
 mod dither_method;
 mod filter_type;
 mod gravity_type;
@@ -11,6 +12,7 @@ mod resource_type;
 pub use self::alpha_channel_option::AlphaChannelOption;
 pub use self::colorspace_type::ColorspaceType;
 pub use self::composite_operator::CompositeOperator;
+pub use self::compression_type::CompressionType;
 pub use self::dither_method::DitherMethod;
 pub use self::filter_type::FilterType;
 pub use self::gravity_type::GravityType;
