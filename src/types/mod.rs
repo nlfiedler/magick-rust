@@ -12,6 +12,7 @@ mod metric_type;
 mod orientation_type;
 mod pixel_interpolate_method;
 mod rendering_intent;
+mod resolution_type;
 mod resource_type;
 
 pub use self::alpha_channel_option::AlphaChannelOption;
@@ -28,4 +29,5 @@ pub use self::metric_type::MetricType;
 pub use self::orientation_type::OrientationType;
 pub use self::pixel_interpolate_method::PixelInterpolateMethod;
 pub use self::rendering_intent::RenderingIntent;
+pub use self::resolution_type::ResolutionType;
 pub use self::resource_type::ResourceType;
