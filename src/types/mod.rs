@@ -1,6 +1,7 @@
 mod align_type;
 mod alpha_channel_option;
 mod auto_threshold_method;
+mod channel_type;
 mod clip_path_units;
 mod colorspace_type;
 mod composite_operator;
@@ -31,6 +32,7 @@ mod style_type;
 pub use self::align_type::AlignType;
 pub use self::alpha_channel_option::AlphaChannelOption;
 pub use self::auto_threshold_method::AutoThresholdMethod;
+pub use self::channel_type::ChannelType;
 pub use self::clip_path_units::ClipPathUnits;
 pub use self::colorspace_type::ColorspaceType;
 pub use self::composite_operator::CompositeOperator;

@@ -33,6 +33,7 @@ use super::{DrawingWand, PixelWand};
 use crate::{
     AlphaChannelOption,
     AutoThresholdMethod,
+    ChannelType,
     ColorspaceType,
     CompositeOperator,
     CompressionType,
@@ -1052,8 +1053,8 @@ impl MagickWand {
     }
 
     /// Implodes the image towards the center by the specified percentage
-    pub fn implode(&self, amount: f64, method: bindings::PixelInterpolateMethod) -> Result<()> {
-        match unsafe { bindings::MagickImplodeImage(self.wand, amount, method) } {
+    pub fn implode(&self, amount: f64, method: PixelInterpolateMethod) -> Result<()> {
+        match unsafe { bindings::MagickImplodeImage(self.wand, amount, method.into()) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError("failed to implode image")),
         }
@@ -1191,9 +1192,9 @@ impl MagickWand {
     /// Set image channel mask
     pub fn set_image_channel_mask(
         &mut self,
-        option: bindings::ChannelType,
-    ) -> bindings::ChannelType {
-        unsafe { bindings::MagickSetImageChannelMask(self.wand, option) }
+        option: ChannelType,
+    ) -> ChannelType {
+        unsafe { bindings::MagickSetImageChannelMask(self.wand, option.into()).into() }
     }
 
     /// Apply an arithmetic, relational, or logical
