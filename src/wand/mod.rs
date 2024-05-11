@@ -22,3 +22,6 @@ mod pixel;
 pub use self::drawing::DrawingWand;
 pub use self::magick::MagickWand;
 pub use self::pixel::{PixelWand, HSL};
+
+use bindings::MagickBooleanType_MagickTrue  as MagickTrue;
+use bindings::MagickBooleanType_MagickFalse as MagickFalse;

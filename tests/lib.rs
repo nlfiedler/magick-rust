@@ -22,7 +22,7 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::Once;
 
-use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand};
+use magick_rust::{magick_wand_genesis, MagickWand, PixelWand};
 use magick_rust::MagickError;
 
 // Used to make sure MagickWand is initialized exactly once. Note that we

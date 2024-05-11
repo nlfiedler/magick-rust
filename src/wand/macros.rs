@@ -130,10 +130,10 @@ macro_rules! set_get_unchecked {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident, $typ:ty )*) => {
         $(
             pub fn $get(&self) -> $typ {
-                unsafe { ::bindings::$c_get(self.wand) }
+                unsafe { ::bindings::$c_get(self.wand).into() }
             }
             pub fn $set(&mut self, v: $typ) {
-                unsafe { ::bindings::$c_set(self.wand, v) }
+                unsafe { ::bindings::$c_set(self.wand, v.into()) }
             }
         )*
         pub fn fmt_unchecked_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {

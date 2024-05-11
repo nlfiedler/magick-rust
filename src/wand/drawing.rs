@@ -16,15 +16,11 @@
 use std::ffi::{CStr, CString};
 use std::fmt;
 
-#[cfg(target_os = "freebsd")]
-use libc::size_t;
-#[cfg(not(target_os = "freebsd"))]
-use size_t;
-
 use bindings;
 
 use crate::result::MagickError;
 use crate::result::Result;
+use crate::GravityType;
 
 wand_common!(
     DrawingWand,
@@ -91,7 +87,7 @@ impl DrawingWand {
     );
 
     set_get_unchecked!(
-        get_gravity,                set_gravity,                  DrawGetGravity,               DrawSetGravity,               bindings::GravityType
+        get_gravity,                set_gravity,                  DrawGetGravity,               DrawSetGravity,               GravityType
         get_opacity,                set_opacity,                  DrawGetOpacity,               DrawSetOpacity,               f64
         get_clip_rule,              set_clip_rule,                DrawGetClipRule,              DrawSetClipRule,              bindings::FillRule
         get_clip_units,             set_clip_units,               DrawGetClipUnits,             DrawSetClipUnits,             bindings::ClipPathUnits
@@ -100,13 +96,13 @@ impl DrawingWand {
 
         get_font_size,              set_font_size,                DrawGetFontSize,              DrawSetFontSize,              f64
         get_font_style,             set_font_style,               DrawGetFontStyle,             DrawSetFontStyle,             bindings::StyleType
-        get_font_weight,            set_font_weight,              DrawGetFontWeight,            DrawSetFontWeight,            size_t
+        get_font_weight,            set_font_weight,              DrawGetFontWeight,            DrawSetFontWeight,            usize
         get_font_stretch,           set_font_stretch,             DrawGetFontStretch,           DrawSetFontStretch,           bindings::StretchType
 
         get_stroke_dash_offset,     set_stroke_dash_offset,       DrawGetStrokeDashOffset,      DrawSetStrokeDashOffset,      f64
         get_stroke_line_cap,        set_stroke_line_cap,          DrawGetStrokeLineCap,         DrawSetStrokeLineCap,         bindings::LineCap
         get_stroke_line_join,       set_stroke_line_join,         DrawGetStrokeLineJoin,        DrawSetStrokeLineJoin,        bindings::LineJoin
-        get_stroke_miter_limit,     set_stroke_miter_limit,       DrawGetStrokeMiterLimit,      DrawSetStrokeMiterLimit,      size_t
+        get_stroke_miter_limit,     set_stroke_miter_limit,       DrawGetStrokeMiterLimit,      DrawSetStrokeMiterLimit,      usize
         get_stroke_opacity,         set_stroke_opacity,           DrawGetStrokeOpacity,         DrawSetStrokeOpacity,         f64
         get_stroke_width,           set_stroke_width,             DrawGetStrokeWidth,           DrawSetStrokeWidth,           f64
         get_stroke_antialias,       set_stroke_antialias,         DrawGetStrokeAntialias,       DrawSetStrokeAntialias,       bindings::MagickBooleanType

@@ -25,6 +25,7 @@ use bindings;
 use result::MagickError;
 
 use crate::result::Result;
+use super::MagickTrue;
 
 #[derive(Default, Debug)]
 pub struct HSL {
@@ -48,7 +49,7 @@ wand_common!(
 impl PixelWand {
     pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> Result<()> {
         match unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) } {
-            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            MagickTrue => Ok(()),
             _ => Err(MagickError("not similar")),
         }
     }
@@ -86,7 +87,7 @@ impl PixelWand {
     pub fn set_color(&mut self, s: &str) -> Result<()> {
         let c_string = CString::new(s).map_err(|_| "could not convert to cstring")?;
         match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr()) } {
-            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            MagickTrue => Ok(()),
             _ => Err(MagickError("failed to set color")),
         }
     }
