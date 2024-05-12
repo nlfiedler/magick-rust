@@ -998,6 +998,24 @@ impl MagickWand {
         }
     }
 
+    /// Resize image by specifying the new size in percent of last size.
+    ///
+    /// Effectively resizes image to (current width * `width_scale`, current height *
+    /// `height_scale`)
+    pub fn scale_image(
+        &self,
+        width_scale: f64,
+        height_scale: f64,
+        filter: FilterType) -> Result<()> {
+        let width = self.get_image_width();
+        let height = self.get_image_height();
+
+        let width = ((width as f64) * width_scale) as usize;
+        let height = ((height as f64) * height_scale) as usize;
+
+        return self.resize_image(width, height, filter);
+    }
+
     /// Resize the image to the specified width and height, using the
     /// 'thumbnail' optimizations which remove a lot of image meta-data with the goal
     /// of producing small low cost images suited for display on the web.
