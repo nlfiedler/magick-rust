@@ -383,6 +383,26 @@ impl MagickWand {
         }
     }
 
+    /// Applies the reversed [level_image](Self::level_image). It compresses the full range of color values, so
+    /// that they lie between the given black and white points. Gamma is applied before the values
+    /// are mapped. It can be used to de-contrast a greyscale image to the exact levels specified.
+    pub fn levelize_image(&self, black_point: f64, gamma: f64, white_point: f64) -> Result<()> {
+        let quantum_range = self.quantum_range()?;
+
+        let result = unsafe {
+            bindings::MagickLevelizeImage(
+                self.wand,
+                black_point * quantum_range,
+                gamma,
+                white_point * quantum_range,
+            )
+        };
+        match result {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("Failed to level the image")),
+        }
+    }
+
     //MagickNormalizeImage enhances the contrast of a color image by adjusting the pixels color
     //to span the entire range of colors available
     pub fn normalize_image(
