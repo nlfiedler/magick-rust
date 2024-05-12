@@ -51,6 +51,7 @@ use crate::{
     MorphologyMethod,
     OrientationType,
     PixelInterpolateMethod,
+    PixelMask,
     RenderingIntent,
     ResolutionType,
     ResourceType,
@@ -1236,6 +1237,27 @@ impl MagickWand {
         match unsafe { bindings::MagickDeskewImage(self.wand, threshold) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError("unable to deskew image")),
+        }
+    }
+
+    /// Sets image clip mask.
+    ///
+    /// * `pixel_mask`: type of mask, Read or Write.
+    /// * `clip_mask`: the clip_mask wand.
+    pub fn set_image_mask(
+        &mut self,
+        pixel_mask: PixelMask,
+        clip_mask: &MagickWand
+    ) -> Result<()> {
+        match unsafe {
+            bindings::MagickSetImageMask(
+                self.wand,
+                pixel_mask.into(),
+                clip_mask.wand
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to set image mask")),
         }
     }
 
