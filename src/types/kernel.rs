@@ -106,7 +106,7 @@ impl From<MorphologyMethod> for bindings::KernelInfoType {
 
 /// Builder, that creates instances of [KernelInfo](self::KernelInfo)
 ///
-/// # Example
+/// # Examples
 ///
 /// Here is an example of how you can use this struct to create a kernel to convolve an image:
 ///
@@ -132,11 +132,38 @@ impl From<MorphologyMethod> for bindings::KernelInfoType {
 ///     Ok(())
 /// }
 /// ```
+///
+/// Here is an example of how you can use this struct to create builtin kernel to gaussian blur an
+/// image (not the best way to do it, just an example):
+///
+/// ```
+/// use magick_rust::{MagickWand, PixelWand, KernelBuilder, KernelInfoType, GeometryInfo};
+///
+/// fn main() -> Result<(), magick_rust::MagickError> {
+///     let mut wand1 = MagickWand::new();
+///     wand1.new_image(4, 4, &PixelWand::new())?; // Replace with `read_image` to open your image file
+///     let wand2 = wand1.clone();
+///
+///     let mut geom_info = GeometryInfo::new();
+///     geom_info.set_sigma(15.0);
+///     let kernel_info = KernelBuilder::new()
+///         .set_info_type(KernelInfoType::Gaussian)
+///         .set_geom_info(geom_info)
+///         .build_builtin()?;
+///
+///     wand1.convolve_image(&kernel_info)?;
+///
+///     Ok(())
+/// }
+/// ```
 #[derive(Debug, Clone)]
 pub struct KernelBuilder {
     size: Option<(usize, usize)>,
     center: Option<(usize, usize)>,
     values: Option<Vec<f64>>,
+
+    info_type: Option<KernelInfoType>,
+    geom_info: Option<crate::GeometryInfo>,
 }
 
 impl KernelBuilder {
@@ -145,19 +172,25 @@ impl KernelBuilder {
             size: None,
             center: None,
             values: None,
+
+            info_type: None,
+            geom_info: None,
         };
     }
 
+    /// Used for user defined kernels
     pub fn set_size(mut self, size: (usize, usize)) -> KernelBuilder {
         self.size = Some(size);
         return self;
     }
 
+    /// Used for user defined kernels
     pub fn set_center(mut self, center: (usize, usize)) -> KernelBuilder {
         self.center = Some(center);
         return self;
     }
 
+    /// Used for user defined kernels
     pub fn set_values(mut self, values: &[f64]) -> KernelBuilder {
         self.values = Some(values.into());
         return self;
@@ -209,6 +242,38 @@ impl KernelBuilder {
 
         if kernel_info.is_null() {
             return Err(MagickError("failed to acquire kernel info"));
+        }
+
+        Ok(KernelInfo::new(kernel_info))
+    }
+
+    /// Used for builtin kernels
+    pub fn set_info_type(mut self, info_type: KernelInfoType) -> KernelBuilder {
+        self.info_type = Some(info_type);
+        return self;
+    }
+
+    /// Used for builtin kernels
+    pub fn set_geom_info(mut self, geom_info: crate::GeometryInfo) -> KernelBuilder {
+        self.geom_info = Some(geom_info);
+        return self;
+    }
+
+    pub fn build_builtin(&self) -> Result<KernelInfo> {
+        let info_type = self.info_type.ok_or(MagickError("no info type given"))?;
+        let mut geom_info = self.geom_info.ok_or(MagickError("no geometry info given"))?;
+
+        // Create kernel info
+        let kernel_info = unsafe {
+            bindings::AcquireKernelBuiltIn(
+                info_type.into(),
+                &mut geom_info,
+                std::ptr::null_mut()
+            )
+        };
+
+        if kernel_info.is_null() {
+            return Err(MagickError("failed to acquire builtin kernel info"));
         }
 
         Ok(KernelInfo::new(kernel_info))
