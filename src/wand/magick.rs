@@ -44,9 +44,11 @@ use crate::{
     GravityType,
     ImageType,
     InterlaceType,
+    KernelInfo,
     MagickEvaluateOperator,
     MagickFunction,
     MetricType,
+    MorphologyMethod,
     OrientationType,
     PixelInterpolateMethod,
     RenderingIntent,
@@ -1407,6 +1409,65 @@ impl MagickWand {
         } {
             MagickTrue => Ok(()),
             _ => Err(MagickError("failed to apply polynomial to image")),
+        }
+    }
+
+    /// Applies a custom convolution kernel to the image.
+    ///
+    /// * `kernel_info`: An array of doubles representing the convolution kernel.
+    pub fn convolve_image(&self, kernel_info: &KernelInfo) -> Result<()> {
+        match unsafe {
+            bindings::MagickConvolveImage(
+                self.wand,
+                kernel_info.get_ptr()
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to convolve image")),
+        }
+    }
+
+    /// Applies a user supplied kernel to the image according to the given morphology method.
+    ///
+    /// * `morphology_method`: the morphology method to be applied.
+    /// * `iterations`: apply the operation this many times (or no change). A value of -1 means loop until no change found. How this is applied may depend on the morphology method. Typically this is a value of 1.
+    /// * `kernel_info`: An array of doubles representing the morphology kernel.
+    pub fn morphology_image(
+        &self,
+        morphology_method: MorphologyMethod,
+        iterations: isize,
+        kernel_info: &KernelInfo
+    ) -> Result<()> {
+        match unsafe {
+            bindings::MagickMorphologyImage(
+                self.wand,
+                morphology_method.into(),
+                iterations.into(),
+                kernel_info.get_ptr()
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to morphology image")),
+        }
+    }
+
+    /// Apply color transformation to an image. The method permits saturation changes, hue rotation,
+    /// luminance to alpha, and various other effects. Although variable-sized transformation
+    /// matrices can be used, typically one uses a 5x5 matrix for an RGBA image and a 6x6 for CMYKA
+    /// (or RGBA with offsets). The matrix is similar to those used by Adobe Flash except offsets
+    /// are in column 6 rather than 5 (in support of CMYKA images) and offsets are normalized
+    /// (divide Flash offset by 255).
+    ///
+    /// * `color_matrix`: the color matrix.
+    pub fn color_matrix_image(&self, color_matrix: &KernelInfo) -> Result<()> {
+        match unsafe {
+            bindings::MagickColorMatrixImage(
+                self.wand,
+                color_matrix.get_ptr()
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to color matrix image")),
         }
     }
 
