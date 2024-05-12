@@ -989,18 +989,24 @@ impl MagickWand {
 
     /// Resize the image to the specified width and height, using the
     /// specified filter type.
-    pub fn resize_image(&self, width: usize, height: usize, filter: FilterType) {
-        unsafe {
-            bindings::MagickResizeImage(self.wand, width.into(), height.into(), filter.into());
+    pub fn resize_image(&self, width: usize, height: usize, filter: FilterType) -> Result<()> {
+        match unsafe {
+            bindings::MagickResizeImage(self.wand, width.into(), height.into(), filter.into())
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to resize image")),
         }
     }
 
     /// Resize the image to the specified width and height, using the
     /// 'thumbnail' optimizations which remove a lot of image meta-data with the goal
     /// of producing small low cost images suited for display on the web.
-    pub fn thumbnail_image(&self, width: usize, height: usize) {
-        unsafe {
-            bindings::MagickThumbnailImage(self.wand, width.into(), height.into());
+    pub fn thumbnail_image(&self, width: usize, height: usize) -> Result<()> {
+        match unsafe {
+            bindings::MagickThumbnailImage(self.wand, width.into(), height.into())
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to create thumbnail")),
         }
     }
 
@@ -1033,9 +1039,12 @@ impl MagickWand {
         x_resolution: f64,
         y_resolution: f64,
         filter: FilterType,
-    ) {
-        unsafe {
-            bindings::MagickResampleImage(self.wand, x_resolution, y_resolution, filter.into());
+    ) -> Result<()> {
+        match unsafe {
+            bindings::MagickResampleImage(self.wand, x_resolution, y_resolution, filter.into())
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("failed to resample image")),
         }
     }
 
