@@ -54,7 +54,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2,
     };
-    wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos);
+    assert!(wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos).is_ok());
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -76,7 +76,7 @@ fn test_thumbnail_image() {
         1 => 1,
         height => height / 2,
     };
-    wand.thumbnail_image(halfwidth, halfheight);
+    assert!(wand.thumbnail_image(halfwidth, halfheight).is_ok());
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
