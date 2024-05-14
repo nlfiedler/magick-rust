@@ -42,9 +42,11 @@ use crate::{
     EndianType,
     FilterType,
     GravityType,
+    Image,
     ImageType,
     InterlaceType,
     KernelInfo,
+    LayerMethod,
     MagickEvaluateOperator,
     MagickFunction,
     MetricType,
@@ -77,6 +79,21 @@ wand_common!(
 /// When the `MagickWand` is dropped, the ImageMagick wand will be
 /// destroyed as well.
 impl MagickWand {
+    /// Creates new wand by cloning the image.
+    ///
+    /// * `img`: the image.
+    pub fn new_from_image(img: &Image<'_>) -> Result<MagickWand> {
+        let result = unsafe {
+            bindings::NewMagickWandFromImage(img.get_ptr())
+        };
+
+        return if result.is_null() {
+            Err(MagickError("failed to create wand from image"))
+        } else {
+            Ok(MagickWand { wand: result })
+        }
+    }
+
     pub fn new_image(&self, columns: usize, rows: usize, background: &PixelWand) -> Result<()> {
         match unsafe { bindings::MagickNewImage(self.wand, columns.into(), rows.into(), background.wand) } {
             MagickTrue => Ok(()),
@@ -222,6 +239,37 @@ impl MagickWand {
             MagickTrue => Ok(()),
             _ => Err(MagickError("failed to ping image")),
         }
+    }
+
+    /// Composes all the image layers from the current given image onward to produce a single image
+    /// of the merged layers.
+    ///
+    /// The inital canvas's size depends on the given LayerMethod, and is initialized using the
+    /// first images background color. The images are then composited onto that image in sequence
+    /// using the given composition that has been assigned to each individual image.
+    ///
+    /// * `method`: the method of selecting the size of the initial canvas.
+    ///     MergeLayer: Merge all layers onto a canvas just large enough to hold all the actual
+    ///     images. The virtual canvas of the first image is preserved but otherwise ignored.
+    ///
+    ///     FlattenLayer: Use the virtual canvas size of first image. Images which fall outside
+    ///     this canvas is clipped. This can be used to 'fill out' a given virtual canvas.
+    ///
+    ///     MosaicLayer: Start with the virtual canvas of the first image, enlarging left and right
+    ///     edges to contain all images. Images with negative offsets will be clipped.
+    pub fn merge_image_layers(&self, method: LayerMethod) -> Result<MagickWand> {
+        let result = unsafe {
+            bindings::MagickMergeImageLayers(self.wand, method.into())
+        };
+        if result.is_null() {
+            return Err(MagickError("failed to merge image layres"));
+        }
+        return Ok(MagickWand { wand: result });
+    }
+
+    /// Returns the number of images associated with a magick wand.
+    pub fn get_number_images(&self) -> usize {
+        return unsafe { bindings::MagickGetNumberImages(self.wand).into() };
     }
 
     /// Compare two images and return tuple `(distortion, diffImage)`
@@ -1537,6 +1585,64 @@ impl MagickWand {
         } {
             MagickTrue => Ok(()),
             _ => Err(MagickError("failed to color matrix image")),
+        }
+    }
+
+    /// Applies a channel expression to the specified image. The expression
+    /// consists of one or more channels, either mnemonic or numeric (e.g. red, 1), separated by
+    /// actions as follows:
+    ///
+    /// <=> exchange two channels (e.g. red<=>blue) => transfer a channel to another (e.g.
+    /// red=>green) , separate channel operations (e.g. red, green) | read channels from next input
+    /// image (e.g. red | green) ; write channels to next output image (e.g. red; green; blue) A
+    /// channel without a operation symbol implies extract. For example, to create 3 grayscale
+    /// images from the red, green, and blue channels of an image, use:
+    ///
+    /// * `expression`: the expression.
+    pub fn channel_fx_image(&self, expression: &str) -> Result<MagickWand> {
+        let c_expression = CString::new(expression).map_err(|_| MagickError("artifact string contains null byte"))?;
+
+        let result = unsafe {
+            bindings::MagickChannelFxImage(
+                self.wand,
+                c_expression.as_ptr()
+            )
+        };
+
+        return if result.is_null() {
+            Err(MagickError("failed to apply expression to image"))
+        } else {
+            Ok(MagickWand{ wand: result })
+        };
+    }
+
+    /// Combines one or more images into a single image. The grayscale value of the pixels of each
+    /// image in the sequence is assigned in order to the specified channels of the combined image.
+    /// The typical ordering would be image 1 => Red, 2 => Green, 3 => Blue, etc.
+    ///
+    /// * `colorspace`: the colorspace.
+    pub fn combine_images(&self, colorspace: ColorspaceType) -> Result<MagickWand> {
+        let result = unsafe {
+            bindings::MagickCombineImages(self.wand, colorspace.into())
+        };
+
+        return if result.is_null() {
+            Err(MagickError("failed to combine images"))
+        } else {
+            Ok(MagickWand{ wand: result })
+        }
+    }
+
+    /// Returns the current image from the magick wand.
+    pub fn get_image<'wand>(&'wand self) -> Result<Image<'wand>> {
+        let result = unsafe {
+            bindings::GetImageFromMagickWand(self.wand)
+        };
+
+        return if result.is_null() {
+            Err(MagickError("no image in wand"))
+        } else {
+            unsafe { Ok(Image::new(result)) }
         }
     }
 
