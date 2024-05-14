@@ -197,11 +197,11 @@ impl KernelBuilder {
     }
 
     pub fn build(&self) -> Result<KernelInfo> {
-        let size = self.size.ok_or(MagickError("no kernel size given"))?;
-        let values = self.values.as_ref().ok_or(MagickError("no kernel values given"))?;
+        let size = self.size.ok_or(MagickError("no kernel size given".to_string()))?;
+        let values = self.values.as_ref().ok_or(MagickError("no kernel values given".to_string()))?;
 
         if values.len() != size.0 * size.1 {
-            return Err(MagickError("kernel size doesn't match kernel values size"));
+            return Err(MagickError("kernel size doesn't match kernel values size".to_string()));
         }
 
         // Create kernel string
@@ -241,7 +241,7 @@ impl KernelBuilder {
         };
 
         if kernel_info.is_null() {
-            return Err(MagickError("failed to acquire kernel info"));
+            return Err(MagickError("failed to acquire kernel info".to_string()));
         }
 
         Ok(KernelInfo::new(kernel_info))
@@ -260,8 +260,8 @@ impl KernelBuilder {
     }
 
     pub fn build_builtin(&self) -> Result<KernelInfo> {
-        let info_type = self.info_type.ok_or(MagickError("no info type given"))?;
-        let mut geom_info = self.geom_info.ok_or(MagickError("no geometry info given"))?;
+        let info_type = self.info_type.ok_or(MagickError("no info type given".to_string()))?;
+        let mut geom_info = self.geom_info.ok_or(MagickError("no geometry info given".to_string()))?;
 
         // Create kernel info
         let kernel_info = unsafe {
@@ -273,7 +273,7 @@ impl KernelBuilder {
         };
 
         if kernel_info.is_null() {
-            return Err(MagickError("failed to acquire builtin kernel info"));
+            return Err(MagickError("failed to acquire builtin kernel info".to_string()));
         }
 
         Ok(KernelInfo::new(kernel_info))

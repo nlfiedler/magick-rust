@@ -42,11 +42,9 @@ wand_common!(
 );
 
 impl PixelWand {
-    pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> Result<()> {
-        match unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) } {
-            MagickTrue => Ok(()),
-            _ => Err(MagickError("not similar")),
-        }
+    pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> bool {
+        let result = unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) };
+        return result == MagickTrue;
     }
 
     pub fn get_hsl(&self) -> HSL {
@@ -83,7 +81,7 @@ impl PixelWand {
         let c_string = CString::new(s).map_err(|_| "could not convert to cstring")?;
         match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr()) } {
             MagickTrue => Ok(()),
-            _ => Err(MagickError("failed to set color")),
+            _ => Err(MagickError(self.get_exception()?.0)),
         }
     }
 

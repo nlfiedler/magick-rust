@@ -171,7 +171,7 @@ fn test_get_image_property() {
     // retrieve a property that does not exist
     let missing_value = wand.get_image_property("exif:Foobar");
     assert!(missing_value.is_err());
-    assert_eq!(MagickError("missing property"), missing_value.unwrap_err());
+    assert_eq!(MagickError("missing property: exif:Foobar".to_string()), missing_value.unwrap_err());
 }
 
 #[test]
