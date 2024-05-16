@@ -1056,6 +1056,38 @@ impl MagickWand {
         }
     }
 
+    pub fn export_image_pixels_double(
+        &self,
+        x: isize,
+        y: isize,
+        width: usize,
+        height: usize,
+        map: &str,
+    ) -> Option<Vec<f64>> {
+        let c_map = CString::new(map).unwrap();
+        let capacity = width * height * map.len();
+        let mut pixels = Vec::with_capacity(capacity);
+        pixels.resize(capacity, 0.0);
+
+        unsafe {
+            if bindings::MagickExportImagePixels(
+                self.wand,
+                x,
+                y,
+                width,
+                height,
+                c_map.as_ptr(),
+                bindings::StorageType_DoublePixel,
+                pixels.as_mut_ptr() as *mut c_void,
+            ) == MagickTrue
+            {
+                Some(pixels)
+            } else {
+                None
+            }
+        }
+    }
+
     /// Resize the image to the specified width and height, using the
     /// specified filter type.
     pub fn resize_image(&self, width: usize, height: usize, filter: FilterType) -> Result<()> {
@@ -1381,6 +1413,33 @@ impl MagickWand {
                 rows,
                 pixel_map.as_ptr(),
                 bindings::StorageType_CharPixel,
+                pixels.as_ptr() as *const libc::c_void,
+            )
+        } {
+            MagickTrue => Ok(()),
+            _ => Err(MagickError("unable to import pixels")),
+        }
+    }
+
+    pub fn import_image_pixels_double(
+        &mut self,
+        x: isize,
+        y: isize,
+        columns: usize,
+        rows: usize,
+        pixels: &[f64],
+        map: &str,
+    ) -> Result<()> {
+        let pixel_map = CString::new(map).unwrap();
+        match unsafe {
+            bindings::MagickImportImagePixels(
+                self.wand,
+                x,
+                y,
+                columns,
+                rows,
+                pixel_map.as_ptr(),
+                bindings::StorageType_DoublePixel,
                 pixels.as_ptr() as *const libc::c_void,
             )
         } {
