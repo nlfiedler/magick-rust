@@ -16,15 +16,11 @@
 use std::ffi::{CStr, CString};
 use std::fmt;
 
-#[cfg(target_os = "freebsd")]
-use libc::size_t;
-#[cfg(not(target_os = "freebsd"))]
-use size_t;
-
 use bindings;
 use result::MagickError;
 
 use crate::result::Result;
+use super::MagickTrue;
 
 #[derive(Default, Debug)]
 pub struct HSL {
@@ -48,7 +44,7 @@ wand_common!(
 impl PixelWand {
     pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> Result<()> {
         match unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) } {
-            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            MagickTrue => Ok(()),
             _ => Err(MagickError("not similar")),
         }
     }
@@ -86,7 +82,7 @@ impl PixelWand {
     pub fn set_color(&mut self, s: &str) -> Result<()> {
         let c_string = CString::new(s).map_err(|_| "could not convert to cstring")?;
         match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr()) } {
-            bindings::MagickBooleanType_MagickTrue => Ok(()),
+            MagickTrue => Ok(()),
             _ => Err(MagickError("failed to set color")),
         }
     }
@@ -98,8 +94,8 @@ impl PixelWand {
     );
 
     set_get_unchecked!(
-        get_color_count, set_color_count, PixelGetColorCount, PixelSetColorCount,   size_t
-        get_index,       set_index,       PixelGetIndex,      PixelSetIndex,        bindings::Quantum
+        get_color_count, set_color_count, PixelGetColorCount, PixelSetColorCount,   usize
+        get_index,       set_index,       PixelGetIndex,      PixelSetIndex,        f32
         get_fuzz,        set_fuzz,        PixelGetFuzz,       PixelSetFuzz,         f64
     );
 

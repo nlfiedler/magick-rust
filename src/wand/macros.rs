@@ -100,7 +100,7 @@ macro_rules! get {
     ($($get:ident, $c_get:ident, $typ:ty )*) => {
         $(
             pub fn $get(&self) -> $typ {
-                unsafe { ::bindings::$c_get(self.wand) }
+                unsafe { ::bindings::$c_get(self.wand).into() }
             }
         )*
     }
@@ -110,10 +110,10 @@ macro_rules! set_get {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident, $typ:ty )*) => {
         $(
             pub fn $get(&self) -> $typ {
-                unsafe { ::bindings::$c_get(self.wand) }
+                unsafe { ::bindings::$c_get(self.wand).into() }
             }
             pub fn $set(&mut self, v: $typ) -> Result<()> {
-                match unsafe { ::bindings::$c_set(self.wand, v) } {
+                match unsafe { ::bindings::$c_set(self.wand, v.into()) } {
                     ::bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(MagickError(concat!(stringify!($set), " returned false")))
                 }
@@ -130,10 +130,10 @@ macro_rules! set_get_unchecked {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident, $typ:ty )*) => {
         $(
             pub fn $get(&self) -> $typ {
-                unsafe { ::bindings::$c_get(self.wand) }
+                unsafe { ::bindings::$c_get(self.wand).into() }
             }
             pub fn $set(&mut self, v: $typ) {
-                unsafe { ::bindings::$c_set(self.wand, v) }
+                unsafe { ::bindings::$c_set(self.wand, v.into()) }
             }
         )*
         pub fn fmt_unchecked_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {
@@ -258,7 +258,7 @@ macro_rules! mutations {
         $(
             $(#[$attr])*
             pub fn $fun(&self $(, $arg: $ty)*) -> Result<()> {
-                match unsafe { bindings::$c_fun(self.wand $(, $arg)*) } {
+                match unsafe { bindings::$c_fun(self.wand $(, $arg.into())*) } {
                     bindings::MagickBooleanType_MagickTrue => Ok(()),
                     _ => Err(MagickError(concat!(stringify!($c_fun), " invocation failed")))
                 }

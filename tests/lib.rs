@@ -22,7 +22,7 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::Once;
 
-use magick_rust::{bindings, magick_wand_genesis, MagickWand, PixelWand};
+use magick_rust::{magick_wand_genesis, MagickWand, PixelWand};
 use magick_rust::MagickError;
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
@@ -54,7 +54,7 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2,
     };
-    wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos);
+    assert!(wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos).is_ok());
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -76,7 +76,7 @@ fn test_thumbnail_image() {
         1 => 1,
         height => height / 2,
     };
-    wand.thumbnail_image(halfwidth, halfheight);
+    assert!(wand.thumbnail_image(halfwidth, halfheight).is_ok());
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -317,7 +317,7 @@ fn test_set_image_background_color() {
     let mut pw = PixelWand::new();
     pw.set_color("#0000FF").unwrap();
     wand.set_image_background_color(&pw).unwrap();
-    wand.set_image_alpha_channel(bindings::AlphaChannelOption_RemoveAlphaChannel)
+    wand.set_image_alpha_channel(magick_rust::AlphaChannelOption::Remove)
         .unwrap();
     let blob = wand.write_image_blob("rgb").unwrap();
     assert_eq!(0u8, blob[0]);
@@ -364,7 +364,7 @@ fn test_clut_image() {
     assert!(wand
         .clut_image(
             &gradient,
-            bindings::PixelInterpolateMethod_BilinearInterpolatePixel
+            magick_rust::PixelInterpolateMethod::Bilinear
         )
         .is_ok());
 }
@@ -422,7 +422,7 @@ fn test_image_compose() {
     START.call_once(|| {
         magick_wand_genesis();
     });
-    let wand = MagickWand::new();
+    let mut wand = MagickWand::new();
     wand.new_image(4, 4, &PixelWand::new()).unwrap();
 
     let operators = [
