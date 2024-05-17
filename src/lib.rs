@@ -73,7 +73,7 @@ pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>> {
     let ptr =
         unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut size_t) };
     if ptr.is_null() {
-        Err(MagickError("null ptr returned by magick_query_fonts"))
+        Err(MagickError("null ptr returned by magick_query_fonts".to_string()))
     } else {
         let mut v = Vec::new();
         let c_str_ptr_slice = unsafe { ::std::slice::from_raw_parts(ptr, number_fonts as usize) };
