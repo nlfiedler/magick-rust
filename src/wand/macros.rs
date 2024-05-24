@@ -93,6 +93,13 @@ macro_rules! wand_common {
                 }
             }
         }
+
+        // The wand types should be safe to drop in a different thread
+        unsafe impl Send for $wand {}
+
+        // Probably shouldn't implement Sync because some methods might not be
+        // safe to call on the same wand from different threads.
+        // unsafe impl Sync for $wand {}
     };
 }
 
