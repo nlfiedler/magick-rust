@@ -4,8 +4,8 @@ use crate::bindings;
 #[repr(u32)]
 pub enum PixelMask {
     Undefined = bindings::PixelMask_UndefinedPixelMask,
-    Read      = bindings::PixelMask_ReadPixelMask,
-    Write     = bindings::PixelMask_WritePixelMask,
+    Read = bindings::PixelMask_ReadPixelMask,
+    Write = bindings::PixelMask_WritePixelMask,
     Composite = bindings::PixelMask_CompositePixelMask,
 }
 

@@ -4,9 +4,9 @@ use crate::bindings;
 #[repr(u32)]
 pub enum LineCap {
     Undefined = bindings::LineCap_UndefinedCap,
-    Butt      = bindings::LineCap_ButtCap,
-    Round     = bindings::LineCap_RoundCap,
-    Square    = bindings::LineCap_SquareCap,
+    Butt = bindings::LineCap_ButtCap,
+    Round = bindings::LineCap_RoundCap,
+    Square = bindings::LineCap_SquareCap,
 }
 
 impl Default for LineCap {

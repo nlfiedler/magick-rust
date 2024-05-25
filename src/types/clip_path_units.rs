@@ -3,9 +3,9 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum ClipPathUnits {
-    Undefined         = bindings::ClipPathUnits_UndefinedPathUnits,
-    UserSpace         = bindings::ClipPathUnits_UserSpace,
-    UserSpaceOnUse    = bindings::ClipPathUnits_UserSpaceOnUse,
+    Undefined = bindings::ClipPathUnits_UndefinedPathUnits,
+    UserSpace = bindings::ClipPathUnits_UserSpace,
+    UserSpaceOnUse = bindings::ClipPathUnits_UserSpaceOnUse,
     ObjectBoundingBox = bindings::ClipPathUnits_ObjectBoundingBox,
 }
 

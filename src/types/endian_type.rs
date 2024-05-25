@@ -4,8 +4,8 @@ use crate::bindings;
 #[repr(u32)]
 pub enum EndianType {
     Undefined = bindings::EndianType_UndefinedEndian,
-    LSB       = bindings::EndianType_LSBEndian,
-    MSB       = bindings::EndianType_MSBEndian,
+    LSB = bindings::EndianType_LSBEndian,
+    MSB = bindings::EndianType_MSBEndian,
 }
 
 impl Default for EndianType {

@@ -1,49 +1,49 @@
 use std::ffi::CString;
 
 use crate::bindings;
-use crate::{Result, MagickError};
+use crate::{MagickError, Result};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum KernelInfoType {
-    Undefined     = bindings::KernelInfoType_UndefinedKernel,
-    Unity         = bindings::KernelInfoType_UnityKernel,
-    Gaussian      = bindings::KernelInfoType_GaussianKernel,
-    DoG           = bindings::KernelInfoType_DoGKernel,
-    LoG           = bindings::KernelInfoType_LoGKernel,
-    Blur          = bindings::KernelInfoType_BlurKernel,
-    Comet         = bindings::KernelInfoType_CometKernel,
-    Binomial      = bindings::KernelInfoType_BinomialKernel,
-    Laplacian     = bindings::KernelInfoType_LaplacianKernel,
-    Sobel         = bindings::KernelInfoType_SobelKernel,
-    FreiChen      = bindings::KernelInfoType_FreiChenKernel,
-    Roberts       = bindings::KernelInfoType_RobertsKernel,
-    Prewitt       = bindings::KernelInfoType_PrewittKernel,
-    Compass       = bindings::KernelInfoType_CompassKernel,
-    Kirsch        = bindings::KernelInfoType_KirschKernel,
-    Diamond       = bindings::KernelInfoType_DiamondKernel,
-    Square        = bindings::KernelInfoType_SquareKernel,
-    Rectangle     = bindings::KernelInfoType_RectangleKernel,
-    Octagon       = bindings::KernelInfoType_OctagonKernel,
-    Disk          = bindings::KernelInfoType_DiskKernel,
-    Plus          = bindings::KernelInfoType_PlusKernel,
-    Cross         = bindings::KernelInfoType_CrossKernel,
-    Ring          = bindings::KernelInfoType_RingKernel,
-    Peaks         = bindings::KernelInfoType_PeaksKernel,
-    Edges         = bindings::KernelInfoType_EdgesKernel,
-    Corners       = bindings::KernelInfoType_CornersKernel,
-    Diagonals     = bindings::KernelInfoType_DiagonalsKernel,
-    LineEnds      = bindings::KernelInfoType_LineEndsKernel,
+    Undefined = bindings::KernelInfoType_UndefinedKernel,
+    Unity = bindings::KernelInfoType_UnityKernel,
+    Gaussian = bindings::KernelInfoType_GaussianKernel,
+    DoG = bindings::KernelInfoType_DoGKernel,
+    LoG = bindings::KernelInfoType_LoGKernel,
+    Blur = bindings::KernelInfoType_BlurKernel,
+    Comet = bindings::KernelInfoType_CometKernel,
+    Binomial = bindings::KernelInfoType_BinomialKernel,
+    Laplacian = bindings::KernelInfoType_LaplacianKernel,
+    Sobel = bindings::KernelInfoType_SobelKernel,
+    FreiChen = bindings::KernelInfoType_FreiChenKernel,
+    Roberts = bindings::KernelInfoType_RobertsKernel,
+    Prewitt = bindings::KernelInfoType_PrewittKernel,
+    Compass = bindings::KernelInfoType_CompassKernel,
+    Kirsch = bindings::KernelInfoType_KirschKernel,
+    Diamond = bindings::KernelInfoType_DiamondKernel,
+    Square = bindings::KernelInfoType_SquareKernel,
+    Rectangle = bindings::KernelInfoType_RectangleKernel,
+    Octagon = bindings::KernelInfoType_OctagonKernel,
+    Disk = bindings::KernelInfoType_DiskKernel,
+    Plus = bindings::KernelInfoType_PlusKernel,
+    Cross = bindings::KernelInfoType_CrossKernel,
+    Ring = bindings::KernelInfoType_RingKernel,
+    Peaks = bindings::KernelInfoType_PeaksKernel,
+    Edges = bindings::KernelInfoType_EdgesKernel,
+    Corners = bindings::KernelInfoType_CornersKernel,
+    Diagonals = bindings::KernelInfoType_DiagonalsKernel,
+    LineEnds = bindings::KernelInfoType_LineEndsKernel,
     LineJunctions = bindings::KernelInfoType_LineJunctionsKernel,
-    Ridges        = bindings::KernelInfoType_RidgesKernel,
-    ConvexHull    = bindings::KernelInfoType_ConvexHullKernel,
-    ThinSE        = bindings::KernelInfoType_ThinSEKernel,
-    Skeleton      = bindings::KernelInfoType_SkeletonKernel,
-    Chebyshev     = bindings::KernelInfoType_ChebyshevKernel,
-    Manhattan     = bindings::KernelInfoType_ManhattanKernel,
-    Octagonal     = bindings::KernelInfoType_OctagonalKernel,
-    Euclidean     = bindings::KernelInfoType_EuclideanKernel,
-    UserDefined   = bindings::KernelInfoType_UserDefinedKernel,
+    Ridges = bindings::KernelInfoType_RidgesKernel,
+    ConvexHull = bindings::KernelInfoType_ConvexHullKernel,
+    ThinSE = bindings::KernelInfoType_ThinSEKernel,
+    Skeleton = bindings::KernelInfoType_SkeletonKernel,
+    Chebyshev = bindings::KernelInfoType_ChebyshevKernel,
+    Manhattan = bindings::KernelInfoType_ManhattanKernel,
+    Octagonal = bindings::KernelInfoType_OctagonalKernel,
+    Euclidean = bindings::KernelInfoType_EuclideanKernel,
+    UserDefined = bindings::KernelInfoType_UserDefinedKernel,
 }
 
 impl Default for KernelInfoType {
@@ -58,35 +58,32 @@ impl From<KernelInfoType> for bindings::KernelInfoType {
     }
 }
 
-
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum MorphologyMethod {
-    Undefined         = bindings::MorphologyMethod_UndefinedMorphology,
-    Convolve          = bindings::MorphologyMethod_ConvolveMorphology,
-    Correlate         = bindings::MorphologyMethod_CorrelateMorphology,
-    Erode             = bindings::MorphologyMethod_ErodeMorphology,
-    Dilate            = bindings::MorphologyMethod_DilateMorphology,
-    ErodeIntensity    = bindings::MorphologyMethod_ErodeIntensityMorphology,
-    DilateIntensity   = bindings::MorphologyMethod_DilateIntensityMorphology,
+    Undefined = bindings::MorphologyMethod_UndefinedMorphology,
+    Convolve = bindings::MorphologyMethod_ConvolveMorphology,
+    Correlate = bindings::MorphologyMethod_CorrelateMorphology,
+    Erode = bindings::MorphologyMethod_ErodeMorphology,
+    Dilate = bindings::MorphologyMethod_DilateMorphology,
+    ErodeIntensity = bindings::MorphologyMethod_ErodeIntensityMorphology,
+    DilateIntensity = bindings::MorphologyMethod_DilateIntensityMorphology,
     IterativeDistance = bindings::MorphologyMethod_IterativeDistanceMorphology,
-    Open              = bindings::MorphologyMethod_OpenMorphology,
-    Close             = bindings::MorphologyMethod_CloseMorphology,
-    OpenIntensity     = bindings::MorphologyMethod_OpenIntensityMorphology,
-    CloseIntensity    = bindings::MorphologyMethod_CloseIntensityMorphology,
-    Smooth            = bindings::MorphologyMethod_SmoothMorphology,
-    EdgeIn            = bindings::MorphologyMethod_EdgeInMorphology,
-    EdgeOut           = bindings::MorphologyMethod_EdgeOutMorphology,
-    Edge              = bindings::MorphologyMethod_EdgeMorphology,
-    TopHat            = bindings::MorphologyMethod_TopHatMorphology,
-    BottomHat         = bindings::MorphologyMethod_BottomHatMorphology,
-    HitAndMiss        = bindings::MorphologyMethod_HitAndMissMorphology,
-    Thinning          = bindings::MorphologyMethod_ThinningMorphology,
-    Thicken           = bindings::MorphologyMethod_ThickenMorphology,
-    Distance          = bindings::MorphologyMethod_DistanceMorphology,
-    Voronoi           = bindings::MorphologyMethod_VoronoiMorphology,
+    Open = bindings::MorphologyMethod_OpenMorphology,
+    Close = bindings::MorphologyMethod_CloseMorphology,
+    OpenIntensity = bindings::MorphologyMethod_OpenIntensityMorphology,
+    CloseIntensity = bindings::MorphologyMethod_CloseIntensityMorphology,
+    Smooth = bindings::MorphologyMethod_SmoothMorphology,
+    EdgeIn = bindings::MorphologyMethod_EdgeInMorphology,
+    EdgeOut = bindings::MorphologyMethod_EdgeOutMorphology,
+    Edge = bindings::MorphologyMethod_EdgeMorphology,
+    TopHat = bindings::MorphologyMethod_TopHatMorphology,
+    BottomHat = bindings::MorphologyMethod_BottomHatMorphology,
+    HitAndMiss = bindings::MorphologyMethod_HitAndMissMorphology,
+    Thinning = bindings::MorphologyMethod_ThinningMorphology,
+    Thicken = bindings::MorphologyMethod_ThickenMorphology,
+    Distance = bindings::MorphologyMethod_DistanceMorphology,
+    Voronoi = bindings::MorphologyMethod_VoronoiMorphology,
 }
 
 impl Default for MorphologyMethod {
@@ -100,9 +97,6 @@ impl From<MorphologyMethod> for bindings::KernelInfoType {
         return value as bindings::MorphologyMethod;
     }
 }
-
-
-
 
 /// Builder, that creates instances of [KernelInfo](self::KernelInfo)
 ///
@@ -197,28 +191,25 @@ impl KernelBuilder {
     }
 
     pub fn build(&self) -> Result<KernelInfo> {
-        let size = self.size.ok_or(MagickError("no kernel size given".to_string()))?;
-        let values = self.values.as_ref().ok_or(MagickError("no kernel values given".to_string()))?;
+        let size = self
+            .size
+            .ok_or(MagickError("no kernel size given".to_string()))?;
+        let values = self
+            .values
+            .as_ref()
+            .ok_or(MagickError("no kernel values given".to_string()))?;
 
         if values.len() != size.0 * size.1 {
-            return Err(MagickError("kernel size doesn't match kernel values size".to_string()));
+            return Err(MagickError(
+                "kernel size doesn't match kernel values size".to_string(),
+            ));
         }
 
         // Create kernel string
         let mut kernel_string = if let Some(center) = self.center {
-            format!(
-                "{}x{}+{}+{}:",
-                size.0,
-                size.1,
-                center.0,
-                center.1
-            )
+            format!("{}x{}+{}+{}:", size.0, size.1, center.0, center.1)
         } else {
-            format!(
-                "{}x{}:",
-                size.0,
-                size.1,
-            )
+            format!("{}x{}:", size.0, size.1,)
         };
 
         // Add values
@@ -233,12 +224,8 @@ impl KernelBuilder {
         let c_kernel_string = CString::new(kernel_string).expect("CString::new() has failed");
 
         // Create kernel info
-        let kernel_info = unsafe {
-            bindings::AcquireKernelInfo(
-                c_kernel_string.as_ptr(),
-                std::ptr::null_mut()
-            )
-        };
+        let kernel_info =
+            unsafe { bindings::AcquireKernelInfo(c_kernel_string.as_ptr(), std::ptr::null_mut()) };
 
         if kernel_info.is_null() {
             return Err(MagickError("failed to acquire kernel info".to_string()));
@@ -260,20 +247,22 @@ impl KernelBuilder {
     }
 
     pub fn build_builtin(&self) -> Result<KernelInfo> {
-        let info_type = self.info_type.ok_or(MagickError("no info type given".to_string()))?;
-        let mut geom_info = self.geom_info.ok_or(MagickError("no geometry info given".to_string()))?;
+        let info_type = self
+            .info_type
+            .ok_or(MagickError("no info type given".to_string()))?;
+        let mut geom_info = self
+            .geom_info
+            .ok_or(MagickError("no geometry info given".to_string()))?;
 
         // Create kernel info
         let kernel_info = unsafe {
-            bindings::AcquireKernelBuiltIn(
-                info_type.into(),
-                &mut geom_info,
-                std::ptr::null_mut()
-            )
+            bindings::AcquireKernelBuiltIn(info_type.into(), &mut geom_info, std::ptr::null_mut())
         };
 
         if kernel_info.is_null() {
-            return Err(MagickError("failed to acquire builtin kernel info".to_string()));
+            return Err(MagickError(
+                "failed to acquire builtin kernel info".to_string(),
+            ));
         }
 
         Ok(KernelInfo::new(kernel_info))
@@ -286,20 +275,12 @@ pub struct KernelInfo {
 
 impl KernelInfo {
     fn new(kernel_info: *mut bindings::KernelInfo) -> KernelInfo {
-        return KernelInfo {
-            kernel_info
-        };
+        return KernelInfo { kernel_info };
     }
 
     /// The values within the kernel is scaled directly using given scaling factor without change.
     pub fn scale(&mut self, factor: f64) {
-        unsafe {
-            bindings::ScaleKernelInfo(
-                self.kernel_info,
-                factor,
-                0
-            )
-        }
+        unsafe { bindings::ScaleKernelInfo(self.kernel_info, factor, 0) }
     }
 
     /// Kernel normalization is designed to ensure that any use of the kernel scaling factor with
@@ -323,7 +304,7 @@ impl KernelInfo {
             bindings::ScaleKernelInfo(
                 self.kernel_info,
                 1.0,
-                bindings::GeometryFlags_NormalizeValue
+                bindings::GeometryFlags_NormalizeValue,
             )
         }
     }
@@ -337,7 +318,7 @@ impl KernelInfo {
             bindings::ScaleKernelInfo(
                 self.kernel_info,
                 1.0,
-                bindings::GeometryFlags_CorrelateNormalizeValue
+                bindings::GeometryFlags_CorrelateNormalizeValue,
             )
         }
     }
@@ -350,12 +331,7 @@ impl KernelInfo {
     /// The resulting effect is to convert the defined kernels into blended soft-blurs, unsharp
     /// kernels or into sharpening kernels.
     pub fn unity_add(&mut self, scale: f64) {
-        unsafe {
-            bindings::UnityAddKernelInfo(
-                self.kernel_info,
-                scale
-            )
-        }
+        unsafe { bindings::UnityAddKernelInfo(self.kernel_info, scale) }
     }
 
     pub unsafe fn get_ptr(&self) -> *mut bindings::KernelInfo {
@@ -371,9 +347,7 @@ impl Drop for KernelInfo {
 
 impl Clone for KernelInfo {
     fn clone(&self) -> Self {
-        let kernel_info = unsafe {
-            bindings::CloneKernelInfo(self.kernel_info)
-        };
+        let kernel_info = unsafe { bindings::CloneKernelInfo(self.kernel_info) };
 
         if kernel_info.is_null() {
             panic!("failed to clone kernel info");

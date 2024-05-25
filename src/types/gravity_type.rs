@@ -9,13 +9,13 @@ pub enum GravityType {
      */
     // Forget    = bindings::GravityType_ForgetGravity,
     NorthWest = bindings::GravityType_NorthWestGravity,
-    North     = bindings::GravityType_NorthGravity,
+    North = bindings::GravityType_NorthGravity,
     NorthEast = bindings::GravityType_NorthEastGravity,
-    West      = bindings::GravityType_WestGravity,
-    Center    = bindings::GravityType_CenterGravity,
-    East      = bindings::GravityType_EastGravity,
+    West = bindings::GravityType_WestGravity,
+    Center = bindings::GravityType_CenterGravity,
+    East = bindings::GravityType_EastGravity,
     SouthWest = bindings::GravityType_SouthWestGravity,
-    South     = bindings::GravityType_SouthGravity,
+    South = bindings::GravityType_SouthGravity,
     SouthEast = bindings::GravityType_SouthEastGravity,
 }
 

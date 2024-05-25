@@ -3,18 +3,18 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum ImageType {
-    Undefined            = bindings::ImageType_UndefinedType,
-    Bilevel              = bindings::ImageType_BilevelType,
-    Grayscale            = bindings::ImageType_GrayscaleType,
-    GrayscaleAlpha       = bindings::ImageType_GrayscaleAlphaType,
-    Palette              = bindings::ImageType_PaletteType,
-    PaletteAlpha         = bindings::ImageType_PaletteAlphaType,
-    TrueColor            = bindings::ImageType_TrueColorType,
-    TrueColorAlpha       = bindings::ImageType_TrueColorAlphaType,
-    ColorSeparation      = bindings::ImageType_ColorSeparationType,
+    Undefined = bindings::ImageType_UndefinedType,
+    Bilevel = bindings::ImageType_BilevelType,
+    Grayscale = bindings::ImageType_GrayscaleType,
+    GrayscaleAlpha = bindings::ImageType_GrayscaleAlphaType,
+    Palette = bindings::ImageType_PaletteType,
+    PaletteAlpha = bindings::ImageType_PaletteAlphaType,
+    TrueColor = bindings::ImageType_TrueColorType,
+    TrueColorAlpha = bindings::ImageType_TrueColorAlphaType,
+    ColorSeparation = bindings::ImageType_ColorSeparationType,
     ColorSeparationAlpha = bindings::ImageType_ColorSeparationAlphaType,
-    Optimize             = bindings::ImageType_OptimizeType,
-    PaletteBilevelAlpha  = bindings::ImageType_PaletteBilevelAlphaType,
+    Optimize = bindings::ImageType_OptimizeType,
+    PaletteBilevelAlpha = bindings::ImageType_PaletteBilevelAlphaType,
 }
 
 impl Default for ImageType {

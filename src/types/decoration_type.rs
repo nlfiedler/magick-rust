@@ -3,10 +3,10 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum DecorationType {
-    Undefined   = bindings::DecorationType_UndefinedDecoration,
-    No          = bindings::DecorationType_NoDecoration,
-    Underline   = bindings::DecorationType_UnderlineDecoration,
-    Overline    = bindings::DecorationType_OverlineDecoration,
+    Undefined = bindings::DecorationType_UndefinedDecoration,
+    No = bindings::DecorationType_NoDecoration,
+    Underline = bindings::DecorationType_UnderlineDecoration,
+    Overline = bindings::DecorationType_OverlineDecoration,
     LineThrough = bindings::DecorationType_LineThroughDecoration,
 }
 

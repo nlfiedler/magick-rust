@@ -4,9 +4,9 @@ use crate::bindings;
 #[repr(u32)]
 pub enum LineJoin {
     Undefined = bindings::LineJoin_UndefinedJoin,
-    Miter     = bindings::LineJoin_MiterJoin,
-    Round     = bindings::LineJoin_RoundJoin,
-    Bevel     = bindings::LineJoin_BevelJoin,
+    Miter = bindings::LineJoin_MiterJoin,
+    Round = bindings::LineJoin_RoundJoin,
+    Bevel = bindings::LineJoin_BevelJoin,
 }
 
 impl Default for LineJoin {

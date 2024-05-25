@@ -3,9 +3,9 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum DitherMethod {
-    Undefined      = bindings::DitherMethod_UndefinedDitherMethod,
-    No             = bindings::DitherMethod_NoDitherMethod,
-    Riemersma      = bindings::DitherMethod_RiemersmaDitherMethod,
+    Undefined = bindings::DitherMethod_UndefinedDitherMethod,
+    No = bindings::DitherMethod_NoDitherMethod,
+    Riemersma = bindings::DitherMethod_RiemersmaDitherMethod,
     FloydSteinberg = bindings::DitherMethod_FloydSteinbergDitherMethod,
 }
 

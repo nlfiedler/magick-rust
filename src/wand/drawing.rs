@@ -21,16 +21,8 @@ use bindings;
 use crate::result::MagickError;
 use crate::result::Result;
 use crate::{
-    AlignType,
-    ClipPathUnits,
-    DecorationType,
-    DirectionType,
-    FillRule,
-    GravityType,
-    LineCap,
-    LineJoin,
-    StretchType,
-    StyleType,
+    AlignType, ClipPathUnits, DecorationType, DirectionType, FillRule, GravityType, LineCap,
+    LineJoin, StretchType, StyleType,
 };
 
 wand_common!(

@@ -19,8 +19,8 @@ use std::fmt;
 use bindings;
 use result::MagickError;
 
-use crate::result::Result;
 use super::MagickTrue;
+use crate::result::Result;
 
 #[derive(Default, Debug)]
 pub struct HSL {

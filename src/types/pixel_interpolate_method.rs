@@ -3,18 +3,18 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum PixelInterpolateMethod {
-    Undefined  = bindings::PixelInterpolateMethod_UndefinedInterpolatePixel,
-    Average    = bindings::PixelInterpolateMethod_AverageInterpolatePixel,
-    Average9   = bindings::PixelInterpolateMethod_Average9InterpolatePixel,
-    Average16  = bindings::PixelInterpolateMethod_Average16InterpolatePixel,
+    Undefined = bindings::PixelInterpolateMethod_UndefinedInterpolatePixel,
+    Average = bindings::PixelInterpolateMethod_AverageInterpolatePixel,
+    Average9 = bindings::PixelInterpolateMethod_Average9InterpolatePixel,
+    Average16 = bindings::PixelInterpolateMethod_Average16InterpolatePixel,
     Background = bindings::PixelInterpolateMethod_BackgroundInterpolatePixel,
-    Bilinear   = bindings::PixelInterpolateMethod_BilinearInterpolatePixel,
-    Blend      = bindings::PixelInterpolateMethod_BlendInterpolatePixel,
-    Catrom     = bindings::PixelInterpolateMethod_CatromInterpolatePixel,
-    Integer    = bindings::PixelInterpolateMethod_IntegerInterpolatePixel,
-    Mesh       = bindings::PixelInterpolateMethod_MeshInterpolatePixel,
-    Nearest    = bindings::PixelInterpolateMethod_NearestInterpolatePixel,
-    Spline     = bindings::PixelInterpolateMethod_SplineInterpolatePixel,
+    Bilinear = bindings::PixelInterpolateMethod_BilinearInterpolatePixel,
+    Blend = bindings::PixelInterpolateMethod_BlendInterpolatePixel,
+    Catrom = bindings::PixelInterpolateMethod_CatromInterpolatePixel,
+    Integer = bindings::PixelInterpolateMethod_IntegerInterpolatePixel,
+    Mesh = bindings::PixelInterpolateMethod_MeshInterpolatePixel,
+    Nearest = bindings::PixelInterpolateMethod_NearestInterpolatePixel,
+    Spline = bindings::PixelInterpolateMethod_SplineInterpolatePixel,
 }
 
 impl Default for PixelInterpolateMethod {

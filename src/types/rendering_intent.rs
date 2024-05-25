@@ -3,11 +3,11 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum RenderingIntent {
-    Undefined  = bindings::RenderingIntent_UndefinedIntent,
+    Undefined = bindings::RenderingIntent_UndefinedIntent,
     Saturation = bindings::RenderingIntent_SaturationIntent,
     Perceptual = bindings::RenderingIntent_PerceptualIntent,
-    Absolute   = bindings::RenderingIntent_AbsoluteIntent,
-    Relative   = bindings::RenderingIntent_RelativeIntent,
+    Absolute = bindings::RenderingIntent_AbsoluteIntent,
+    Relative = bindings::RenderingIntent_RelativeIntent,
 }
 
 impl Default for RenderingIntent {

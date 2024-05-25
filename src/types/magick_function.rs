@@ -3,11 +3,11 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum MagickFunction {
-    Undefined  = bindings::MagickFunction_UndefinedFunction,
-    Arcsin     = bindings::MagickFunction_ArcsinFunction,
-    Arctan     = bindings::MagickFunction_ArctanFunction,
+    Undefined = bindings::MagickFunction_UndefinedFunction,
+    Arcsin = bindings::MagickFunction_ArcsinFunction,
+    Arctan = bindings::MagickFunction_ArctanFunction,
     Polynomial = bindings::MagickFunction_PolynomialFunction,
-    Sinusoid   = bindings::MagickFunction_SinusoidFunction,
+    Sinusoid = bindings::MagickFunction_SinusoidFunction,
 }
 
 impl Default for MagickFunction {

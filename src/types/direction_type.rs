@@ -3,7 +3,7 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum DirectionType {
-    Undefined   = bindings::DirectionType_UndefinedDirection,
+    Undefined = bindings::DirectionType_UndefinedDirection,
     RightToLeft = bindings::DirectionType_RightToLeftDirection,
     LeftToRight = bindings::DirectionType_LeftToRightDirection,
     TopToBottom = bindings::DirectionType_TopToBottomDirection,

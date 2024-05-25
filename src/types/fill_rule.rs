@@ -4,8 +4,8 @@ use crate::bindings;
 #[repr(u32)]
 pub enum FillRule {
     Undefined = bindings::FillRule_UndefinedRule,
-    EvenOdd   = bindings::FillRule_EvenOddRule,
-    NonZero   = bindings::FillRule_NonZeroRule,
+    EvenOdd = bindings::FillRule_EvenOddRule,
+    NonZero = bindings::FillRule_NonZeroRule,
 }
 
 impl Default for FillRule {

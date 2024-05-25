@@ -3,15 +3,15 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum OrientationType {
-    Undefined   = bindings::OrientationType_UndefinedOrientation,
-    TopLeft     = bindings::OrientationType_TopLeftOrientation,
-    TopRight    = bindings::OrientationType_TopRightOrientation,
+    Undefined = bindings::OrientationType_UndefinedOrientation,
+    TopLeft = bindings::OrientationType_TopLeftOrientation,
+    TopRight = bindings::OrientationType_TopRightOrientation,
     BottomRight = bindings::OrientationType_BottomRightOrientation,
-    BottomLeft  = bindings::OrientationType_BottomLeftOrientation,
-    LeftTop     = bindings::OrientationType_LeftTopOrientation,
-    RightTop    = bindings::OrientationType_RightTopOrientation,
+    BottomLeft = bindings::OrientationType_BottomLeftOrientation,
+    LeftTop = bindings::OrientationType_LeftTopOrientation,
+    RightTop = bindings::OrientationType_RightTopOrientation,
     RightBottom = bindings::OrientationType_RightBottomOrientation,
-    LeftBottom  = bindings::OrientationType_LeftBottomOrientation,
+    LeftBottom = bindings::OrientationType_LeftBottomOrientation,
 }
 
 impl Default for OrientationType {

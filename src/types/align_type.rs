@@ -4,9 +4,9 @@ use crate::bindings;
 #[repr(u32)]
 pub enum AlignType {
     Undefined = bindings::AlignType_UndefinedAlign,
-    Left      = bindings::AlignType_LeftAlign,
-    Center    = bindings::AlignType_CenterAlign,
-    Right     = bindings::AlignType_RightAlign,
+    Left = bindings::AlignType_LeftAlign,
+    Center = bindings::AlignType_CenterAlign,
+    Right = bindings::AlignType_RightAlign,
 }
 
 impl Default for AlignType {

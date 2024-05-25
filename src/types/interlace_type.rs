@@ -4,13 +4,13 @@ use crate::bindings;
 #[repr(u32)]
 pub enum InterlaceType {
     Undefined = bindings::InterlaceType_UndefinedInterlace,
-    No        = bindings::InterlaceType_NoInterlace,
-    Line      = bindings::InterlaceType_LineInterlace,
-    Plane     = bindings::InterlaceType_PlaneInterlace,
+    No = bindings::InterlaceType_NoInterlace,
+    Line = bindings::InterlaceType_LineInterlace,
+    Plane = bindings::InterlaceType_PlaneInterlace,
     Partition = bindings::InterlaceType_PartitionInterlace,
-    GIF       = bindings::InterlaceType_GIFInterlace,
-    JPEG      = bindings::InterlaceType_JPEGInterlace,
-    PNG       = bindings::InterlaceType_PNGInterlace,
+    GIF = bindings::InterlaceType_GIFInterlace,
+    JPEG = bindings::InterlaceType_JPEGInterlace,
+    PNG = bindings::InterlaceType_PNGInterlace,
 }
 
 impl Default for InterlaceType {

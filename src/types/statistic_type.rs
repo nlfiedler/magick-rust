@@ -3,17 +3,17 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum StatisticType {
-    Undefined         = bindings::StatisticType_UndefinedStatistic,
-    Gradient          = bindings::StatisticType_GradientStatistic,
-    Maximum           = bindings::StatisticType_MaximumStatistic,
-    Mean              = bindings::StatisticType_MeanStatistic,
-    Median            = bindings::StatisticType_MedianStatistic,
-    Minimum           = bindings::StatisticType_MinimumStatistic,
-    Mode              = bindings::StatisticType_ModeStatistic,
-    Nonpeak           = bindings::StatisticType_NonpeakStatistic,
-    RootMeanSquare    = bindings::StatisticType_RootMeanSquareStatistic,
+    Undefined = bindings::StatisticType_UndefinedStatistic,
+    Gradient = bindings::StatisticType_GradientStatistic,
+    Maximum = bindings::StatisticType_MaximumStatistic,
+    Mean = bindings::StatisticType_MeanStatistic,
+    Median = bindings::StatisticType_MedianStatistic,
+    Minimum = bindings::StatisticType_MinimumStatistic,
+    Mode = bindings::StatisticType_ModeStatistic,
+    Nonpeak = bindings::StatisticType_NonpeakStatistic,
+    RootMeanSquare = bindings::StatisticType_RootMeanSquareStatistic,
     StandardDeviation = bindings::StatisticType_StandardDeviationStatistic,
-    Contrast          = bindings::StatisticType_ContrastStatistic,
+    Contrast = bindings::StatisticType_ContrastStatistic,
 }
 
 impl Default for StatisticType {

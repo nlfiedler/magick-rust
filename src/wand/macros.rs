@@ -40,11 +40,9 @@ macro_rules! wand_common {
             pub fn clear_exception(&mut self) -> Result<()> {
                 match unsafe { ::bindings::$clear_exc(self.wand) } {
                     ::bindings::MagickBooleanType_MagickTrue => Ok(()),
-                    _ => Err(MagickError(concat!(
-                        "failed to clear",
-                        stringify!($wand),
-                        "exception"
-                    ).to_string())),
+                    _ => Err(MagickError(
+                        concat!("failed to clear", stringify!($wand), "exception").to_string(),
+                    )),
                 }
             }
 
@@ -58,17 +56,14 @@ macro_rules! wand_common {
 
                 let ptr = unsafe { ::bindings::$get_exc(self.wand, &mut severity as *mut _) };
                 if ptr.is_null() {
-                    Err(MagickError(concat!(
-                        "null ptr returned by",
-                        stringify!($wand),
-                        "get_exception"
-                    ).to_string()))
+                    Err(MagickError(
+                        concat!("null ptr returned by", stringify!($wand), "get_exception")
+                            .to_string(),
+                    ))
                 } else {
                     let c_str = unsafe { CStr::from_ptr(ptr) };
                     let exception = c_str.to_string_lossy().into_owned();
-                    unsafe {
-                        ::bindings::RelinquishMagickMemory(ptr as *mut ::libc::c_void)
-                    };
+                    unsafe { ::bindings::RelinquishMagickMemory(ptr as *mut ::libc::c_void) };
                     Ok((exception, severity))
                 }
             }
@@ -76,7 +71,9 @@ macro_rules! wand_common {
             pub fn is_wand(&self) -> Result<()> {
                 match unsafe { ::bindings::$is_wand(self.wand) } {
                     ::bindings::MagickBooleanType_MagickTrue => Ok(()),
-                    _ => Err(MagickError(concat!(stringify!($wand), " not a wand").to_string())),
+                    _ => Err(MagickError(
+                        concat!(stringify!($wand), " not a wand").to_string(),
+                    )),
                 }
             }
         }
@@ -159,10 +156,9 @@ macro_rules! string_get {
         pub fn $get(&self) -> Result<String> {
             let ptr = unsafe { ::bindings::$c_get(self.wand) };
             if ptr.is_null() {
-                Err(MagickError(concat!(
-                    "null ptr returned by ",
-                    stringify!($get)
-                ).to_string()))
+                Err(MagickError(
+                    concat!("null ptr returned by ", stringify!($get)).to_string(),
+                ))
             } else {
                 let c_str = unsafe { ::std::ffi::CStr::from_ptr(ptr) };
                 let result: String = c_str.to_string_lossy().into_owned();

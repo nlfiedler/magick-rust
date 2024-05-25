@@ -37,13 +37,13 @@ use libc::size_t;
 pub use conversions::ToMagick;
 pub use result::MagickError;
 use result::Result;
-pub use wand::*;
 pub use types::*;
+pub use wand::*;
 
 mod conversions;
 mod result;
-mod wand;
 mod types;
+mod wand;
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 /// This function must be called before any other ImageMagick operations
@@ -73,7 +73,9 @@ pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>> {
     let ptr =
         unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut size_t) };
     if ptr.is_null() {
-        Err(MagickError("null ptr returned by magick_query_fonts".to_string()))
+        Err(MagickError(
+            "null ptr returned by magick_query_fonts".to_string(),
+        ))
     } else {
         let mut v = Vec::new();
         let c_str_ptr_slice = unsafe { ::std::slice::from_raw_parts(ptr, number_fonts as usize) };

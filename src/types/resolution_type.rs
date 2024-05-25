@@ -3,8 +3,8 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum ResolutionType {
-    Undefined           = bindings::ResolutionType_UndefinedResolution,
-    PixelsPerInch       = bindings::ResolutionType_PixelsPerInchResolution,
+    Undefined = bindings::ResolutionType_UndefinedResolution,
+    PixelsPerInch = bindings::ResolutionType_PixelsPerInchResolution,
     PixelsPerCentimeter = bindings::ResolutionType_PixelsPerCentimeterResolution,
 }
 

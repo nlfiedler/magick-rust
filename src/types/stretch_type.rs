@@ -3,17 +3,17 @@ use crate::bindings;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum StretchType {
-    Undefined      = bindings::StretchType_UndefinedStretch,
-    Normal         = bindings::StretchType_NormalStretch,
+    Undefined = bindings::StretchType_UndefinedStretch,
+    Normal = bindings::StretchType_NormalStretch,
     UltraCondensed = bindings::StretchType_UltraCondensedStretch,
     ExtraCondensed = bindings::StretchType_ExtraCondensedStretch,
-    Condensed      = bindings::StretchType_CondensedStretch,
-    SemiCondensed  = bindings::StretchType_SemiCondensedStretch,
-    SemiExpanded   = bindings::StretchType_SemiExpandedStretch,
-    Expanded       = bindings::StretchType_ExpandedStretch,
-    ExtraExpanded  = bindings::StretchType_ExtraExpandedStretch,
-    UltraExpanded  = bindings::StretchType_UltraExpandedStretch,
-    Any            = bindings::StretchType_AnyStretch,
+    Condensed = bindings::StretchType_CondensedStretch,
+    SemiCondensed = bindings::StretchType_SemiCondensedStretch,
+    SemiExpanded = bindings::StretchType_SemiExpandedStretch,
+    Expanded = bindings::StretchType_ExpandedStretch,
+    ExtraExpanded = bindings::StretchType_ExtraExpandedStretch,
+    UltraExpanded = bindings::StretchType_UltraExpandedStretch,
+    Any = bindings::StretchType_AnyStretch,
 }
 
 impl Default for StretchType {

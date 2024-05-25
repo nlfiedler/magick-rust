@@ -11,7 +11,7 @@ impl Image<'_> {
     pub unsafe fn new(img: *mut bindings::Image) -> Self {
         Image {
             image: img,
-            phantom_data: PhantomData
+            phantom_data: PhantomData,
         }
     }
 

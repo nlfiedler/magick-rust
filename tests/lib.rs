@@ -22,8 +22,8 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::Once;
 
-use magick_rust::{magick_wand_genesis, MagickWand, PixelWand};
 use magick_rust::MagickError;
+use magick_rust::{magick_wand_genesis, MagickWand, PixelWand};
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
@@ -54,7 +54,9 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2,
     };
-    assert!(wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos).is_ok());
+    assert!(wand
+        .resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos)
+        .is_ok());
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -171,7 +173,10 @@ fn test_get_image_property() {
     // retrieve a property that does not exist
     let missing_value = wand.get_image_property("exif:Foobar");
     assert!(missing_value.is_err());
-    assert_eq!(MagickError("missing property: exif:Foobar".to_string()), missing_value.unwrap_err());
+    assert_eq!(
+        MagickError("missing property: exif:Foobar".to_string()),
+        missing_value.unwrap_err()
+    );
 }
 
 #[test]
@@ -208,8 +213,7 @@ fn test_compare_images() {
     assert!(wand2.read_image("tests/data/IMG_5745_rotl.JPG").is_ok());
     wand2.auto_orient();
 
-    let (distortion, diff) =
-        wand1.compare_images(&wand2, magick_rust::MetricType::RootMeanSquared);
+    let (distortion, diff) = wand1.compare_images(&wand2, magick_rust::MetricType::RootMeanSquared);
     assert!(distortion < 0.01);
     assert!(diff.is_some());
 }
@@ -362,10 +366,7 @@ fn test_clut_image() {
     assert!(gradient.read_image("gradient:black-yellow").is_ok());
 
     assert!(wand
-        .clut_image(
-            &gradient,
-            magick_rust::PixelInterpolateMethod::Bilinear
-        )
+        .clut_image(&gradient, magick_rust::PixelInterpolateMethod::Bilinear)
         .is_ok());
 }
 

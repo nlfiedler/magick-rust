@@ -4,9 +4,9 @@ use crate::bindings;
 #[repr(u32)]
 pub enum AutoThresholdMethod {
     Undefined = bindings::AutoThresholdMethod_UndefinedThresholdMethod,
-    Kapur     = bindings::AutoThresholdMethod_KapurThresholdMethod,
-    OTSU      = bindings::AutoThresholdMethod_OTSUThresholdMethod,
-    Triangle  = bindings::AutoThresholdMethod_TriangleThresholdMethod,
+    Kapur = bindings::AutoThresholdMethod_KapurThresholdMethod,
+    OTSU = bindings::AutoThresholdMethod_OTSUThresholdMethod,
+    Triangle = bindings::AutoThresholdMethod_TriangleThresholdMethod,
 }
 
 impl Default for AutoThresholdMethod {

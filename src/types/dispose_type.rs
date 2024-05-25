@@ -7,10 +7,10 @@ pub enum DisposeType {
      * Identical to `Undefined`
      */
     // Unrecognized = bindings::DisposeType_UnrecognizedDispose,
-    Undefined    = bindings::DisposeType_UndefinedDispose,
-    None         = bindings::DisposeType_NoneDispose,
-    Background   = bindings::DisposeType_BackgroundDispose,
-    Previous     = bindings::DisposeType_PreviousDispose,
+    Undefined = bindings::DisposeType_UndefinedDispose,
+    None = bindings::DisposeType_NoneDispose,
+    Background = bindings::DisposeType_BackgroundDispose,
+    Previous = bindings::DisposeType_PreviousDispose,
 }
 
 impl Default for DisposeType {

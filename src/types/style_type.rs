@@ -4,11 +4,11 @@ use crate::bindings;
 #[repr(u32)]
 pub enum StyleType {
     Undefined = bindings::StyleType_UndefinedStyle,
-    Normal    = bindings::StyleType_NormalStyle,
-    Italic    = bindings::StyleType_ItalicStyle,
-    Oblique   = bindings::StyleType_ObliqueStyle,
-    Any       = bindings::StyleType_AnyStyle,
-    Bold      = bindings::StyleType_BoldStyle,
+    Normal = bindings::StyleType_NormalStyle,
+    Italic = bindings::StyleType_ItalicStyle,
+    Oblique = bindings::StyleType_ObliqueStyle,
+    Any = bindings::StyleType_AnyStyle,
+    Bold = bindings::StyleType_BoldStyle,
 }
 
 impl Default for StyleType {
