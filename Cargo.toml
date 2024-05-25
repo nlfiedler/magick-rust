@@ -10,8 +10,9 @@ license = "Apache-2.0"
 keywords = ["magickwand", "imagemagick"]
 build = "build.rs"
 exclude = [
+    ".github/*",
     "docker/*",
-    "test/*",
+    "tests/*",
 ]
 
 [dependencies]
