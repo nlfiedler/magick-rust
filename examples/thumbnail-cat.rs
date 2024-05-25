@@ -23,7 +23,7 @@ fn resize(filepath: &str) -> Result<Vec<u8>, MagickError> {
 }
 
 fn main() {
-    match resize("tests/data/snow-covered-cat.jpg") {
+    match resize("tests/fixtures/snow-covered-cat.jpg") {
         Ok(bytes) => {
             fs::write("thumbnail-cat.jpg", bytes).expect("write failed");
         }
