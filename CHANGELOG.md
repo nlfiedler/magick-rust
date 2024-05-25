@@ -5,6 +5,27 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [1.0.0] - 2024-05-25
+### Added
+- An example! After 9 years, finally an example.
+### Changed
+- **BREAKING CHANGES**
+    * 5ohue: Refactored the current `CompositeOperator` and `ResourceType` types
+      into a separate module and added many new enum wrappers around ImageMagick
+      types. the caller will have less need to directly touch the `bindings`
+      module to pass arguments to functions. For instance, the
+      `bindings::FilterType_GaussianFilter` type is now replaced with
+      `FilterType::Gaussian`, lending the API a more Rust-like aesthetic.
+    * 5ohue: Replaced the not so helpful `MagickError("failed to resize image")`
+      with `MagickError(self.get_exception()?.0)`. This should provide more
+      helpful error messages. In some cases there is no exception given when a
+      failure occurs and the caller will only see `Error:` which is even less
+      helpful than before. This is due to the way the MagickWand API works,
+      unfortunately.
+    * 5ohue: Add `impl Send` for wand types.
+- This crate will now adhere to the semantic versioning practice more rigidly
+  than it had been while evolving in a pre-1.0 state.
+
 ## [0.21.0] - 2024-04-17
 ### Added
 - yoghurt-x86: added `MagickNormalizeImage()` and `MagickOrderedDitherImage()`

@@ -1,21 +1,22 @@
 # magick-rust
 
-A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. Many of the functions in the MagickWand API are still missing, but over time more will be added. Pull requests are welcome.
+A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. Many of the functions in the MagickWand API are still missing, but over time more will be added. Pull requests are welcome, as are bug reports, and requests for examples.
 
 ## Dependencies
 
-* Rust stable
-* ImageMagick (version 7.0.10-36 to 7.1.x)
-    - Does _not_ work with ImageMagick 6.x due to backward incompatible changes.
+* [Rust](https://www.rust-lang.org) stable
+* [ImageMagick](https://imagemagick.org) (version 7.0.10-36 to 7.1.x)
+    - Does _not_ work with ImageMagick **6.x** due to backward incompatible changes.
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
     - [Homebrew](http://brew.sh): `brew install imagemagick`
-    - Linux may require building ImageMagick from source, see the `docker/Dockerfile` for an example
+    - Linux may require building ImageMagick from source, see the [INSTALL.md](./INSTALL.md) guide
     - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/download.php#windows). When installing, check the *Install development headers and libraries for C and C++* checkbox.
-* [Clang](https://clang.llvm.org) (version 3.5 or higher)
-    - Or whatever version is dictated by [rust-bindgen](https://github.com/rust-lang/rust-bindgen)
+* [Clang](https://clang.llvm.org) (version 5.0 or higher, as dictated by [rust-bindgen](https://github.com/rust-lang/rust-bindgen))
 * Windows requires MSVC toolchain
-    - Download the [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) and select the `MSVC ... build tools` (latest version with appropriate architecture) and `Windows 10 SDK` (or 11 if using Windows 11) at a minimum.
-* Optionally `pkg-config`, to facilitate linking with ImageMagick. Or you can set linker parameters via environment variables as described in the next section.
+    - Download the [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) and select the `MSVC ... build tools` (latest version with appropriate architecture) and `Windows 11 SDK` (or `10` if using Windows 10).
+* Optionally `pkg-config`, to facilitate linking with ImageMagick. Alternatively, you can set linker parameters via environment variables as described in the next section.
+
+For detailed examples, see the [INSTALL.md](./INSTALL.md) guide, along with some discussion about the various dependencies.
 
 ## Build and Test
 
@@ -47,34 +48,9 @@ When building on Windows, you will need to set the `IMAGE_MAGICK_DIR` environmen
 
 The API documentation is available at [github pages](https://nlfiedler.github.io/magick-rust) since the docs.rs system has a hard time building anything that requires an external library that is not wrapped in a "sys" style library. See [issue 57](https://github.com/nlfiedler/magick-rust/issues/57) for the "create a sys crate request."
 
-## Example Usage
+## Examples
 
-MagickWand has some global state that needs to be initialized prior to using the library, but fortunately Rust makes handling this pretty easy. In the example below, we read in an image from a file and resize it to fit a square of 240 by 240 pixels, then convert the image to JPEG.
-
-```rust
-use magick_rust::{MagickWand, magick_wand_genesis};
-use std::sync::Once;
-
-// Used to make sure MagickWand is initialized exactly once. Note that we
-// do not bother shutting down, we simply exit when we're done.
-static START: Once = Once::new();
-
-fn resize() -> Result<Vec<u8>, &'static str> {
-    START.call_once(|| {
-        magick_wand_genesis();
-    });
-    let wand = MagickWand::new();
-    try!(wand.read_image("kittens.jpg"));
-    wand.fit(240, 240);
-    wand.write_image_blob("jpeg")
-}
-```
-
-Writing the image to a file rather than an in-memory blob is done by replacing the call to `write_image_blob()` with `write_image()`, which takes a string for the path to the file.
-
-## Frequent API Changes
-
-Because rust-bindgen changes from time to time, and is very difficult to use for a library as large as ImageMagick, the API of this crate may experience dramatic mood swings. Typically this pain manifests itself in the way the enums are represented. I am deeply sorry for this pain. Hopefully someone smarter than me can fix it some day. Pull requests are welcome.
+MagickWand has some global state that needs to be initialized prior to using the library, but fortunately Rust makes handling this pretty easy by use of the `std::sync::Once` type. See the example code in the `examples` directory for the basic usage of the crate.
 
 ## Contributing
 

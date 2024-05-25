@@ -1,6 +1,6 @@
 [package]
 name = "magick_rust"
-version = "0.21.0"
+version = "1.0.0"
 authors = ["Nathan Fiedler <nathanfiedler@fastmail.fm>"]
 description = "Selection of Rust bindings for the ImageMagick library."
 homepage = "https://github.com/nlfiedler/magick-rust"
@@ -9,6 +9,10 @@ readme = "README.md"
 license = "Apache-2.0"
 keywords = ["magickwand", "imagemagick"]
 build = "build.rs"
+exclude = [
+    "docker/*",
+    "test/*",
+]
 
 [dependencies]
 libc = "0.2"
