@@ -1425,7 +1425,7 @@ impl MagickWand {
             )
         } {
             MagickTrue => Ok(()),
-            _ => Err(MagickError("unable to import pixels")),
+            _ => Err(MagickError("unable to import pixels".into())),
         }
     }
 
