@@ -43,6 +43,28 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 . "$HOME/.cargo/env"
 ```
 
+## Installing on Windows
+
+Using the MSVC build tools installer seems to be difficult since it installs a 32-bit version of LLVM. Maybe there is a better way to get Clang, so if you know, feel free to file an issue and/or pull request.
+
+In the mean time, we will be using MSYS since that works.
+
+### MSYS2
+
+Visit the [MSYS2](https://www.msys2.org/) web site and follow the instructions for installation. Open a terminal and then install all of the prerequistes for building magick-rust (Clang, ImageMagick, pkg-config, and Rust).
+
+```shell
+pacman -S git mingw-w64-x86_64-clang mingw-w64-x86_64-imagemagick mingw-w64-x86_64-pkg-config mingw-w64-x86_64-rust
+export PATH=$PATH:/mingw64/bin
+export IMAGE_MAGICK_LIBS='libMagickCore-7.Q16HDRI.dll.a;libMagickWand-7.Q16HDRI.dll.a'
+export IMAGE_MAGICK_INCLUDE_DIRS='C:/msys64/mingw64/include/ImageMagick-7;C:/msys64/mingw64/lib/clang/18/include'
+export LIBCLANG_PATH=/mingw64/bin
+```
+
+**TODO:** However, the unit tests for the generated bindings fail on the size of a long double. See [issue #124](https://github.com/nlfiedler/magick-rust/issues/124) for details.
+
+## Creating an Example
+
 Create the example and copy the code that follows into the `src/main.rs` file.
 
 ```shell
@@ -90,7 +112,9 @@ cargo run
 
 Hopefully that produced a `thumbnail-cat.jpg` file.
 
-### Debugging
+## Debugging
+
+### Linux builds
 
 Maybe that failed with the "failed to read file" error, in which case you can double-check that the image libraries were found and linked into the final binary. Use the `ldd` tool as shown below to make sure there are no libraries that were "not found". If there are any, make sure to install the requisite library, and then try `ldd` again.
 

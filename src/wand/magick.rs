@@ -35,8 +35,10 @@ use crate::{
     CompressionType, DisposeType, DitherMethod, EndianType, FilterType, GravityType, Image,
     ImageType, InterlaceType, KernelInfo, LayerMethod, MagickEvaluateOperator, MagickFunction,
     MetricType, MorphologyMethod, OrientationType, PixelInterpolateMethod, PixelMask,
-    RenderingIntent, ResolutionType, ResourceType, StatisticType,
+    RenderingIntent, ResolutionType, StatisticType,
 };
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+use crate::ResourceType;
 
 wand_common!(
     MagickWand,

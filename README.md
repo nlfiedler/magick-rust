@@ -25,8 +25,8 @@ For detailed examples, see the [INSTALL.md](./INSTALL.md) guide, along with some
 On FreeBSD, Linux, and macOS the following commands should suffice.
 
 ```shell
-$ cargo build
-$ cargo test
+cargo build
+cargo test
 ```
 
 If `pkg-config` is not available, or you wish to override its behavior, you can set one or more environment variables before building. The `build.rs` script will pick these up and use them instead of trying to invoke the `pkg-config` utility.
@@ -41,9 +41,9 @@ If `pkg-config` is not available, or you wish to override its behavior, you can 
 When building on Windows, you will need to set the `IMAGE_MAGICK_DIR` environment variable to point to the ImageMagick installation path. Maybe this is possible with the `set` command, but it may be necessary to set the variable in the system preferences. Without setting `IMAGE_MAGICK_DIR`, the `build.rs` script will try to run `pkg-config` which is a tool generally found on Unix-based systems.
 
 ```shell
-> set IMAGE_MAGICK_DIR=<path to ImageMagick installation directory>
-> cargo build
-> cargo test
+$Env:IMAGE_MAGICK_DIR = '<path\to\imagemagick>'
+cargo build
+cargo test
 ```
 
 ## Documentation
@@ -63,10 +63,10 @@ There are still many missing functions, so if you find there is something you wo
 [Docker](https://www.docker.com) can be used to build and test the code without affecting your development environment, which may have a different version of ImageMagick installed. The use of `docker compose`, as shown in the example below, is optional, but it makes the process very simple.
 
 ```shell
-$ cd docker
-$ docker compose build --pull
-$ docker compose run magick-rust
-$ cargo clean
-$ cargo build
-$ cargo test
+cd docker
+docker compose build --pull
+docker compose run magick-rust
+cargo clean
+cargo build
+cargo test
 ```
