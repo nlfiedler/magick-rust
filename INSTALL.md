@@ -45,23 +45,38 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 ## Installing on Windows
 
-Using the MSVC build tools installer seems to be difficult since it installs a 32-bit version of LLVM. Maybe there is a better way to get Clang, so if you know, feel free to file an issue and/or pull request.
+So far nothing works. There are several problems that must be overcome:
 
-In the mean time, we will be using MSYS since that works.
+* Get an appropriate version of LLVM/Clang for your architecture (32 or 64 bit).
+* Get an appropriate version of ImageMagick.
+* Get the generated bindings to compile without error.
 
-### MSYS2
+[MSYS2](https://www.msys2.org/) looks neat and might work, but the compiled binary will only run with MSYS2.
 
-Visit the [MSYS2](https://www.msys2.org/) web site and follow the instructions for installation. Open a terminal and then install all of the prerequistes for building magick-rust (Clang, ImageMagick, pkg-config, and Rust).
+For LLVM/Clang, I found more success with the _windows_ file on the project [releases page](https://github.com/llvm/llvm-project/releases); it is a `.tar.xz` file that might be tricky to extract, but at least it seems to work. Other versions would fail during build time due to an error in the `LoadLibraryExW` function.
 
-```shell
-pacman -S git mingw-w64-x86_64-clang mingw-w64-x86_64-imagemagick mingw-w64-x86_64-pkg-config mingw-w64-x86_64-rust
-export PATH=$PATH:/mingw64/bin
-export IMAGE_MAGICK_LIBS='libMagickCore-7.Q16HDRI.dll.a;libMagickWand-7.Q16HDRI.dll.a'
-export IMAGE_MAGICK_INCLUDE_DIRS='C:/msys64/mingw64/include/ImageMagick-7;C:/msys64/mingw64/lib/clang/18/include'
-export LIBCLANG_PATH=/mingw64/bin
+The remaining problem, I believe, is getting an appropriate version of ImageMagick. I tried the _dll_ installers both with and without HDRI, but both resulted in build failures. The other _static_ files do not have any `.dll` files so they are not useful for building magick-rust.
+
+My conclusion is that building magick-rust on Windows is not possible. If you do find a way to build a portable binary that does not require a separate subsystem, such as MSYS2, please share extremely detailed and repeatable instructions. Thank you.
+
+### Nathan's notes
+
+This section will be replaced by working instructions, if any can ever be found.
+
+```
+$Env:IMAGE_MAGICK_DIR = 'C:\bin\ImageMagick-7.1.1-Q16'
+$Env:LIBCLANG_PATH = 'C:\bin\clang+llvm-18.1.7-x86_64-pc-windows-msvc\bin'
 ```
 
-**TODO:** However, the unit tests for the generated bindings fail on the size of a long double. See [issue #124](https://github.com/nlfiedler/magick-rust/issues/124) for details.
+The weird build error:
+
+```
+error[E0308]: mismatched types
+  --> src\types\style_type.rs:26:12
+   |
+26 |     Bold = bindings::StyleType_BoldStyle,
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `u32`, found `i32`
+```
 
 ## Creating an Example
 

@@ -46,6 +46,8 @@ cargo build
 cargo test
 ```
 
+If you are having trouble building on Windows, you are not alone. See the [INSTALL.md](./INSTALL.md) guide for the current state of affairs.
+
 ## Documentation
 
 The API documentation is available at [github pages](https://nlfiedler.github.io/magick-rust) since the docs.rs system has a hard time building anything that requires an external library that is not wrapped in a "sys" style library. See [issue 57](https://github.com/nlfiedler/magick-rust/issues/57) for the "create a sys crate request."
