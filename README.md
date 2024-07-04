@@ -7,7 +7,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 Because this crate is generating bindings for a C/C++ library, there are several dependencies beyond simply having the latest Rust toolchain installed.
 
 * [Rust](https://www.rust-lang.org) stable
-* [ImageMagick](https://imagemagick.org) (version 7.0.10-36 to 7.1.x)
+* [ImageMagick](https://imagemagick.org) (version 7.1.1-26 or later)
     - Does _not_ work with ImageMagick **6.x** due to backward incompatible changes.
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
     - [Homebrew](http://brew.sh): `brew install imagemagick`

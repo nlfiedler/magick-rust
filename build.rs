@@ -23,7 +23,7 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-const MIN_VERSION: &str = "7.0";
+const MIN_VERSION: &str = "7.1.1";
 const MAX_VERSION: &str = "7.2";
 
 #[cfg(windows)]
