@@ -16,7 +16,7 @@
 extern crate bindgen;
 extern crate pkg_config;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
@@ -46,6 +46,71 @@ pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
     true => ";",
     _ => ":",
 };
+
+#[derive(Debug)]
+struct IgnoreMacros {
+    macros_to_ignore: HashSet<String>
+}
+
+impl IgnoreMacros {
+    fn from_iter<S, I>(macro_names: I) -> Self
+    where
+        S: Into<String>,
+        I: IntoIterator<Item = S>
+    {
+        let mut macros_to_ignore = HashSet::new();
+        for macro_name in macro_names {
+            macros_to_ignore.insert(macro_name.into());
+        }
+        Self {
+            macros_to_ignore
+        }
+    }
+}
+
+impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
+    fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
+        if self.macros_to_ignore.contains(name) {
+            bindgen::callbacks::MacroParsingBehavior::Ignore
+        } else {
+            bindgen::callbacks::MacroParsingBehavior::Default
+        }
+    }
+}
+
+#[derive(Debug)]
+struct RemoveEnumVariantSuffixes {
+    names_to_suffix: HashMap<String, String>
+}
+
+impl RemoveEnumVariantSuffixes {
+    fn from_iter<S, I>(enum_suffix_pairs: I) -> Self
+    where
+        S: Into<String>,
+        I: IntoIterator<Item = (S, S)>,
+    {
+        let mut names_to_suffix = HashMap::new();
+        for (enum_name, variant_suffix) in enum_suffix_pairs {
+            names_to_suffix.insert(enum_name.into(), variant_suffix.into());
+        }
+
+        Self {
+            names_to_suffix
+        }
+    }
+}
+
+impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffixes {
+    fn enum_variant_name(
+        &self,
+        enum_name: Option<&str>,
+        original_variant_name: &str,
+        _variant_value: bindgen::callbacks::EnumVariantValue
+    ) -> Option<String> {
+        let suffix = self.names_to_suffix.get(enum_name?)?;
+        Some(original_variant_name.trim_end_matches(suffix).to_string())
+    }
+}
 
 fn main() {
     let check_cppflags = if cfg!(target_os = "windows") {
@@ -112,63 +177,21 @@ fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let bindings_path_str = out_dir.join("bindings.rs");
 
-    #[derive(Debug)]
-    struct IgnoreMacros(HashSet<String>);
+    let ignored_macros = IgnoreMacros::from_iter([
+        "FP_INFINITE",
+        "FP_NAN",
+        "FP_NORMAL",
+        "FP_SUBNORMAL",
+        "FP_ZERO",
+        "IPPORT_RESERVED",
+        "FP_INT_UPWARD",
+        "FP_INT_DOWNWARD",
+        "FP_INT_TOWARDZERO",
+        "FP_INT_TONEARESTFROMZERO",
+        "FP_INT_TONEAREST",
+    ]);
 
-    impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
-        fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
-            if self.0.contains(name) {
-                bindgen::callbacks::MacroParsingBehavior::Ignore
-            } else {
-                bindgen::callbacks::MacroParsingBehavior::Default
-            }
-        }
-    }
-
-    #[derive(Debug)]
-    struct RemoveEnumVariantSuffix {
-        enum_name: String,
-        variant_suffix: String
-    }
-
-    impl RemoveEnumVariantSuffix {
-        fn new(enum_name: impl Into<String>, variant_suffix: impl Into<String>) -> Self {
-            Self {
-                enum_name: enum_name.into(),
-                variant_suffix: variant_suffix.into()
-            }
-        }
-    }
-
-    impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffix {
-        fn enum_variant_name(&self, enum_name: Option<&str>, original_variant_name: &str, _variant_value: bindgen::callbacks::EnumVariantValue) -> Option<String> {
-            if enum_name != Some(&self.enum_name) {
-                return None;
-            }
-
-            Some(original_variant_name.trim_end_matches(&self.variant_suffix).to_string())
-        }
-    }
-
-    let ignored_macros = IgnoreMacros(
-        vec![
-            "FP_INFINITE".into(),
-            "FP_NAN".into(),
-            "FP_NORMAL".into(),
-            "FP_SUBNORMAL".into(),
-            "FP_ZERO".into(),
-            "IPPORT_RESERVED".into(),
-            "FP_INT_UPWARD".into(),
-            "FP_INT_DOWNWARD".into(),
-            "FP_INT_TOWARDZERO".into(),
-            "FP_INT_TONEARESTFROMZERO".into(),
-            "FP_INT_TONEAREST".into(),
-        ]
-        .into_iter()
-        .collect(),
-    );
-
-    let enum_suffixes = vec![
+    let remove_enum_suffixes = RemoveEnumVariantSuffixes::from_iter([
         ("ClassType", "Class"),
         ("CompositeOperator", "CompositeOp"),
         ("GravityType", "Gravity"),
@@ -225,7 +248,7 @@ fn main() {
         ("ComplexOperator", "ComplexOperator"),
         ("MontageMode", "Mode"),
         ("MagickCLDeviceType", "DeviceType"),
-        ("CommandOption", "Options"),   // debatable
+        ("CommandOption", "Options"),
         ("ValidateType", "Validate"),
         ("CommandOptionFLags", "OptionFlag"),
         ("PolicyDomain", "PolicyDomain"),
@@ -239,7 +262,7 @@ fn main() {
         ("AutoThresholdMethod", "ThresholdMethod"),
         ("PathType", "Path"),
         ("NoiseType", "Noise")
-    ];
+    ]);
 
     if !Path::new(&bindings_path_str).exists() {
         // Create the header file that rust-bindgen needs as input.
@@ -257,6 +280,7 @@ fn main() {
             .header(gen_h_path.to_str().unwrap())
             .size_t_is_usize(true)
             .parse_callbacks(Box::new(ignored_macros))
+            .parse_callbacks(Box::new(remove_enum_suffixes))
             .blocklist_type("timex")
             .blocklist_function("clock_adjtime")
             .default_enum_style(bindgen::EnumVariation::Rust { non_exhaustive: false })
@@ -264,11 +288,6 @@ fn main() {
 
         for d in include_dirs {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));
-        }
-
-        for (enum_name, suffix) in enum_suffixes {
-            let remove_suffix = RemoveEnumVariantSuffix::new(enum_name, suffix);
-            builder = builder.parse_callbacks(Box::new(remove_suffix));
         }
 
         let bindings = if cfg!(all(windows, target_pointer_width = "64")) {
