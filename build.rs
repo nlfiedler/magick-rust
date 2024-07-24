@@ -113,7 +113,7 @@ impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffixes {
 }
 
 fn main() {
-    let check_cppflags = if cfg!(target_os = "windows") {
+    let check_cppflags = if cfg!(all(target_os = "windows", not(target_env = "msvc"))) {
         // Resolve bash from directories listed in the PATH environment variable in the
         // order they appear.
         Command::new("cmd")
