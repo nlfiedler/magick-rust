@@ -94,7 +94,7 @@ fn main() {
         Ok(ref v) => v.split(PATH_SEPARATOR).map(|x| x.to_owned()).collect(),
         Err(_) => {
             if target.contains("windows") {
-                vec!["CORE_RL_MagickWand_".to_string()]
+                vec!["CORE_RL_MagickWand_".to_string(), "CORE_RL_MagickCore_".to_string()]
             } else if target.contains("freebsd") {
                 vec!["MagickWand-7".to_string()]
             } else {
