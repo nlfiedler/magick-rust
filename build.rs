@@ -125,6 +125,31 @@ fn main() {
         }
     }
 
+    #[derive(Debug)]
+    struct RemoveEnumVariantSuffix {
+        enum_name: String,
+        variant_suffix: String
+    }
+
+    impl RemoveEnumVariantSuffix {
+        fn new(enum_name: impl Into<String>, variant_suffix: impl Into<String>) -> Self {
+            Self {
+                enum_name: enum_name.into(),
+                variant_suffix: variant_suffix.into()
+            }
+        }
+    }
+
+    impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffix {
+        fn enum_variant_name(&self, enum_name: Option<&str>, original_variant_name: &str, _variant_value: bindgen::callbacks::EnumVariantValue) -> Option<String> {
+            if enum_name != Some(&self.enum_name) {
+                return None;
+            }
+
+            Some(original_variant_name.trim_end_matches(&self.variant_suffix).to_string())
+        }
+    }
+
     let ignored_macros = IgnoreMacros(
         vec![
             "FP_INFINITE".into(),
@@ -143,6 +168,79 @@ fn main() {
         .collect(),
     );
 
+    let enum_suffixes = vec![
+        ("ClassType", "Class"),
+        ("CompositeOperator", "CompositeOp"),
+        ("GravityType", "Gravity"),
+        ("ImageType", "Type"),
+        ("InterlaceType", "Interlace"),
+        ("OrientationType", "Orientation"),
+        ("ResolutionType", "Resolution"),
+        ("TransmitType", "TransmitType"),
+        ("MapMode", "Mode"),
+        ("ColorspaceType", "Colorspace"),
+        ("ChannelType", "Channel"),
+        ("PixelChannel", "PixelChannel"),
+        ("PixelIntensityMethod", "PixelIntensityMethod"),
+        ("PixelInterpolateMethod", "InterpolatePixel"),
+        ("PixelMask", "PixelMask"),
+        ("PixelTrait", "PixelTrait"),
+        ("VirtualPixelMethod", "VirtualPixelMethod"),
+        ("ComplianceType", "Compliance"),
+        ("IlluminantType", "Illuminant"),
+        ("CompressionType", "Compression"),
+        ("KernelInfoType", "Kernel"),
+        ("MorphologyMethod", "Morphology"),
+        ("PreviewType", "Preview"),
+        ("DisposeType", "Dispose"),
+        ("LayerMethod", "Layer"),
+        ("RenderingIntent", "Intent"),
+        ("EndianType", "Endian"),
+        ("QuantumAlphaType", "QuantumAlpha"),
+        ("QuantumFormat", "QuantumFormat"),
+        ("QuantumType", "Quantum"),
+        ("FilterType", "Filter"),
+        ("TimerState", "TimerState"),
+        ("StretchType", "Stretch"),
+        ("StyleType", "Style"),
+        ("AlignType", "Align"),
+        ("DecorationType", "Decoration"),
+        ("DirectionType", "Direction"),
+        ("FillRule", "Rule"),
+        ("GradientType", "Gradient"),
+        ("LineCap", "Cap"),
+        ("LineJoin", "Join"),
+        ("PaintMethod", "Method"),
+        ("PrimitiveType", "Primitive"),
+        ("ReferenceType", "Reference"),
+        ("SpreadMethod", "Spread"),
+        ("WordBreakType", "WordBreakType"),
+        ("CacheType", "Cache"),
+        ("AlphaChannelOption", "AlphaChannel"),
+        ("MetricType", "ErrorMetric"),
+        ("MagickFormatType", "FormatType"),
+        ("MagickInfoFlag", "Flag"),
+        ("DistortMethod", "Distortion"),
+        ("SparseColorMethod", "ColorInterpolate"),
+        ("ComplexOperator", "ComplexOperator"),
+        ("MontageMode", "Mode"),
+        ("MagickCLDeviceType", "DeviceType"),
+        ("CommandOption", "Options"),   // debatable
+        ("ValidateType", "Validate"),
+        ("CommandOptionFLags", "OptionFlag"),
+        ("PolicyDomain", "PolicyDomain"),
+        ("PolicyRights", "PolicyRights"),
+        ("DitherMethod", "DitherMethod"),
+        ("RegistryType", "RegistryType"),
+        ("ResourceType", "Resource"),
+        ("MagickEvaluateOperator", "EvaluateOperator"),
+        ("MagickFunction", "Function"),
+        ("StatisticType", "Statistic"),
+        ("AutoThresholdMethod", "ThresholdMethod"),
+        ("PathType", "Path"),
+        ("NoiseType", "Noise")
+    ];
+
     if !Path::new(&bindings_path_str).exists() {
         // Create the header file that rust-bindgen needs as input.
         let gen_h_path = out_dir.join("gen.h");
@@ -160,10 +258,16 @@ fn main() {
             .size_t_is_usize(true)
             .parse_callbacks(Box::new(ignored_macros))
             .blocklist_type("timex")
-            .blocklist_function("clock_adjtime");
+            .blocklist_function("clock_adjtime")
+            .default_enum_style(bindgen::EnumVariation::Rust { non_exhaustive: false });
 
         for d in include_dirs {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));
+        }
+
+        for (enum_name, suffix) in enum_suffixes {
+            let remove_suffix = RemoveEnumVariantSuffix::new(enum_name, suffix);
+            builder = builder.parse_callbacks(Box::new(remove_suffix));
         }
 
         let bindings = if cfg!(all(windows, target_pointer_width = "64")) {

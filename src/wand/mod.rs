@@ -23,5 +23,5 @@ pub use self::drawing::DrawingWand;
 pub use self::magick::MagickWand;
 pub use self::pixel::{PixelWand, HSL};
 
-use bindings::MagickBooleanType_MagickFalse as MagickFalse;
-use bindings::MagickBooleanType_MagickTrue as MagickTrue;
+use bindings::MagickBooleanType::MagickFalse as MagickFalse;
+use bindings::MagickBooleanType::MagickTrue as MagickTrue;

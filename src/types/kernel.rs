@@ -18,101 +18,6 @@ use std::ffi::CString;
 use crate::bindings;
 use crate::{MagickError, Result};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u32)]
-pub enum KernelInfoType {
-    Undefined = bindings::KernelInfoType_UndefinedKernel,
-    Unity = bindings::KernelInfoType_UnityKernel,
-    Gaussian = bindings::KernelInfoType_GaussianKernel,
-    DoG = bindings::KernelInfoType_DoGKernel,
-    LoG = bindings::KernelInfoType_LoGKernel,
-    Blur = bindings::KernelInfoType_BlurKernel,
-    Comet = bindings::KernelInfoType_CometKernel,
-    Binomial = bindings::KernelInfoType_BinomialKernel,
-    Laplacian = bindings::KernelInfoType_LaplacianKernel,
-    Sobel = bindings::KernelInfoType_SobelKernel,
-    FreiChen = bindings::KernelInfoType_FreiChenKernel,
-    Roberts = bindings::KernelInfoType_RobertsKernel,
-    Prewitt = bindings::KernelInfoType_PrewittKernel,
-    Compass = bindings::KernelInfoType_CompassKernel,
-    Kirsch = bindings::KernelInfoType_KirschKernel,
-    Diamond = bindings::KernelInfoType_DiamondKernel,
-    Square = bindings::KernelInfoType_SquareKernel,
-    Rectangle = bindings::KernelInfoType_RectangleKernel,
-    Octagon = bindings::KernelInfoType_OctagonKernel,
-    Disk = bindings::KernelInfoType_DiskKernel,
-    Plus = bindings::KernelInfoType_PlusKernel,
-    Cross = bindings::KernelInfoType_CrossKernel,
-    Ring = bindings::KernelInfoType_RingKernel,
-    Peaks = bindings::KernelInfoType_PeaksKernel,
-    Edges = bindings::KernelInfoType_EdgesKernel,
-    Corners = bindings::KernelInfoType_CornersKernel,
-    Diagonals = bindings::KernelInfoType_DiagonalsKernel,
-    LineEnds = bindings::KernelInfoType_LineEndsKernel,
-    LineJunctions = bindings::KernelInfoType_LineJunctionsKernel,
-    Ridges = bindings::KernelInfoType_RidgesKernel,
-    ConvexHull = bindings::KernelInfoType_ConvexHullKernel,
-    ThinSE = bindings::KernelInfoType_ThinSEKernel,
-    Skeleton = bindings::KernelInfoType_SkeletonKernel,
-    Chebyshev = bindings::KernelInfoType_ChebyshevKernel,
-    Manhattan = bindings::KernelInfoType_ManhattanKernel,
-    Octagonal = bindings::KernelInfoType_OctagonalKernel,
-    Euclidean = bindings::KernelInfoType_EuclideanKernel,
-    UserDefined = bindings::KernelInfoType_UserDefinedKernel,
-}
-
-impl Default for KernelInfoType {
-    fn default() -> Self {
-        return KernelInfoType::Undefined;
-    }
-}
-
-impl From<KernelInfoType> for bindings::KernelInfoType {
-    fn from(value: KernelInfoType) -> Self {
-        return value as bindings::KernelInfoType;
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u32)]
-pub enum MorphologyMethod {
-    Undefined = bindings::MorphologyMethod_UndefinedMorphology,
-    Convolve = bindings::MorphologyMethod_ConvolveMorphology,
-    Correlate = bindings::MorphologyMethod_CorrelateMorphology,
-    Erode = bindings::MorphologyMethod_ErodeMorphology,
-    Dilate = bindings::MorphologyMethod_DilateMorphology,
-    ErodeIntensity = bindings::MorphologyMethod_ErodeIntensityMorphology,
-    DilateIntensity = bindings::MorphologyMethod_DilateIntensityMorphology,
-    IterativeDistance = bindings::MorphologyMethod_IterativeDistanceMorphology,
-    Open = bindings::MorphologyMethod_OpenMorphology,
-    Close = bindings::MorphologyMethod_CloseMorphology,
-    OpenIntensity = bindings::MorphologyMethod_OpenIntensityMorphology,
-    CloseIntensity = bindings::MorphologyMethod_CloseIntensityMorphology,
-    Smooth = bindings::MorphologyMethod_SmoothMorphology,
-    EdgeIn = bindings::MorphologyMethod_EdgeInMorphology,
-    EdgeOut = bindings::MorphologyMethod_EdgeOutMorphology,
-    Edge = bindings::MorphologyMethod_EdgeMorphology,
-    TopHat = bindings::MorphologyMethod_TopHatMorphology,
-    BottomHat = bindings::MorphologyMethod_BottomHatMorphology,
-    HitAndMiss = bindings::MorphologyMethod_HitAndMissMorphology,
-    Thinning = bindings::MorphologyMethod_ThinningMorphology,
-    Thicken = bindings::MorphologyMethod_ThickenMorphology,
-    Distance = bindings::MorphologyMethod_DistanceMorphology,
-    Voronoi = bindings::MorphologyMethod_VoronoiMorphology,
-}
-
-impl Default for MorphologyMethod {
-    fn default() -> Self {
-        return MorphologyMethod::Undefined;
-    }
-}
-
-impl From<MorphologyMethod> for bindings::KernelInfoType {
-    fn from(value: MorphologyMethod) -> Self {
-        return value as bindings::MorphologyMethod;
-    }
-}
-
 /// Builder, that creates instances of [KernelInfo](self::KernelInfo)
 ///
 /// # Examples
@@ -171,7 +76,7 @@ pub struct KernelBuilder {
     center: Option<(usize, usize)>,
     values: Option<Vec<f64>>,
 
-    info_type: Option<KernelInfoType>,
+    info_type: Option<crate::KernelInfoType>,
     geom_info: Option<crate::GeometryInfo>,
 }
 
@@ -250,7 +155,7 @@ impl KernelBuilder {
     }
 
     /// Used for builtin kernels
-    pub fn set_info_type(mut self, info_type: KernelInfoType) -> KernelBuilder {
+    pub fn set_info_type(mut self, info_type: crate::KernelInfoType) -> KernelBuilder {
         self.info_type = Some(info_type);
         return self;
     }
@@ -295,7 +200,7 @@ impl KernelInfo {
 
     /// The values within the kernel is scaled directly using given scaling factor without change.
     pub fn scale(&mut self, factor: f64) {
-        unsafe { bindings::ScaleKernelInfo(self.kernel_info, factor, 0) }
+        unsafe { bindings::ScaleKernelInfo(self.kernel_info, factor, bindings::GeometryFlags::NoValue) }
     }
 
     /// Kernel normalization is designed to ensure that any use of the kernel scaling factor with
@@ -319,7 +224,7 @@ impl KernelInfo {
             bindings::ScaleKernelInfo(
                 self.kernel_info,
                 1.0,
-                bindings::GeometryFlags_NormalizeValue,
+                bindings::GeometryFlags::NormalizeValue,
             )
         }
     }
@@ -333,7 +238,7 @@ impl KernelInfo {
             bindings::ScaleKernelInfo(
                 self.kernel_info,
                 1.0,
-                bindings::GeometryFlags_CorrelateNormalizeValue,
+                bindings::GeometryFlags::CorrelateNormalizeValue,
             )
         }
     }
