@@ -259,7 +259,8 @@ fn main() {
             .parse_callbacks(Box::new(ignored_macros))
             .blocklist_type("timex")
             .blocklist_function("clock_adjtime")
-            .default_enum_style(bindgen::EnumVariation::Rust { non_exhaustive: false });
+            .default_enum_style(bindgen::EnumVariation::Rust { non_exhaustive: false })
+            .derive_eq(true);
 
         for d in include_dirs {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));
