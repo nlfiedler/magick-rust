@@ -45,38 +45,45 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 ## Installing on Windows
 
-So far nothing works. There are several problems that must be overcome:
+Currently, the only way to build on Windows is from source, as the `.lib` files have been removed from the binary releases (see [ImageMagick#7272](https://github.com/ImageMagick/ImageMagick/issues/7272)). You will need to follow the below steps carefully.
 
-* Get an appropriate version of LLVM/Clang for your architecture (32 or 64 bit).
-* Get an appropriate version of ImageMagick.
-* Get the generated bindings to compile without error.
-
-[MSYS2](https://www.msys2.org/) looks neat and might work, but the compiled binary will only run with MSYS2.
-
-For LLVM/Clang, I found more success with the _windows_ file on the project [releases page](https://github.com/llvm/llvm-project/releases); it is a `.tar.xz` file that might be tricky to extract, but at least it seems to work. Other versions would fail during build time due to an error in the `LoadLibraryExW` function.
-
-The remaining problem, I believe, is getting an appropriate version of ImageMagick. I tried the _dll_ installers both with and without HDRI, but both resulted in build failures. The other _static_ files do not have any `.dll` files so they are not useful for building magick-rust.
-
-My conclusion is that building magick-rust on Windows is not possible. If you do find a way to build a portable binary that does not require a separate subsystem, such as MSYS2, please share extremely detailed and repeatable instructions. Thank you.
-
-### Nathan's notes
-
-This section will be replaced by working instructions, if any can ever be found.
-
+1. Ensure you have installed Git and LLVM. The easiest way to do this on Windows is by using `winget`:
+```powershell
+winget install Git.Git
+winget install LLVM.LLVM
 ```
-$Env:IMAGE_MAGICK_DIR = 'C:\bin\ImageMagick-7.1.1-Q16'
-$Env:LIBCLANG_PATH = 'C:\bin\clang+llvm-18.1.7-x86_64-pc-windows-msvc\bin'
+2. Ensure you have installed Visual Studio 2022, with the "C++ MFC for latest build tools (x86 & x64)".
+3. Clone the [ImageMagick-Windows](https://github.com/ImageMagick/ImageMagick-Windows) repository to a well known place. The following instructions assume `C:\IM7`, but the choice does not matter:
+```powershell
+git clone https://github.com/ImageMagick/ImageMagick-Windows C:\IM7
 ```
+4. Run the `CloneRepositories.IM7.cmd` batch file from the source directory, but take care to include the SHA hash of the latest [ImageMagick](https://github.com/ImageMagick/ImageMagick) release (e.g. d775d2a for [7.1.1-35](https://github.com/ImageMagick/ImageMagick/releases/tag/7.1.1-35)):
+```powershell
+cd C:\IM7
+.\CloneRepositories.IM7.cmd d775d2a
+```
+5. With Visual Studio 2022, open the `C:\IM7\Configure\Configure.sln` solution.
+6. Build and run this application. You can use Ctrl+F5 as a shortcut.
+7. Using the wizard, configure for "Dynamic Multi-Threaded DLL Runtimes". You can leave everything else as defaults.
+8. Open the generated `C:\IM7\IM7.Dynamic.x64.sln` solution.
+9. Change the run configuration from Debug to Release mode.
+10. Build the solution using "Build Solution" under the "Build" menu, or press Ctrl+Shift+B.
+12. Get a cup of coffee, because this will take a while to finish compiling.
+13. Search for "Edit the system environment variables" in the Start menu and click on "Environment Variables..."
+14. Add the following as system or user environment variables (replacing `C:\IM7` as appropriate):
+```ini
+IMAGE_MAGICK_DIR=C:\IM7\Output
+IMAGE_MAGICK_INCLUDE_DIRS=C:\IM7\ImageMagick
+```
+15. Add the following directory to your `PATH` variable:
+```
+C:\IM7\Output\bin
+```
+16. Once you have restarted your IDE or terminal to pick up on the changes, you may run `cargo build` in your project that includes `magick_rust` to confirm that ImageMagick is linked successfully.
 
-The weird build error:
+__NOTE:__ Keep in mind that these instructions will *dynamically* link your Rust application with the ImageMagick DLLs. Thus, when distributing your application, you will either need to provide these DLLs (found as `C:\IM7\Output\bin\*_RL_*_.dll`) in the same directory as your executable, or get your users to install the ImageMagick binary distribution.
 
-```
-error[E0308]: mismatched types
-  --> src\types\style_type.rs:26:12
-   |
-26 |     Bold = bindings::StyleType_BoldStyle,
-   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `u32`, found `i32`
-```
+A set of instructions to enable static linkage of ImageMagick on Windows has yet to be found.
 
 ## Creating an Example
 
