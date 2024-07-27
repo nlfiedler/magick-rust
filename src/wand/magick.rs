@@ -21,7 +21,6 @@ use libc::c_void;
 use libc::size_t;
 
 use bindings;
-use conversions::*;
 use result::MagickError;
 #[cfg(not(target_os = "freebsd"))]
 use size_t;
@@ -140,7 +139,7 @@ impl MagickWand {
 
     pub fn append_all(&mut self, stack: bool) -> Result<MagickWand> {
         unsafe { bindings::MagickResetIterator(self.wand) };
-        let result = unsafe { bindings::MagickAppendImages(self.wand, stack.to_magick()) };
+        let result = unsafe { bindings::MagickAppendImages(self.wand, stack.into()) };
 
         if result.is_null() {
             return Err(MagickError("failed to append image".to_string()));
@@ -160,7 +159,7 @@ impl MagickWand {
     pub fn write_images(&self, path: &str, adjoin: bool) -> Result<()> {
         let c_name = CString::new(path).map_err(|_| "path string contains null byte")?;
         let result =
-            unsafe { bindings::MagickWriteImages(self.wand, c_name.as_ptr(), adjoin.to_magick()) };
+            unsafe { bindings::MagickWriteImages(self.wand, c_name.as_ptr(), adjoin.into()) };
         match result {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -478,7 +477,7 @@ impl MagickWand {
         let result = unsafe {
             bindings::MagickSigmoidalContrastImage(
                 self.wand,
-                sharpen.to_magick(),
+                sharpen.into(),
                 strength,
                 midpoint * quantum_range,
             )
@@ -961,7 +960,7 @@ impl MagickWand {
                 width,
                 height,
                 c_map.as_ptr(),
-                bindings::StorageType_CharPixel,
+                bindings::StorageType::CharPixel,
                 pixels.as_mut_ptr() as *mut c_void,
             ) == MagickTrue
             {
@@ -993,7 +992,7 @@ impl MagickWand {
                 width,
                 height,
                 c_map.as_ptr(),
-                bindings::StorageType_DoublePixel,
+                bindings::StorageType::DoublePixel,
                 pixels.as_mut_ptr() as *mut c_void,
             ) == MagickTrue
             {
@@ -1138,7 +1137,7 @@ impl MagickWand {
                     self.wand,
                     new_width.into(),
                     new_height.into(),
-                    bindings::FilterType_LanczosFilter,
+                    FilterType::Lanczos,
                 );
             }
         }
@@ -1314,7 +1313,7 @@ impl MagickWand {
                 columns,
                 rows,
                 pixel_map.as_ptr(),
-                bindings::StorageType_CharPixel,
+                bindings::StorageType::CharPixel,
                 pixels.as_ptr() as *const libc::c_void,
             )
         } {
@@ -1341,8 +1340,8 @@ impl MagickWand {
                 columns,
                 rows,
                 pixel_map.as_ptr(),
-                bindings::StorageType_DoublePixel,
-                pixels.as_ptr() as *const libc::c_void,
+                bindings::StorageType::DoublePixel,
+                pixels.as_ptr() as *const c_void,
             )
         } {
             MagickTrue => Ok(()),
@@ -1401,7 +1400,7 @@ impl MagickWand {
                 colorspace.into(),
                 tree_depth.into(),
                 dither_method.into(),
-                measure_error.to_magick(),
+                measure_error.into(),
             )
         } {
             MagickTrue => Ok(()),
@@ -1425,7 +1424,7 @@ impl MagickWand {
                 colorspace.into(),
                 tree_depth.into(),
                 dither_method.into(),
-                measure_error.to_magick(),
+                measure_error.into(),
             )
         } {
             MagickTrue => Ok(()),

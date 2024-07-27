@@ -16,7 +16,7 @@
 extern crate bindgen;
 extern crate pkg_config;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
@@ -47,8 +47,73 @@ pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
     _ => ":",
 };
 
+#[derive(Debug)]
+struct IgnoreMacros {
+    macros_to_ignore: HashSet<String>
+}
+
+impl IgnoreMacros {
+    fn from_iter<S, I>(macro_names: I) -> Self
+    where
+        S: Into<String>,
+        I: IntoIterator<Item = S>
+    {
+        let mut macros_to_ignore = HashSet::new();
+        for macro_name in macro_names {
+            macros_to_ignore.insert(macro_name.into());
+        }
+        Self {
+            macros_to_ignore
+        }
+    }
+}
+
+impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
+    fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
+        if self.macros_to_ignore.contains(name) {
+            bindgen::callbacks::MacroParsingBehavior::Ignore
+        } else {
+            bindgen::callbacks::MacroParsingBehavior::Default
+        }
+    }
+}
+
+#[derive(Debug)]
+struct RemoveEnumVariantSuffixes {
+    names_to_suffix: HashMap<String, String>
+}
+
+impl RemoveEnumVariantSuffixes {
+    fn from_iter<S, I>(enum_suffix_pairs: I) -> Self
+    where
+        S: Into<String>,
+        I: IntoIterator<Item = (S, S)>,
+    {
+        let mut names_to_suffix = HashMap::new();
+        for (enum_name, variant_suffix) in enum_suffix_pairs {
+            names_to_suffix.insert(enum_name.into(), variant_suffix.into());
+        }
+
+        Self {
+            names_to_suffix
+        }
+    }
+}
+
+impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffixes {
+    fn enum_variant_name(
+        &self,
+        enum_name: Option<&str>,
+        original_variant_name: &str,
+        _variant_value: bindgen::callbacks::EnumVariantValue
+    ) -> Option<String> {
+        let suffix = self.names_to_suffix.get(enum_name?)?;
+        Some(original_variant_name.trim_end_matches(suffix).to_string())
+    }
+}
+
 fn main() {
-    let check_cppflags = if cfg!(target_os = "windows") {
+    let check_cppflags = if cfg!(all(target_os = "windows", not(target_env = "msvc"))) {
         // Resolve bash from directories listed in the PATH environment variable in the
         // order they appear.
         Command::new("cmd")
@@ -94,7 +159,7 @@ fn main() {
         Ok(ref v) => v.split(PATH_SEPARATOR).map(|x| x.to_owned()).collect(),
         Err(_) => {
             if target.contains("windows") {
-                vec!["CORE_RL_MagickWand_".to_string()]
+                vec!["CORE_RL_MagickWand_".to_string(), "CORE_RL_MagickCore_".to_string()]
             } else if target.contains("freebsd") {
                 vec!["MagickWand-7".to_string()]
             } else {
@@ -112,36 +177,92 @@ fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let bindings_path_str = out_dir.join("bindings.rs");
 
-    #[derive(Debug)]
-    struct IgnoreMacros(HashSet<String>);
+    let ignored_macros = IgnoreMacros::from_iter([
+        "FP_INFINITE",
+        "FP_NAN",
+        "FP_NORMAL",
+        "FP_SUBNORMAL",
+        "FP_ZERO",
+        "IPPORT_RESERVED",
+        "FP_INT_UPWARD",
+        "FP_INT_DOWNWARD",
+        "FP_INT_TOWARDZERO",
+        "FP_INT_TONEARESTFROMZERO",
+        "FP_INT_TONEAREST",
+    ]);
 
-    impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
-        fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
-            if self.0.contains(name) {
-                bindgen::callbacks::MacroParsingBehavior::Ignore
-            } else {
-                bindgen::callbacks::MacroParsingBehavior::Default
-            }
-        }
-    }
-
-    let ignored_macros = IgnoreMacros(
-        vec![
-            "FP_INFINITE".into(),
-            "FP_NAN".into(),
-            "FP_NORMAL".into(),
-            "FP_SUBNORMAL".into(),
-            "FP_ZERO".into(),
-            "IPPORT_RESERVED".into(),
-            "FP_INT_UPWARD".into(),
-            "FP_INT_DOWNWARD".into(),
-            "FP_INT_TOWARDZERO".into(),
-            "FP_INT_TONEARESTFROMZERO".into(),
-            "FP_INT_TONEAREST".into(),
-        ]
-        .into_iter()
-        .collect(),
-    );
+    let remove_enum_suffixes = RemoveEnumVariantSuffixes::from_iter([
+        ("ClassType", "Class"),
+        ("CompositeOperator", "CompositeOp"),
+        ("GravityType", "Gravity"),
+        ("ImageType", "Type"),
+        ("InterlaceType", "Interlace"),
+        ("OrientationType", "Orientation"),
+        ("ResolutionType", "Resolution"),
+        ("TransmitType", "TransmitType"),
+        ("MapMode", "Mode"),
+        ("ColorspaceType", "Colorspace"),
+        ("ChannelType", "Channel"),
+        ("PixelChannel", "PixelChannel"),
+        ("PixelIntensityMethod", "PixelIntensityMethod"),
+        ("PixelInterpolateMethod", "InterpolatePixel"),
+        ("PixelMask", "PixelMask"),
+        ("PixelTrait", "PixelTrait"),
+        ("VirtualPixelMethod", "VirtualPixelMethod"),
+        ("ComplianceType", "Compliance"),
+        ("IlluminantType", "Illuminant"),
+        ("CompressionType", "Compression"),
+        ("KernelInfoType", "Kernel"),
+        ("MorphologyMethod", "Morphology"),
+        ("PreviewType", "Preview"),
+        ("DisposeType", "Dispose"),
+        ("LayerMethod", "Layer"),
+        ("RenderingIntent", "Intent"),
+        ("EndianType", "Endian"),
+        ("QuantumAlphaType", "QuantumAlpha"),
+        ("QuantumFormat", "QuantumFormat"),
+        ("QuantumType", "Quantum"),
+        ("FilterType", "Filter"),
+        ("TimerState", "TimerState"),
+        ("StretchType", "Stretch"),
+        ("StyleType", "Style"),
+        ("AlignType", "Align"),
+        ("DecorationType", "Decoration"),
+        ("DirectionType", "Direction"),
+        ("FillRule", "Rule"),
+        ("GradientType", "Gradient"),
+        ("LineCap", "Cap"),
+        ("LineJoin", "Join"),
+        ("PaintMethod", "Method"),
+        ("PrimitiveType", "Primitive"),
+        ("ReferenceType", "Reference"),
+        ("SpreadMethod", "Spread"),
+        ("WordBreakType", "WordBreakType"),
+        ("CacheType", "Cache"),
+        ("AlphaChannelOption", "AlphaChannel"),
+        ("MetricType", "ErrorMetric"),
+        ("MagickFormatType", "FormatType"),
+        ("MagickInfoFlag", "Flag"),
+        ("DistortMethod", "Distortion"),
+        ("SparseColorMethod", "ColorInterpolate"),
+        ("ComplexOperator", "ComplexOperator"),
+        ("MontageMode", "Mode"),
+        ("MagickCLDeviceType", "DeviceType"),
+        ("CommandOption", "Options"),
+        ("ValidateType", "Validate"),
+        ("CommandOptionFLags", "OptionFlag"),
+        ("PolicyDomain", "PolicyDomain"),
+        ("PolicyRights", "PolicyRights"),
+        ("DitherMethod", "DitherMethod"),
+        ("RegistryType", "RegistryType"),
+        ("ResourceType", "Resource"),
+        ("MagickEvaluateOperator", "EvaluateOperator"),
+        ("MagickFunction", "Function"),
+        ("StatisticType", "Statistic"),
+        ("AutoThresholdMethod", "ThresholdMethod"),
+        ("PathType", "Path"),
+        ("NoiseType", "Noise")
+    ]);
 
     if !Path::new(&bindings_path_str).exists() {
         // Create the header file that rust-bindgen needs as input.
@@ -159,8 +280,11 @@ fn main() {
             .header(gen_h_path.to_str().unwrap())
             .size_t_is_usize(true)
             .parse_callbacks(Box::new(ignored_macros))
+            .parse_callbacks(Box::new(remove_enum_suffixes))
             .blocklist_type("timex")
-            .blocklist_function("clock_adjtime");
+            .blocklist_function("clock_adjtime")
+            .default_enum_style(bindgen::EnumVariation::Rust { non_exhaustive: false })
+            .derive_eq(true);
 
         for d in include_dirs {
             builder = builder.clang_arg(format!("-I{}", d.to_string_lossy()));

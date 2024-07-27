@@ -12,7 +12,7 @@ Because this crate is generating bindings for a C/C++ library, there are several
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
     - [Homebrew](http://brew.sh): `brew install imagemagick`
     - Linux may require building ImageMagick from source, see the [INSTALL.md](./INSTALL.md) guide
-    - Windows: download `*-dll` [installer](https://www.imagemagick.org/script/download.php#windows). When installing, check the *Install development headers and libraries for C and C++* checkbox.
+    - Windows currently requires building from source, see [INSTALL.md](./INSTALL.md#installing-on-windows)
 * [Clang](https://clang.llvm.org) (version 5.0 or higher, as dictated by [rust-bindgen](https://github.com/rust-lang/rust-bindgen))
 * Windows requires MSVC toolchain
     - Download the [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) and select the `MSVC ... build tools` (latest version with appropriate architecture) and `Windows 11 SDK` (or `10` if using Windows 10).
@@ -38,15 +38,7 @@ If `pkg-config` is not available, or you wish to override its behavior, you can 
 
 ### Build on Windows
 
-When building on Windows, you will need to set the `IMAGE_MAGICK_DIR` environment variable to point to the ImageMagick installation path. Maybe this is possible with the `set` command, but it may be necessary to set the variable in the system preferences. Without setting `IMAGE_MAGICK_DIR`, the `build.rs` script will try to run `pkg-config` which is a tool generally found on Unix-based systems.
-
-```shell
-$Env:IMAGE_MAGICK_DIR = '<path\to\imagemagick>'
-cargo build
-cargo test
-```
-
-If you are having trouble building on Windows, you are not alone. See the [INSTALL.md](./INSTALL.md) guide for the current state of affairs.
+At the moment, building on Windows requires building from source. See [INSTALL.md](./INSTALL.md#installing-on-windows) for guidance.
 
 ## Documentation
 
