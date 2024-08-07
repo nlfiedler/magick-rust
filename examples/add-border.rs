@@ -24,7 +24,7 @@ fn add_border(filepath: &str, border_color: &str) -> Result<Vec<u8>, MagickError
 }
 
 fn main() {
-    match add_border("../tests/fixtures/snow-covered-cat.jpg", "red") {
+    match add_border("tests/fixtures/snow-covered-cat.jpg", "red") {
         Ok(bytes) => {
             fs::write("border-cat.jpg", bytes).expect("write failed");
         }
