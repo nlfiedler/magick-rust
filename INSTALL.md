@@ -72,7 +72,7 @@ cd C:\IM7
 13. Search for "Edit the system environment variables" in the Start menu and click on "Environment Variables..."
 14. Add the following as system or user environment variables (replacing `C:\IM7` as appropriate):
 ```ini
-IMAGE_MAGICK_DIR=C:\IM7\Output
+IMAGE_MAGICK_DIR=C:\IM7\Artifacts
 IMAGE_MAGICK_INCLUDE_DIRS=C:\IM7\ImageMagick
 ```
 15. Add the following directory to your `PATH` variable:
