@@ -123,7 +123,14 @@ fn main() {
             .arg("--cppflags")
             .output()
     } else {
-        Command::new("MagickCore-config").arg("--cppflags").output()
+        Command::new("MagickCore-config")
+            .arg("--cppflags")
+            .output()
+            .or_else(|_| {
+                Command::new("pkg-config")
+                    .args(["--cflags", "MagickCore"])
+                    .output()
+            })
     };
     if let Ok(ok_cppflags) = check_cppflags {
         let cppflags = ok_cppflags.stdout;
