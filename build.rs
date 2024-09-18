@@ -113,25 +113,14 @@ impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffixes {
 }
 
 fn main() {
-    let check_cppflags = if cfg!(all(target_os = "windows", not(target_env = "msvc"))) {
-        // Resolve bash from directories listed in the PATH environment variable in the
-        // order they appear.
-        Command::new("cmd")
-            .arg("/C")
-            .arg("bash")
-            .arg("MagickCore-config")
-            .arg("--cppflags")
-            .output()
-    } else {
-        Command::new("MagickCore-config")
-            .arg("--cppflags")
-            .output()
-            .or_else(|_| {
-                Command::new("pkg-config")
-                    .args(["--cflags", "MagickCore"])
-                    .output()
-            })
-    };
+    let check_cppflags = Command::new("MagickCore-config")
+        .arg("--cppflags")
+        .output()
+        .or_else(|_| {
+            Command::new("pkg-config")
+                .args(["--cflags", "MagickCore"])
+                .output()
+        });
     if let Ok(ok_cppflags) = check_cppflags {
         let cppflags = ok_cppflags.stdout;
         let cppflags = String::from_utf8(cppflags).unwrap();
