@@ -93,7 +93,7 @@ impl PixelWand {
 
     set_get_unchecked!(
         get_color_count, set_color_count, PixelGetColorCount, PixelSetColorCount,   usize
-        get_index,       set_index,       PixelGetIndex,      PixelSetIndex,        f32
+        get_index,       set_index,       PixelGetIndex,      PixelSetIndex,        bindings::Quantum
         get_fuzz,        set_fuzz,        PixelGetFuzz,       PixelSetFuzz,         f64
     );
 
