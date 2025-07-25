@@ -165,7 +165,7 @@ impl KernelBuilder {
 
         // Create kernel info
         let kernel_info = unsafe {
-            bindings::AcquireKernelBuiltIn(info_type, *geom_info, std::ptr::null_mut())
+            bindings::AcquireKernelBuiltIn(info_type.into(), geom_info.inner(), std::ptr::null_mut())
         };
 
         if kernel_info.is_null() {
