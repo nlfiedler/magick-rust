@@ -311,7 +311,7 @@ fn main() {
 
 fn env_var_set_default(name: &str, value: &str) {
     if env::var(name).is_err() {
-        env::set_var(name, value);
+        unsafe { env::set_var(name, value); }
     }
 }
 
