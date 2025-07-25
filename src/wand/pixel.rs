@@ -16,8 +16,8 @@
 use std::ffi::{CStr, CString};
 use std::fmt;
 
-use bindings;
-use result::MagickError;
+use crate::bindings;
+use crate::result::MagickError;
 
 use super::MagickTrue;
 use crate::result::Result;

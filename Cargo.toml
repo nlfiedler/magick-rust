@@ -9,6 +9,7 @@ readme = "README.md"
 license = "Apache-2.0"
 keywords = ["magickwand", "imagemagick"]
 build = "build.rs"
+edition = "2018"
 exclude = [
     ".github/*",
     "docker/*",
