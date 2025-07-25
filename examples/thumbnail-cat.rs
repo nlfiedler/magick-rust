@@ -27,6 +27,6 @@ fn main() {
         Ok(bytes) => {
             fs::write("thumbnail-cat.jpg", bytes).expect("write failed");
         }
-        Err(err) => println!("error: {}", err),
+        Err(err) => println!("error: {err}"),
     }
 }

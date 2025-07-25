@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+use std::ops::{Deref, DerefMut};
 use crate::bindings;
 
-pub type GeometryInfo = bindings::GeometryInfo;
-
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct GeometryInfo(bindings::GeometryInfo);
 impl GeometryInfo {
     pub fn new() -> GeometryInfo {
-        return GeometryInfo {
+        let inner_geometry_info =  bindings::GeometryInfo {
             rho: 0.0,
             sigma: 0.0,
             xi: 0.0,
             psi: 0.0,
             chi: 0.0,
         };
+
+        Self(inner_geometry_info)
     }
 
     pub fn set_rho(&mut self, rho: f64) {
@@ -42,6 +45,20 @@ impl GeometryInfo {
     }
     pub fn set_chi(&mut self, chi: f64) {
         self.chi = chi;
+    }
+}
+
+impl DerefMut for GeometryInfo {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl Deref for GeometryInfo {
+    type Target = bindings::GeometryInfo;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 

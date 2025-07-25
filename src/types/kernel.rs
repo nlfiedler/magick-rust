@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 use std::ffi::CString;
-
+use std::ops::Deref;
 use crate::bindings;
 use crate::{MagickError, Result};
 
@@ -32,7 +32,7 @@ use crate::{MagickError, Result};
 ///     wand1.new_image(4, 4, &PixelWand::new())?; // Replace with `read_image` to open your image file
 ///     let wand2 = wand1.clone();
 ///
-///     let kernel_info = KernelBuilder::new()
+///     let kernel_info = KernelBuilder::default()
 ///         .set_size((3, 3))
 ///         .set_center((1, 1)) // Not really needed here - the center is in the middle of kernel
 ///                             // by default
@@ -60,7 +60,7 @@ use crate::{MagickError, Result};
 ///
 ///     let mut geom_info = GeometryInfo::new();
 ///     geom_info.set_sigma(15.0);
-///     let kernel_info = KernelBuilder::new()
+///     let kernel_info = KernelBuilder::default()
 ///         .set_info_type(KernelInfoType::Gaussian)
 ///         .set_geom_info(geom_info)
 ///         .build_builtin()?;
@@ -70,7 +70,7 @@ use crate::{MagickError, Result};
 ///     Ok(())
 /// }
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct KernelBuilder {
     size: Option<(usize, usize)>,
     center: Option<(usize, usize)>,
@@ -81,33 +81,22 @@ pub struct KernelBuilder {
 }
 
 impl KernelBuilder {
-    pub fn new() -> KernelBuilder {
-        return KernelBuilder {
-            size: None,
-            center: None,
-            values: None,
-
-            info_type: None,
-            geom_info: None,
-        };
-    }
-
     /// Used for user defined kernels
     pub fn set_size(mut self, size: (usize, usize)) -> KernelBuilder {
         self.size = Some(size);
-        return self;
+        self
     }
 
     /// Used for user defined kernels
     pub fn set_center(mut self, center: (usize, usize)) -> KernelBuilder {
         self.center = Some(center);
-        return self;
+        self
     }
 
     /// Used for user defined kernels
     pub fn set_values(mut self, values: &[f64]) -> KernelBuilder {
         self.values = Some(values.into());
-        return self;
+        self
     }
 
     pub fn build(&self) -> Result<KernelInfo> {
@@ -157,26 +146,26 @@ impl KernelBuilder {
     /// Used for builtin kernels
     pub fn set_info_type(mut self, info_type: crate::KernelInfoType) -> KernelBuilder {
         self.info_type = Some(info_type);
-        return self;
+        self
     }
 
     /// Used for builtin kernels
     pub fn set_geom_info(mut self, geom_info: crate::GeometryInfo) -> KernelBuilder {
         self.geom_info = Some(geom_info);
-        return self;
+        self
     }
 
     pub fn build_builtin(&self) -> Result<KernelInfo> {
         let info_type = self
             .info_type
             .ok_or(MagickError("no info type given".to_string()))?;
-        let mut geom_info = self
+        let geom_info = self
             .geom_info
             .ok_or(MagickError("no geometry info given".to_string()))?;
 
         // Create kernel info
         let kernel_info = unsafe {
-            bindings::AcquireKernelBuiltIn(info_type.into(), &mut geom_info, std::ptr::null_mut())
+            bindings::AcquireKernelBuiltIn(info_type, *geom_info, std::ptr::null_mut())
         };
 
         if kernel_info.is_null() {
@@ -195,7 +184,7 @@ pub struct KernelInfo {
 
 impl KernelInfo {
     fn new(kernel_info: *mut bindings::KernelInfo) -> KernelInfo {
-        return KernelInfo { kernel_info };
+        KernelInfo { kernel_info }
     }
 
     /// The values within the kernel is scaled directly using given scaling factor without change.
@@ -255,7 +244,7 @@ impl KernelInfo {
     }
 
     pub unsafe fn get_ptr(&self) -> *mut bindings::KernelInfo {
-        return self.kernel_info;
+        self.kernel_info
     }
 }
 
@@ -273,7 +262,7 @@ impl Clone for KernelInfo {
             panic!("failed to clone kernel info");
         }
 
-        return KernelInfo::new(kernel_info);
+        KernelInfo::new(kernel_info)
     }
 }
 

@@ -166,7 +166,7 @@ fn main() {
 
     let kind = determine_mode(&lib_dirs, libs.as_slice());
     for lib in libs.into_iter() {
-        println!("cargo:rustc-link-lib={}={}", kind, lib);
+        println!("cargo:rustc-link-lib={kind}={lib}");
     }
 
     // If the generated bindings are missing, generate them now.
@@ -292,7 +292,7 @@ fn main() {
                 Err(bindgen::BindgenError::ClangDiagnostic(err_msg)) if err_msg.contains("C++") => {
                     builder.clang_arg("-xc++").generate().unwrap()
                 }
-                Err(err) => panic!("{:?}", err),
+                Err(err) => panic!("{err:?}"),
             }
         } else {
             builder.generate().unwrap()
@@ -386,9 +386,8 @@ fn determine_mode<T: AsRef<str>>(libdirs: &Vec<PathBuf>, libs: &[T]) -> &'static
             }
 
             panic!(
-                "ImageMagick libdirs at `{:?}` do not contain the required files \
-                 to either statically or dynamically link ImageMagick",
-                libdirs
+                "ImageMagick libdirs at `{libdirs:?}` do not contain the required files \
+                 to either statically or dynamically link ImageMagick"
             );
         }
         (true, true) => {}
@@ -411,13 +410,13 @@ fn run_pkg_config() -> pkg_config::Library {
     // pkg-config crate always adds those other flags, we must run the
     // command directly.
     if !Command::new("pkg-config")
-        .arg(format!("--max-version={}", MAX_VERSION))
+        .arg(format!("--max-version={MAX_VERSION}"))
         .arg("MagickWand")
         .status()
         .unwrap()
         .success()
     {
-        panic!("MagickWand version must be less than {}", MAX_VERSION);
+        panic!("MagickWand version must be less than {MAX_VERSION}");
     }
     // We have to split the version check and the cflags/libs check because
     // you can't do both at the same time on RHEL (apparently).
