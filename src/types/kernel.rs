@@ -170,13 +170,13 @@ impl KernelBuilder {
         let info_type = self
             .info_type
             .ok_or(MagickError("no info type given".to_string()))?;
-        let mut geom_info = self
+        let geom_info = self
             .geom_info
             .ok_or(MagickError("no geometry info given".to_string()))?;
 
         // Create kernel info
         let kernel_info = unsafe {
-            bindings::AcquireKernelBuiltIn(info_type.into(), &mut geom_info, std::ptr::null_mut())
+            bindings::AcquireKernelBuiltIn(info_type.into(), geom_info.inner(), std::ptr::null_mut())
         };
 
         if kernel_info.is_null() {

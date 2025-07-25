@@ -15,33 +15,40 @@
  */
 use crate::bindings;
 
-pub type GeometryInfo = bindings::GeometryInfo;
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct GeometryInfo(bindings::GeometryInfo);
 
 impl GeometryInfo {
     pub fn new() -> GeometryInfo {
-        return GeometryInfo {
+        let inner = bindings::GeometryInfo {
             rho: 0.0,
             sigma: 0.0,
             xi: 0.0,
             psi: 0.0,
             chi: 0.0,
         };
+
+        Self(inner)
     }
 
     pub fn set_rho(&mut self, rho: f64) {
-        self.rho = rho;
+        self.0.rho = rho;
     }
     pub fn set_sigma(&mut self, sigma: f64) {
-        self.sigma = sigma;
+        self.0.sigma = sigma;
     }
     pub fn set_xi(&mut self, xi: f64) {
-        self.xi = xi;
+        self.0.xi = xi;
     }
     pub fn set_psi(&mut self, psi: f64) {
-        self.psi = psi;
+        self.0.psi = psi;
     }
     pub fn set_chi(&mut self, chi: f64) {
-        self.chi = chi;
+        self.0.chi = chi;
+    }
+
+    pub(crate) fn inner(&self) -> &bindings::GeometryInfo {
+        &self.0
     }
 }
 
