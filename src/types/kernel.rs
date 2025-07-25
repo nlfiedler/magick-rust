@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 use std::ffi::CString;
-use std::ops::Deref;
 use crate::bindings;
 use crate::{MagickError, Result};
 
