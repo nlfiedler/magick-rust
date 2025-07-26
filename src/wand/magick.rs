@@ -29,6 +29,8 @@ use super::{MagickFalse, MagickTrue};
 use crate::result::Result;
 
 use super::{DrawingWand, PixelWand};
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+use crate::ResourceType;
 use crate::{
     AlphaChannelOption, AutoThresholdMethod, ChannelType, ColorspaceType, CompositeOperator,
     CompressionType, DisposeType, DitherMethod, EndianType, FilterType, GravityType, Image,
@@ -36,8 +38,6 @@ use crate::{
     MetricType, MorphologyMethod, OrientationType, PixelInterpolateMethod, PixelMask,
     RenderingIntent, ResolutionType, StatisticType,
 };
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-use crate::ResourceType;
 
 wand_common!(
     MagickWand,
@@ -74,9 +74,7 @@ impl MagickWand {
     }
 
     pub fn new_image(&self, columns: usize, rows: usize, background: &PixelWand) -> Result<()> {
-        match unsafe {
-            bindings::MagickNewImage(self.wand, columns, rows, background.wand)
-        } {
+        match unsafe { bindings::MagickNewImage(self.wand, columns, rows, background.wand) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
         }
@@ -181,11 +179,7 @@ impl MagickWand {
         let int_slice = data.as_ref();
         let size = int_slice.len();
         let result = unsafe {
-            bindings::MagickReadImageBlob(
-                self.wand,
-                int_slice.as_ptr() as *const c_void,
-                size,
-            )
+            bindings::MagickReadImageBlob(self.wand, int_slice.as_ptr() as *const c_void, size)
         };
         match result {
             MagickTrue => Ok(()),
@@ -210,11 +204,7 @@ impl MagickWand {
         let int_slice = data.as_ref();
         let size = int_slice.len();
         let result = unsafe {
-            bindings::MagickPingImageBlob(
-                self.wand,
-                int_slice.as_ptr() as *const c_void,
-                size,
-            )
+            bindings::MagickPingImageBlob(self.wand, int_slice.as_ptr() as *const c_void, size)
         };
         match result {
             MagickTrue => Ok(()),
@@ -581,14 +571,7 @@ impl MagickWand {
         width: usize,
         height: usize,
     ) -> Result<()> {
-        match unsafe {
-            bindings::MagickStatisticImage(
-                self.wand,
-                statistic_type,
-                width,
-                height,
-            )
-        } {
+        match unsafe { bindings::MagickStatisticImage(self.wand, statistic_type, width, height) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
         }
@@ -1005,9 +988,7 @@ impl MagickWand {
     /// Resize the image to the specified width and height, using the
     /// specified filter type.
     pub fn resize_image(&self, width: usize, height: usize, filter: FilterType) -> Result<()> {
-        match unsafe {
-            bindings::MagickResizeImage(self.wand, width, height, filter)
-        } {
+        match unsafe { bindings::MagickResizeImage(self.wand, width, height, filter) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
         }
@@ -1132,12 +1113,7 @@ impl MagickWand {
         unsafe {
             bindings::MagickResetIterator(self.wand);
             while bindings::MagickNextImage(self.wand) != MagickFalse {
-                bindings::MagickResizeImage(
-                    self.wand,
-                    new_width,
-                    new_height,
-                    FilterType::Lanczos,
-                );
+                bindings::MagickResizeImage(self.wand, new_width, new_height, FilterType::Lanczos);
             }
         }
     }
@@ -1243,8 +1219,7 @@ impl MagickWand {
     /// * `pixel_mask`: type of mask, Read or Write.
     /// * `clip_mask`: the clip_mask wand.
     pub fn set_image_mask(&mut self, pixel_mask: PixelMask, clip_mask: &MagickWand) -> Result<()> {
-        match unsafe { bindings::MagickSetImageMask(self.wand, pixel_mask, clip_mask.wand) }
-        {
+        match unsafe { bindings::MagickSetImageMask(self.wand, pixel_mask, clip_mask.wand) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
         }

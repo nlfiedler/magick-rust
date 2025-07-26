@@ -23,7 +23,7 @@ use std::path::Path;
 use std::sync::Once;
 
 use magick_rust::MagickError;
-use magick_rust::{magick_wand_genesis, MagickWand, PixelWand};
+use magick_rust::{MagickWand, PixelWand, magick_wand_genesis};
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
@@ -54,9 +54,10 @@ fn test_resize_image() {
         1 => 1,
         height => height / 2,
     };
-    assert!(wand
-        .resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos)
-        .is_ok());
+    assert!(
+        wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos)
+            .is_ok()
+    );
     assert_eq!(256, wand.get_image_width());
     assert_eq!(192, wand.get_image_height());
 }
@@ -260,9 +261,10 @@ fn test_transform_image_colorspace() {
     let pixel_color = wand.get_image_pixel_color(10, 10).unwrap();
     assert_ne!(pixel_color.get_hsl().hue, 0.0);
 
-    assert!(wand
-        .transform_image_colorspace(magick_rust::ColorspaceType::GRAY)
-        .is_ok());
+    assert!(
+        wand.transform_image_colorspace(magick_rust::ColorspaceType::GRAY)
+            .is_ok()
+    );
     assert_eq!(
         wand.get_image_colorspace(),
         magick_rust::ColorspaceType::GRAY
@@ -291,15 +293,16 @@ fn test_color_reduction() {
     let image_colors = wand.get_image_colors();
     assert!(image_colors > 38000 || image_colors < 40000);
 
-    assert!(wand
-        .quantize_image(
+    assert!(
+        wand.quantize_image(
             6,
             magick_rust::ColorspaceType::RGB,
             1,
             magick_rust::DitherMethod::Undefined,
             false
         )
-        .is_ok());
+        .is_ok()
+    );
     assert_eq!(6, wand.get_image_colors());
 
     let histogram = wand.get_image_histogram().unwrap();
@@ -365,9 +368,10 @@ fn test_clut_image() {
     assert!(gradient.set_option("gradient:angle", "90").is_ok());
     assert!(gradient.read_image("gradient:black-yellow").is_ok());
 
-    assert!(wand
-        .clut_image(&gradient, magick_rust::PixelInterpolateMethod::Bilinear)
-        .is_ok());
+    assert!(
+        wand.clut_image(&gradient, magick_rust::PixelInterpolateMethod::Bilinear)
+            .is_ok()
+    );
 }
 
 #[test]
@@ -474,8 +478,10 @@ fn test_import_export_pixels_roundtrip() {
     assert!(wand.import_image_pixels(0, 0, w, h, &pixels, map).is_ok());
     let exported_pixels = wand.export_image_pixels(0, 0, w, h, map).unwrap();
     assert_eq!(exported_pixels.len(), pixels.len());
-    assert!(exported_pixels
-        .iter()
-        .zip(pixels.iter())
-        .all(|(a, b)| a == b));
+    assert!(
+        exported_pixels
+            .iter()
+            .zip(pixels.iter())
+            .all(|(a, b)| a == b)
+    );
 }

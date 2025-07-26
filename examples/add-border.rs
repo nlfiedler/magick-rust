@@ -1,5 +1,5 @@
 extern crate magick_rust;
-use magick_rust::{magick_wand_genesis, CompositeOperator, MagickError, MagickWand, PixelWand};
+use magick_rust::{CompositeOperator, MagickError, MagickWand, PixelWand, magick_wand_genesis};
 use std::fs;
 use std::sync::Once;
 
@@ -15,7 +15,7 @@ fn add_border(filepath: &str, border_color: &str) -> Result<Vec<u8>, MagickError
 
     let wand = MagickWand::new();
     wand.read_image(filepath)?;
-    
+
     let mut border = PixelWand::new();
     border.set_color(border_color)?;
 

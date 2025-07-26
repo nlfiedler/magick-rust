@@ -19,7 +19,7 @@ impl From<bindings::MagickBooleanType> for bool {
     fn from(value: bindings::MagickBooleanType) -> Self {
         match value {
             bindings::MagickBooleanType::MagickFalse => false,
-            bindings::MagickBooleanType::MagickTrue => true
+            bindings::MagickBooleanType::MagickTrue => true,
         }
     }
 }
@@ -28,7 +28,7 @@ impl From<bool> for bindings::MagickBooleanType {
     fn from(value: bool) -> Self {
         match value {
             true => bindings::MagickBooleanType::MagickTrue,
-            false => bindings::MagickBooleanType::MagickFalse
+            false => bindings::MagickBooleanType::MagickFalse,
         }
     }
 }

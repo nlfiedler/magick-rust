@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
+mod geometry_info;
 mod image;
 mod kernel;
-mod geometry_info;
 
+pub use self::geometry_info::GeometryInfo;
+pub use self::image::Image;
+pub use self::kernel::{KernelBuilder, KernelInfo};
 pub use crate::bindings::AlignType;
 pub use crate::bindings::AlphaChannelOption;
 pub use crate::bindings::AutoThresholdMethod;
 pub use crate::bindings::ChannelType;
 pub use crate::bindings::ClipPathUnits;
-pub use crate::bindings::CompositeOperator;
 pub use crate::bindings::ColorspaceType;
+pub use crate::bindings::CompositeOperator;
 pub use crate::bindings::CompressionType;
 pub use crate::bindings::DecorationType;
 pub use crate::bindings::DirectionType;
@@ -33,13 +36,10 @@ pub use crate::bindings::DitherMethod;
 pub use crate::bindings::EndianType;
 pub use crate::bindings::FillRule;
 pub use crate::bindings::FilterType;
-pub use self::geometry_info::GeometryInfo;
 pub use crate::bindings::GravityType;
-pub use self::image::Image;
 pub use crate::bindings::ImageType;
 pub use crate::bindings::InterlaceType;
 pub use crate::bindings::KernelInfoType;
-pub use self::kernel::{KernelBuilder, KernelInfo};
 pub use crate::bindings::LayerMethod;
 pub use crate::bindings::LineCap;
 pub use crate::bindings::LineJoin;

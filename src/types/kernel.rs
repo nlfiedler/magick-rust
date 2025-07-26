@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use std::ffi::CString;
 use crate::bindings;
 use crate::{MagickError, Result};
+use std::ffi::CString;
 
 /// Builder, that creates instances of [KernelInfo](self::KernelInfo)
 ///
@@ -164,7 +164,11 @@ impl KernelBuilder {
 
         // Create kernel info
         let kernel_info = unsafe {
-            bindings::AcquireKernelBuiltIn(info_type.into(), geom_info.inner(), std::ptr::null_mut())
+            bindings::AcquireKernelBuiltIn(
+                info_type.into(),
+                geom_info.inner(),
+                std::ptr::null_mut(),
+            )
         };
 
         if kernel_info.is_null() {
@@ -188,7 +192,9 @@ impl KernelInfo {
 
     /// The values within the kernel is scaled directly using given scaling factor without change.
     pub fn scale(&mut self, factor: f64) {
-        unsafe { bindings::ScaleKernelInfo(self.kernel_info, factor, bindings::GeometryFlags::NoValue) }
+        unsafe {
+            bindings::ScaleKernelInfo(self.kernel_info, factor, bindings::GeometryFlags::NoValue)
+        }
     }
 
     /// Kernel normalization is designed to ensure that any use of the kernel scaling factor with

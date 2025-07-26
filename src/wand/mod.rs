@@ -21,7 +21,7 @@ mod pixel;
 
 pub use self::drawing::DrawingWand;
 pub use self::magick::MagickWand;
-pub use self::pixel::{PixelWand, HSL};
+pub use self::pixel::{HSL, PixelWand};
 
-use crate::bindings::MagickBooleanType::MagickFalse as MagickFalse;
-use crate::bindings::MagickBooleanType::MagickTrue as MagickTrue;
+use crate::bindings::MagickBooleanType::MagickFalse;
+use crate::bindings::MagickBooleanType::MagickTrue;

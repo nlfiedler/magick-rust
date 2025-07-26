@@ -49,22 +49,20 @@ pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
 
 #[derive(Debug)]
 struct IgnoreMacros {
-    macros_to_ignore: HashSet<String>
+    macros_to_ignore: HashSet<String>,
 }
 
 impl IgnoreMacros {
     fn from_iter<S, I>(macro_names: I) -> Self
     where
         S: Into<String>,
-        I: IntoIterator<Item = S>
+        I: IntoIterator<Item = S>,
     {
         let mut macros_to_ignore = HashSet::new();
         for macro_name in macro_names {
             macros_to_ignore.insert(macro_name.into());
         }
-        Self {
-            macros_to_ignore
-        }
+        Self { macros_to_ignore }
     }
 }
 
@@ -80,7 +78,7 @@ impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
 
 #[derive(Debug)]
 struct RemoveEnumVariantSuffixes {
-    names_to_suffix: HashMap<String, String>
+    names_to_suffix: HashMap<String, String>,
 }
 
 impl RemoveEnumVariantSuffixes {
@@ -94,9 +92,7 @@ impl RemoveEnumVariantSuffixes {
             names_to_suffix.insert(enum_name.into(), variant_suffix.into());
         }
 
-        Self {
-            names_to_suffix
-        }
+        Self { names_to_suffix }
     }
 }
 
@@ -105,7 +101,7 @@ impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffixes {
         &self,
         enum_name: Option<&str>,
         original_variant_name: &str,
-        _variant_value: bindgen::callbacks::EnumVariantValue
+        _variant_value: bindgen::callbacks::EnumVariantValue,
     ) -> Option<String> {
         let suffix = self.names_to_suffix.get(enum_name?)?;
         Some(original_variant_name.trim_end_matches(suffix).to_string())
@@ -155,7 +151,10 @@ fn main() {
         Ok(ref v) => v.split(PATH_SEPARATOR).map(|x| x.to_owned()).collect(),
         Err(_) => {
             if target.contains("windows") {
-                vec!["CORE_RL_MagickWand_".to_string(), "CORE_RL_MagickCore_".to_string()]
+                vec![
+                    "CORE_RL_MagickWand_".to_string(),
+                    "CORE_RL_MagickCore_".to_string(),
+                ]
             } else if target.contains("freebsd") {
                 vec!["MagickWand-7".to_string()]
             } else {
@@ -257,7 +256,7 @@ fn main() {
         ("StatisticType", "Statistic"),
         ("AutoThresholdMethod", "ThresholdMethod"),
         ("PathType", "Path"),
-        ("NoiseType", "Noise")
+        ("NoiseType", "Noise"),
     ]);
 
     if !Path::new(&bindings_path_str).exists() {
@@ -279,7 +278,9 @@ fn main() {
             .parse_callbacks(Box::new(remove_enum_suffixes))
             .blocklist_type("timex")
             .blocklist_function("clock_adjtime")
-            .default_enum_style(bindgen::EnumVariation::Rust { non_exhaustive: false })
+            .default_enum_style(bindgen::EnumVariation::Rust {
+                non_exhaustive: false,
+            })
             .derive_eq(true);
 
         for d in include_dirs {
@@ -311,7 +312,9 @@ fn main() {
 
 fn env_var_set_default(name: &str, value: &str) {
     if env::var(name).is_err() {
-        unsafe { env::set_var(name, value); }
+        unsafe {
+            env::set_var(name, value);
+        }
     }
 }
 
