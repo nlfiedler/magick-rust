@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-mod geometry_info;
 mod image;
 mod kernel;
+mod geometry_info;
 
 pub use crate::bindings::AlignType;
 pub use crate::bindings::AlphaChannelOption;

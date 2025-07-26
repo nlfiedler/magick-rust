@@ -44,7 +44,7 @@ wand_common!(
 impl PixelWand {
     pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> bool {
         let result = unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) };
-        return result == MagickTrue;
+        result == MagickTrue
     }
 
     pub fn get_hsl(&self) -> HSL {
@@ -69,12 +69,12 @@ impl PixelWand {
     pub fn fmt_w_prefix(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
         let mut prf = prefix.to_string();
         prf.push_str("    ");
-        writeln!(f, "{}PixelWand {{", prefix)?;
+        writeln!(f, "{prefix}PixelWand {{")?;
         writeln!(f, "{}Exception: {:?}", prf, self.get_exception())?;
         writeln!(f, "{}IsWand: {:?}", prf, self.is_wand())?;
         self.fmt_unchecked_settings(f, &prf)?;
         self.fmt_color_settings(f, &prf)?;
-        writeln!(f, "{}}}", prefix)
+        writeln!(f, "{prefix}}}")
     }
 
     pub fn set_color(&mut self, s: &str) -> Result<()> {

@@ -64,18 +64,18 @@ impl MagickWand {
     pub fn new_from_image(img: &Image<'_>) -> Result<MagickWand> {
         let result = unsafe { bindings::NewMagickWandFromImage(img.get_ptr()) };
 
-        return if result.is_null() {
+        if result.is_null() {
             Err(MagickError(
                 "failed to create magick wand from image".to_string(),
             ))
         } else {
             Ok(MagickWand { wand: result })
-        };
+        }
     }
 
     pub fn new_image(&self, columns: usize, rows: usize, background: &PixelWand) -> Result<()> {
         match unsafe {
-            bindings::MagickNewImage(self.wand, columns.into(), rows.into(), background.wand)
+            bindings::MagickNewImage(self.wand, columns, rows, background.wand)
         } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -86,7 +86,7 @@ impl MagickWand {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     pub fn set_resource_limit(resource: ResourceType, limit: u64) -> Result<()> {
         let result = unsafe {
-            bindings::SetMagickResourceLimit(resource.into(), limit as bindings::MagickSizeType)
+            bindings::SetMagickResourceLimit(resource, limit as bindings::MagickSizeType)
         };
         match result {
             MagickTrue => Ok(()),
@@ -144,7 +144,7 @@ impl MagickWand {
         if result.is_null() {
             return Err(MagickError("failed to append image".to_string()));
         }
-        return Ok(MagickWand { wand: result });
+        Ok(MagickWand { wand: result })
     }
 
     pub fn label_image(&self, label: &str) -> Result<()> {
@@ -184,7 +184,7 @@ impl MagickWand {
             bindings::MagickReadImageBlob(
                 self.wand,
                 int_slice.as_ptr() as *const c_void,
-                size.into(),
+                size,
             )
         };
         match result {
@@ -213,7 +213,7 @@ impl MagickWand {
             bindings::MagickPingImageBlob(
                 self.wand,
                 int_slice.as_ptr() as *const c_void,
-                size.into(),
+                size,
             )
         };
         match result {
@@ -239,16 +239,16 @@ impl MagickWand {
     ///     MosaicLayer: Start with the virtual canvas of the first image, enlarging left and right
     ///     edges to contain all images. Images with negative offsets will be clipped.
     pub fn merge_image_layers(&self, method: LayerMethod) -> Result<MagickWand> {
-        let result = unsafe { bindings::MagickMergeImageLayers(self.wand, method.into()) };
+        let result = unsafe { bindings::MagickMergeImageLayers(self.wand, method) };
         if result.is_null() {
             return Err(MagickError("failed to merge image layers".to_string()));
         }
-        return Ok(MagickWand { wand: result });
+        Ok(MagickWand { wand: result })
     }
 
     /// Returns the number of images associated with a magick wand.
     pub fn get_number_images(&self) -> usize {
-        return unsafe { bindings::MagickGetNumberImages(self.wand).into() };
+        unsafe { bindings::MagickGetNumberImages(self.wand) }
     }
 
     /// Compare two images and return tuple `(distortion, diffImage)`
@@ -260,7 +260,7 @@ impl MagickWand {
     ) -> (f64, Option<MagickWand>) {
         let mut distortion: f64 = 0.0;
         let result = unsafe {
-            bindings::MagickCompareImages(self.wand, reference.wand, metric.into(), &mut distortion)
+            bindings::MagickCompareImages(self.wand, reference.wand, metric, &mut distortion)
         };
         let wand = if result.is_null() {
             None
@@ -288,7 +288,7 @@ impl MagickWand {
             bindings::MagickCompositeImage(
                 self.wand,
                 reference.wand,
-                composition_operator.into(),
+                composition_operator,
                 native_clip_to_self,
                 x,
                 y,
@@ -311,8 +311,8 @@ impl MagickWand {
             bindings::MagickCompositeImageGravity(
                 self.wand,
                 reference.wand,
-                composition_operator.into(),
-                gravity_type.into(),
+                composition_operator,
+                gravity_type,
             )
         };
         match result {
@@ -334,7 +334,7 @@ impl MagickWand {
 
     // Replaces colors in the image from a color lookup table.
     pub fn clut_image(&self, clut_wand: &MagickWand, method: PixelInterpolateMethod) -> Result<()> {
-        let result = unsafe { bindings::MagickClutImage(self.wand, clut_wand.wand, method.into()) };
+        let result = unsafe { bindings::MagickClutImage(self.wand, clut_wand.wand, method) };
         match result {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -361,7 +361,7 @@ impl MagickWand {
     }
 
     pub fn set_size(&self, columns: usize, rows: usize) -> Result<()> {
-        let result = unsafe { bindings::MagickSetSize(self.wand, columns.into(), rows.into()) };
+        let result = unsafe { bindings::MagickSetSize(self.wand, columns, rows) };
         match result {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -584,9 +584,9 @@ impl MagickWand {
         match unsafe {
             bindings::MagickStatisticImage(
                 self.wand,
-                statistic_type.into(),
-                width.into(),
-                height.into(),
+                statistic_type,
+                width,
+                height,
             )
         } {
             MagickTrue => Ok(()),
@@ -598,7 +598,7 @@ impl MagickWand {
     ///
     /// See [statistic_image](Self::statistic_image)
     pub fn median_blur_image(&self, width: usize, height: usize) -> Result<()> {
-        return self.statistic_image(StatisticType::Median, width, height);
+        self.statistic_image(StatisticType::Median, width, height)
     }
 
     /// Adaptively resize the currently selected image.
@@ -666,7 +666,7 @@ impl MagickWand {
         let c_value = unsafe { bindings::MagickGetImageArtifact(self.wand, c_artifact.as_ptr()) };
 
         if c_value.is_null() {
-            return Err(MagickError(format!("missing artifact: {}", artifact)));
+            return Err(MagickError(format!("missing artifact: {artifact}")));
         }
         // convert (and copy) the C string to a Rust string
         let value = unsafe { CStr::from_ptr(c_value) }
@@ -761,7 +761,7 @@ impl MagickWand {
 
         match unsafe { bindings::MagickDeleteImageArtifact(self.wand, c_artifact.as_ptr()) } {
             MagickTrue => Ok(()),
-            _ => Err(MagickError(format!("missing artifact: {}", artifact))),
+            _ => Err(MagickError(format!("missing artifact: {artifact}"))),
         }
     }
 
@@ -771,7 +771,7 @@ impl MagickWand {
         let c_value = unsafe { bindings::MagickGetImageProperty(self.wand, c_name.as_ptr()) };
 
         if c_value.is_null() {
-            return Err(MagickError(format!("missing property: {}", name)));
+            return Err(MagickError(format!("missing property: {name}")));
         }
 
         // convert (and copy) the C string to a Rust string
@@ -949,8 +949,7 @@ impl MagickWand {
     ) -> Option<Vec<u8>> {
         let c_map = CString::new(map).ok()?;
         let capacity = width * height * map.len();
-        let mut pixels = Vec::with_capacity(capacity);
-        pixels.resize(capacity, 0);
+        let mut pixels = vec![0; capacity];
 
         unsafe {
             if bindings::MagickExportImagePixels(
@@ -1007,7 +1006,7 @@ impl MagickWand {
     /// specified filter type.
     pub fn resize_image(&self, width: usize, height: usize, filter: FilterType) -> Result<()> {
         match unsafe {
-            bindings::MagickResizeImage(self.wand, width.into(), height.into(), filter.into())
+            bindings::MagickResizeImage(self.wand, width, height, filter)
         } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -1037,14 +1036,14 @@ impl MagickWand {
         let width = ((width as f64) * width_scale) as usize;
         let height = ((height as f64) * height_scale) as usize;
 
-        return self.resize_image(width, height, filter);
+        self.resize_image(width, height, filter)
     }
 
     /// Resize the image to the specified width and height, using the
     /// 'thumbnail' optimizations which remove a lot of image meta-data with the goal
     /// of producing small low cost images suited for display on the web.
     pub fn thumbnail_image(&self, width: usize, height: usize) -> Result<()> {
-        match unsafe { bindings::MagickThumbnailImage(self.wand, width.into(), height.into()) } {
+        match unsafe { bindings::MagickThumbnailImage(self.wand, width, height) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
         }
@@ -1081,7 +1080,7 @@ impl MagickWand {
         filter: FilterType,
     ) -> Result<()> {
         match unsafe {
-            bindings::MagickResampleImage(self.wand, x_resolution, y_resolution, filter.into())
+            bindings::MagickResampleImage(self.wand, x_resolution, y_resolution, filter)
         } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -1106,7 +1105,7 @@ impl MagickWand {
 
     /// Implodes the image towards the center by the specified percentage
     pub fn implode(&self, amount: f64, method: PixelInterpolateMethod) -> Result<()> {
-        match unsafe { bindings::MagickImplodeImage(self.wand, amount, method.into()) } {
+        match unsafe { bindings::MagickImplodeImage(self.wand, amount, method) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
         }
@@ -1135,8 +1134,8 @@ impl MagickWand {
             while bindings::MagickNextImage(self.wand) != MagickFalse {
                 bindings::MagickResizeImage(
                     self.wand,
-                    new_width.into(),
-                    new_height.into(),
+                    new_width,
+                    new_height,
                     FilterType::Lanczos,
                 );
             }
@@ -1146,7 +1145,7 @@ impl MagickWand {
     /// Detect if the loaded image is not in top-left orientation, and
     /// hence should be "auto" oriented so it is suitable for viewing.
     pub fn requires_orientation(&self) -> bool {
-        return self.get_image_orientation() != OrientationType::TopLeft;
+        self.get_image_orientation() != OrientationType::TopLeft
     }
 
     /// Automatically adjusts the loaded image so that its orientation is
@@ -1244,7 +1243,7 @@ impl MagickWand {
     /// * `pixel_mask`: type of mask, Read or Write.
     /// * `clip_mask`: the clip_mask wand.
     pub fn set_image_mask(&mut self, pixel_mask: PixelMask, clip_mask: &MagickWand) -> Result<()> {
-        match unsafe { bindings::MagickSetImageMask(self.wand, pixel_mask.into(), clip_mask.wand) }
+        match unsafe { bindings::MagickSetImageMask(self.wand, pixel_mask, clip_mask.wand) }
         {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -1253,7 +1252,7 @@ impl MagickWand {
 
     /// Set image channel mask
     pub fn set_image_channel_mask(&mut self, option: ChannelType) -> ChannelType {
-        unsafe { bindings::MagickSetImageChannelMask(self.wand, option.into()).into() }
+        unsafe { bindings::MagickSetImageChannelMask(self.wand, option) }
     }
 
     /// Apply an arithmetic, relational, or logical
@@ -1261,7 +1260,7 @@ impl MagickWand {
     /// to increase or decrease contrast in an image, or to produce the "negative"
     /// of an image.
     pub fn evaluate_image(&mut self, op: MagickEvaluateOperator, val: f64) -> Result<()> {
-        let res = unsafe { bindings::MagickEvaluateImage(self.wand, op.into(), val) };
+        let res = unsafe { bindings::MagickEvaluateImage(self.wand, op, val) };
         match res {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -1278,7 +1277,7 @@ impl MagickWand {
         compose: CompositeOperator,
     ) -> Result<()> {
         match unsafe {
-            bindings::MagickBorderImage(self.wand, pixel_wand.wand, width, height, compose.into())
+            bindings::MagickBorderImage(self.wand, pixel_wand.wand, width, height, compose)
         } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -1369,7 +1368,7 @@ impl MagickWand {
     /// Kapur, Otsu, and Triangle methods.
     /// See <https://imagemagick.org/api/magick-image.php#MagickAutoThresholdImage> for more information.
     pub fn auto_threshold(&self, method: AutoThresholdMethod) -> Result<()> {
-        match unsafe { bindings::MagickAutoThresholdImage(self.wand, method.into()) } {
+        match unsafe { bindings::MagickAutoThresholdImage(self.wand, method) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
         }
@@ -1378,7 +1377,7 @@ impl MagickWand {
     /// Set the image colorspace, transforming (unlike `set_image_colorspace`) image data in
     /// the process.
     pub fn transform_image_colorspace(&self, colorspace: ColorspaceType) -> Result<()> {
-        match unsafe { bindings::MagickTransformImageColorspace(self.wand, colorspace.into()) } {
+        match unsafe { bindings::MagickTransformImageColorspace(self.wand, colorspace) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
         }
@@ -1396,10 +1395,10 @@ impl MagickWand {
         match unsafe {
             bindings::MagickQuantizeImage(
                 self.wand,
-                number_of_colors.into(),
-                colorspace.into(),
-                tree_depth.into(),
-                dither_method.into(),
+                number_of_colors,
+                colorspace,
+                tree_depth,
+                dither_method,
                 measure_error.into(),
             )
         } {
@@ -1420,10 +1419,10 @@ impl MagickWand {
         match unsafe {
             bindings::MagickQuantizeImages(
                 self.wand,
-                number_of_colors.into(),
-                colorspace.into(),
-                tree_depth.into(),
-                dither_method.into(),
+                number_of_colors,
+                colorspace,
+                tree_depth,
+                dither_method,
                 measure_error.into(),
             )
         } {
@@ -1458,9 +1457,9 @@ impl MagickWand {
     /// }
     /// ```
     pub fn function_image(&self, function: MagickFunction, args: &[f64]) -> Result<()> {
-        let num_of_args: size_t = args.len().into();
+        let num_of_args: size_t = args.len();
         match unsafe {
-            bindings::MagickFunctionImage(self.wand, function.into(), num_of_args, args.as_ptr())
+            bindings::MagickFunctionImage(self.wand, function, num_of_args, args.as_ptr())
         } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -1475,7 +1474,7 @@ impl MagickWand {
         if terms.len() & 1 != 1 {
             return Err(MagickError("no constant coefficient given".to_string()));
         }
-        let num_of_terms: size_t = (terms.len() >> 1).into();
+        let num_of_terms: size_t = terms.len() >> 1;
         match unsafe { bindings::MagickPolynomialImage(self.wand, num_of_terms, terms.as_ptr()) } {
             MagickTrue => Ok(()),
             _ => Err(MagickError(self.get_exception()?.0)),
@@ -1506,8 +1505,8 @@ impl MagickWand {
         match unsafe {
             bindings::MagickMorphologyImage(
                 self.wand,
-                morphology_method.into(),
-                iterations.into(),
+                morphology_method,
+                iterations,
                 kernel_info.get_ptr(),
             )
         } {
@@ -1548,11 +1547,11 @@ impl MagickWand {
 
         let result = unsafe { bindings::MagickChannelFxImage(self.wand, c_expression.as_ptr()) };
 
-        return if result.is_null() {
+        if result.is_null() {
             Err(MagickError(self.get_exception()?.0))
         } else {
             Ok(MagickWand { wand: result })
-        };
+        }
     }
 
     /// Combines one or more images into a single image. The grayscale value of the pixels of each
@@ -1561,24 +1560,24 @@ impl MagickWand {
     ///
     /// * `colorspace`: the colorspace.
     pub fn combine_images(&self, colorspace: ColorspaceType) -> Result<MagickWand> {
-        let result = unsafe { bindings::MagickCombineImages(self.wand, colorspace.into()) };
+        let result = unsafe { bindings::MagickCombineImages(self.wand, colorspace) };
 
-        return if result.is_null() {
+        if result.is_null() {
             Err(MagickError(self.get_exception()?.0))
         } else {
             Ok(MagickWand { wand: result })
-        };
+        }
     }
 
     /// Returns the current image from the magick wand.
     pub fn get_image<'wand>(&'wand self) -> Result<Image<'wand>> {
         let result = unsafe { bindings::GetImageFromMagickWand(self.wand) };
 
-        return if result.is_null() {
+        if result.is_null() {
             Err(MagickError(self.get_exception()?.0))
         } else {
             unsafe { Ok(Image::new(result)) }
-        };
+        }
     }
 
     mutations!(
