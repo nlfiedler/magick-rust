@@ -9,6 +9,8 @@ readme = "README.md"
 license = "Apache-2.0"
 keywords = ["magickwand", "imagemagick"]
 build = "build.rs"
+edition = "2024"
+rust-version = "1.85"
 exclude = [
     ".github/*",
     "docker/*",
@@ -19,7 +21,7 @@ exclude = [
 libc = "0.2"
 
 [build-dependencies]
-bindgen = "0.69.4"
+bindgen = "0.72.0"
 pkg-config = "0.3"
 
 [features]

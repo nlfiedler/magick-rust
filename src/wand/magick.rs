@@ -20,10 +20,10 @@ use libc::c_void;
 #[cfg(target_os = "freebsd")]
 use libc::size_t;
 
-use bindings;
-use result::MagickError;
+use crate::bindings;
+use crate::result::MagickError;
 #[cfg(not(target_os = "freebsd"))]
-use size_t;
+use crate::size_t;
 
 use super::{MagickFalse, MagickTrue};
 use crate::result::Result;

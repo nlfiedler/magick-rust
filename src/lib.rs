@@ -34,10 +34,10 @@ extern crate libc;
 
 use libc::size_t;
 
-pub use result::MagickError;
-use result::Result;
-pub use types::*;
-pub use wand::*;
+pub use crate::result::MagickError;
+use crate::result::Result;
+pub use crate::types::*;
+pub use crate::wand::*;
 
 mod conversions;
 mod result;
