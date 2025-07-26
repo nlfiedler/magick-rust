@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [1.1.0] - 2025-07-26
+### Changed
+- keithstrydom: set Rust edition to 2024, MSRV is now 1.85.
+- keithstrydom: update `bindgen` to 0.72.0
+- keithstrydom: changed `GeometryInfo` from being a type alias to a tuple struct.
+
 ## [1.0.0] - 2024-05-25
 ### Added
 - An example! After 9 years, finally an example.
