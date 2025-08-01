@@ -28,10 +28,9 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-#![allow(improper_ctypes)] // the siginfo_t in waitid() definition in bindings.rs
 
-extern crate libc;
-
+use std::ffi::{CStr, CString};
+use std::slice::from_raw_parts;
 use libc::size_t;
 
 pub use crate::result::MagickError;
@@ -49,9 +48,8 @@ include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 /// are attempted. This function is safe to be called repeatedly.
 pub fn magick_wand_genesis() {
     unsafe {
-        match bindings::IsMagickWandInstantiated() {
-            bindings::MagickBooleanType::MagickTrue => (),
-            _ => bindings::MagickWandGenesis(),
+        if bindings::IsMagickWandInstantiated() == bindings::MagickBooleanType::MagickFalse {
+            bindings::MagickWandGenesis()
         }
     }
 }
@@ -60,7 +58,7 @@ pub fn magick_wand_genesis() {
 /// This function is safe to be called repeatedly.
 pub fn magick_wand_terminus() {
     unsafe {
-        if let bindings::MagickBooleanType::MagickTrue = bindings::IsMagickWandInstantiated() {
+        if  bindings::IsMagickWandInstantiated() == bindings::MagickBooleanType::MagickTrue{
             bindings::MagickWandTerminus();
         }
     }
@@ -68,7 +66,7 @@ pub fn magick_wand_terminus() {
 
 pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>> {
     let mut number_fonts: size_t = 0;
-    let c_string = std::ffi::CString::new(pattern).map_err(|_| "could not convert to cstring")?;
+    let c_string = CString::new(pattern).map_err(|_| "could not convert to cstring")?;
     let ptr =
         unsafe { bindings::MagickQueryFonts(c_string.as_ptr(), &mut number_fonts as *mut size_t) };
     if ptr.is_null() {
@@ -77,9 +75,9 @@ pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>> {
         ))
     } else {
         let mut v = Vec::new();
-        let c_str_ptr_slice = unsafe { std::slice::from_raw_parts(ptr, number_fonts as usize) };
+        let c_str_ptr_slice = unsafe { from_raw_parts(ptr, number_fonts as usize) };
         for c_str_ptr in c_str_ptr_slice {
-            let c_str = unsafe { std::ffi::CStr::from_ptr(*c_str_ptr) };
+            let c_str = unsafe { CStr::from_ptr(*c_str_ptr) };
             v.push(c_str.to_string_lossy().into_owned())
         }
         Ok(v)

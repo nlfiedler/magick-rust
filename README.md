@@ -63,4 +63,6 @@ docker compose run magick-rust
 cargo clean
 cargo build
 cargo test
+exit
+docker compose down
 ```

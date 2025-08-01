@@ -1,4 +1,3 @@
-extern crate magick_rust;
 use magick_rust::{CompositeOperator, MagickError, MagickWand, PixelWand, magick_wand_genesis};
 use std::fs;
 use std::sync::Once;

@@ -1,7 +1,6 @@
 //
 // Copyright (c) 2024 Nathan Fiedler
 //
-extern crate magick_rust;
 use magick_rust::{MagickError, MagickWand, magick_wand_genesis};
 use std::fs;
 use std::sync::Once;

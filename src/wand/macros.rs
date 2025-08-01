@@ -22,6 +22,12 @@ macro_rules! wand_common {
             pub wand: *mut crate::bindings::$wand,
         }
 
+        impl Default for $wand {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+
         impl $wand {
             pub fn new() -> Self {
                 $wand {

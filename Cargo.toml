@@ -30,3 +30,6 @@ pkg-config = "0.3"
 default = ["disable-hdri"]
 # Workaround for bindgen bug when ImageMagick is compiled with disable-hdri
 disable-hdri = []
+
+[lints.clippy]
+missing_safety_doc =  { level = "allow" }
