@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use crate::bindings;
+use crate::{GeometryInfo, KernelInfoType, bindings};
 use crate::{MagickError, Result};
 use std::ffi::CString;
 
@@ -75,8 +75,8 @@ pub struct KernelBuilder {
     center: Option<(usize, usize)>,
     values: Option<Vec<f64>>,
 
-    info_type: Option<crate::KernelInfoType>,
-    geom_info: Option<crate::GeometryInfo>,
+    info_type: Option<KernelInfoType>,
+    geom_info: Option<GeometryInfo>,
 }
 
 impl KernelBuilder {
@@ -164,11 +164,7 @@ impl KernelBuilder {
 
         // Create kernel info
         let kernel_info = unsafe {
-            bindings::AcquireKernelBuiltIn(
-                info_type.into(),
-                geom_info.inner(),
-                std::ptr::null_mut(),
-            )
+            bindings::AcquireKernelBuiltIn(info_type, geom_info.inner(), std::ptr::null_mut())
         };
 
         if kernel_info.is_null() {

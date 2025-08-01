@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-extern crate bindgen;
-extern crate pkg_config;
 
 use std::collections::{HashMap, HashSet};
 use std::env;
@@ -52,12 +50,8 @@ struct IgnoreMacros {
     macros_to_ignore: HashSet<String>,
 }
 
-impl IgnoreMacros {
-    fn from_iter<S, I>(macro_names: I) -> Self
-    where
-        S: Into<String>,
-        I: IntoIterator<Item = S>,
-    {
+impl<S: Into<String>> FromIterator<S> for IgnoreMacros {
+    fn from_iter<T: IntoIterator<Item=S>>(macro_names: T) -> Self {
         let mut macros_to_ignore = HashSet::new();
         for macro_name in macro_names {
             macros_to_ignore.insert(macro_name.into());
@@ -81,17 +75,12 @@ struct RemoveEnumVariantSuffixes {
     names_to_suffix: HashMap<String, String>,
 }
 
-impl RemoveEnumVariantSuffixes {
-    fn from_iter<S, I>(enum_suffix_pairs: I) -> Self
-    where
-        S: Into<String>,
-        I: IntoIterator<Item = (S, S)>,
-    {
+impl<S: Into<String>> FromIterator<(S, S)> for RemoveEnumVariantSuffixes {
+    fn from_iter<T: IntoIterator<Item=(S, S)>>(enum_suffix_pairs: T) -> Self {
         let mut names_to_suffix = HashMap::new();
         for (enum_name, variant_suffix) in enum_suffix_pairs {
             names_to_suffix.insert(enum_name.into(), variant_suffix.into());
         }
-
         Self { names_to_suffix }
     }
 }
@@ -271,7 +260,8 @@ fn main() {
         let mut builder = bindgen::Builder::default()
             .emit_builtins()
             .ctypes_prefix("libc")
-            .raw_line("extern crate libc;")
+            .raw_line("#![allow(clippy::all)]")
+            .raw_line("use libc;")
             .header(gen_h_path.to_str().unwrap())
             .size_t_is_usize(true)
             .parse_callbacks(Box::new(ignored_macros))

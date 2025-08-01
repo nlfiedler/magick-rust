@@ -14,20 +14,33 @@
  * limitations under the License.
  */
 
-extern crate magick_rust;
+mod fixtures;
 
 use std::error::Error;
-use std::fs::File;
 use std::io::Read;
-use std::path::Path;
 use std::sync::Once;
 
 use magick_rust::MagickError;
-use magick_rust::{MagickWand, PixelWand, magick_wand_genesis};
+use magick_rust::{magick_wand_genesis, MagickWand, PixelWand};
+use crate::fixtures::{ALL_FIXTURES, IMG_5745_JPG, IMG_5745_ROTL_JPG, RUST_GIF, RUST_PNG, RUST_SVG};
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.
 static START: Once = Once::new();
+
+#[test]
+fn test_opening_all_fixtures_and_their_widths_and_heights() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+
+    for fixture in ALL_FIXTURES.iter() {
+        let wand = MagickWand::new();
+        fixture.read_image(&wand);
+        fixture.assert_width(&wand);
+        fixture.assert_height(&wand);
+    }
+}
 
 #[test]
 fn test_new_drop() {
@@ -43,19 +56,20 @@ fn test_resize_image() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
-    assert_eq!(512, wand.get_image_width());
-    assert_eq!(384, wand.get_image_height());
-    let halfwidth = match wand.get_image_width() {
+    IMG_5745_JPG.read_image(&wand);
+    IMG_5745_JPG.assert_width(&wand);
+    IMG_5745_JPG.assert_height(&wand);
+
+    let half_width = match wand.get_image_width() {
         1 => 1,
         width => width / 2,
     };
-    let halfheight = match wand.get_image_height() {
+    let half_height = match wand.get_image_height() {
         1 => 1,
         height => height / 2,
     };
     assert!(
-        wand.resize_image(halfwidth, halfheight, magick_rust::FilterType::Lanczos)
+        wand.resize_image(half_width, half_height, magick_rust::FilterType::Lanczos)
             .is_ok()
     );
     assert_eq!(256, wand.get_image_width());
@@ -68,9 +82,9 @@ fn test_thumbnail_image() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
-    assert_eq!(512, wand.get_image_width());
-    assert_eq!(384, wand.get_image_height());
+    IMG_5745_JPG.read_image(&wand);
+    IMG_5745_JPG.assert_width(&wand);
+    IMG_5745_JPG.assert_height(&wand);
     let halfwidth = match wand.get_image_width() {
         1 => 1,
         width => width / 2,
@@ -91,15 +105,10 @@ fn test_read_from_blob() {
     });
     let wand = MagickWand::new();
 
-    let path = Path::new("tests/fixtures/IMG_5745.JPG");
-    let mut file = match File::open(&path) {
-        Err(why) => panic!("couldn't open file: {}", <dyn Error>::to_string(&why)),
-        Ok(file) => file,
-    };
+    let mut file = IMG_5745_JPG.file();
     let mut data: Vec<u8> = Vec::new();
-    match file.read_to_end(&mut data) {
-        Err(why) => panic!("couldn't read file: {}", <dyn Error>::to_string(&why)),
-        Ok(_) => (),
+    if let Err(why) = file.read_to_end(&mut data) {
+        panic!("couldn't read file: {}", <dyn Error>::to_string(&why))
     };
     assert!(wand.read_image_blob(&data).is_ok());
     assert_eq!(512, wand.get_image_width());
@@ -112,9 +121,9 @@ fn test_write_image_to_blob() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
-    assert_eq!(512, wand.get_image_width());
-    assert_eq!(384, wand.get_image_height());
+    IMG_5745_JPG.read_image(&wand);
+    IMG_5745_JPG.assert_width(&wand);
+    IMG_5745_JPG.assert_height(&wand);
     let blob = wand.write_image_blob("jpeg").unwrap();
     let blob_len = blob.len();
     // There is a slight degree of variability from platform to platform,
@@ -122,7 +131,8 @@ fn test_write_image_to_blob() {
     assert!(blob_len > 103000 && blob_len < 105000);
     // should be able to read it back again
     assert!(wand.read_image_blob(&blob).is_ok());
-    assert_eq!(512, wand.get_image_width());
+    IMG_5745_JPG.assert_width(&wand);
+
     assert_eq!(384, wand.get_image_height());
 }
 
@@ -132,9 +142,9 @@ fn test_write_images_to_blob() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
-    assert_eq!(512, wand.get_image_width());
-    assert_eq!(384, wand.get_image_height());
+    IMG_5745_JPG.read_image(&wand);
+    IMG_5745_JPG.assert_width(&wand);
+    IMG_5745_JPG.assert_height(&wand);
     let blob = wand.write_images_blob("jpeg").unwrap();
     let blob_len = blob.len();
     // There is a slight degree of variability from platform to platform,
@@ -152,9 +162,9 @@ fn test_fit() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
-    assert_eq!(512, wand.get_image_width());
-    assert_eq!(384, wand.get_image_height());
+    IMG_5745_JPG.read_image(&wand);
+    IMG_5745_JPG.assert_width(&wand);
+    IMG_5745_JPG.assert_height(&wand);
     wand.fit(240, 240);
     assert_eq!(240, wand.get_image_width());
     assert_eq!(180, wand.get_image_height());
@@ -166,7 +176,7 @@ fn test_get_image_property() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
+    IMG_5745_JPG.read_image(&wand);
     // retrieve a property we know exists
     let found_value = wand.get_image_property("exif:DateTimeOriginal");
     assert!(found_value.is_ok());
@@ -186,8 +196,8 @@ fn test_requires_orientation() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
-    assert_eq!(false, wand.requires_orientation());
+    IMG_5745_JPG.read_image(&wand);
+    assert!(!wand.requires_orientation());
 }
 
 #[test]
@@ -196,10 +206,10 @@ fn test_auto_orient() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745_rotl.JPG").is_ok());
-    assert_eq!(true, wand.requires_orientation());
+    IMG_5745_ROTL_JPG.read_image(&wand);
+    assert!(wand.requires_orientation());
     assert!(wand.auto_orient());
-    assert_eq!(false, wand.requires_orientation());
+    assert!(!wand.requires_orientation());
 }
 
 #[test]
@@ -208,10 +218,10 @@ fn test_compare_images() {
         magick_wand_genesis();
     });
     let wand1 = MagickWand::new();
-    assert!(wand1.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
+    IMG_5745_JPG.read_image(&wand1);
 
     let wand2 = MagickWand::new();
-    assert!(wand2.read_image("tests/fixtures/IMG_5745_rotl.JPG").is_ok());
+    IMG_5745_ROTL_JPG.read_image(&wand2);
     wand2.auto_orient();
 
     let (distortion, diff) = wand1.compare_images(&wand2, magick_rust::MetricType::RootMeanSquared);
@@ -225,7 +235,7 @@ fn test_set_option() {
         magick_wand_genesis();
     });
     let mut wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
+    IMG_5745_JPG.read_image(&wand);
     // The jpeg:size option is just a hint.
     wand.set_option("jpeg:size", "128x128").unwrap();
     let blob = wand.write_image_blob("jpeg").unwrap();
@@ -240,10 +250,10 @@ fn test_page_geometry() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/rust.gif").is_ok());
+    RUST_GIF.read_image(&wand);
     assert_eq!((156, 150, 39, 36), wand.get_image_page()); /* width, height, x offset, y offset */
-    assert_eq!(80, wand.get_image_width());
-    assert_eq!(76, wand.get_image_height());
+    RUST_GIF.assert_width(&wand);
+    RUST_GIF.assert_height(&wand);
 }
 
 #[test]
@@ -252,7 +262,7 @@ fn test_transform_image_colorspace() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
+    IMG_5745_JPG.read_image(&wand);
     assert_eq!(
         wand.get_image_colorspace(),
         magick_rust::ColorspaceType::sRGB
@@ -287,7 +297,7 @@ fn test_color_reduction() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
+    IMG_5745_JPG.read_image(&wand);
     // There is a slight degree of variability from platform to platform,
     // and version to version of ImageMagick.
     let image_colors = wand.get_image_colors();
@@ -320,7 +330,7 @@ fn test_set_image_background_color() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/rust.png").is_ok());
+    RUST_PNG.read_image(&wand);
     let mut pw = PixelWand::new();
     pw.set_color("#0000FF").unwrap();
     wand.set_image_background_color(&pw).unwrap();
@@ -341,7 +351,7 @@ fn test_set_background_color() {
     let mut pw = PixelWand::new();
     pw.set_color("none").unwrap();
     wand.set_background_color(&pw).unwrap();
-    assert!(wand.read_image("tests/fixtures/rust.svg").is_ok());
+    RUST_SVG.read_image(&wand);
     let blob = wand.write_image_blob("rgba").unwrap();
     assert_eq!(0u8, blob[0]);
     assert_eq!(0u8, blob[1]);
@@ -361,7 +371,7 @@ fn test_clut_image() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
+    IMG_5745_JPG.read_image(&wand);
 
     let mut gradient = MagickWand::new();
     assert!(gradient.set_size(128, 20).is_ok());
@@ -380,7 +390,7 @@ fn test_negate_image() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/rust.png").is_ok());
+    RUST_PNG.read_image(&wand);
     wand.negate_image().unwrap();
     let pixel_color = wand.get_image_pixel_color(0, 0).unwrap();
     assert_eq!(
@@ -399,7 +409,7 @@ fn test_resource_limits() {
     });
     MagickWand::set_resource_limit(ResourceType::Thread, 1).unwrap();
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/rust.png").is_ok());
+    RUST_PNG.read_image(&wand);
 }
 
 #[test]
@@ -408,7 +418,7 @@ fn test_auto_level() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
+    IMG_5745_JPG.read_image(&wand);
     assert!(wand.auto_level().is_ok());
 }
 
@@ -418,7 +428,7 @@ fn test_auto_gamma() {
         magick_wand_genesis();
     });
     let wand = MagickWand::new();
-    assert!(wand.read_image("tests/fixtures/IMG_5745.JPG").is_ok());
+    IMG_5745_JPG.read_image(&wand);
     assert!(wand.auto_gamma().is_ok());
 }
 
