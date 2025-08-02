@@ -84,9 +84,6 @@ impl MagickWand {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     pub fn set_resource_limit(resource: ResourceType, limit: u64) -> Result<()> {
         let result = unsafe {
-            // Note: `MagickSetResourceLimit` wraps a call to `SetMagickResourceLimit`
-            // in ImageMagick, but preferring `MagickSetResourceLimit` as the call
-            // because `SetMagickResourceLimit` is not  in its published API documentation.
             bindings::MagickSetResourceLimit(resource, limit as bindings::MagickSizeType)
         };
         match result {
