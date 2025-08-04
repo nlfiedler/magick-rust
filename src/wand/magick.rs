@@ -220,14 +220,14 @@ impl MagickWand {
     /// using the given composition that has been assigned to each individual image.
     ///
     /// * `method`: the method of selecting the size of the initial canvas.
-    ///     MergeLayer: Merge all layers onto a canvas just large enough to hold all the actual
-    ///     images. The virtual canvas of the first image is preserved but otherwise ignored.
+    ///   MergeLayer: Merge all layers onto a canvas just large enough to hold all the actual
+    ///   images. The virtual canvas of the first image is preserved but otherwise ignored.
     ///
     ///     FlattenLayer: Use the virtual canvas size of first image. Images which fall outside
-    ///     this canvas is clipped. This can be used to 'fill out' a given virtual canvas.
+    ///   this canvas is clipped. This can be used to 'fill out' a given virtual canvas.
     ///
     ///     MosaicLayer: Start with the virtual canvas of the first image, enlarging left and right
-    ///     edges to contain all images. Images with negative offsets will be clipped.
+    ///   edges to contain all images. Images with negative offsets will be clipped.
     pub fn merge_image_layers(&self, method: LayerMethod) -> Result<MagickWand> {
         let result = unsafe { bindings::MagickMergeImageLayers(self.wand, method) };
         if result.is_null() {

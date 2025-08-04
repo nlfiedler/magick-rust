@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-extern crate bindgen;
-extern crate pkg_config;
 
 use std::collections::{HashMap, HashSet};
 use std::env;
@@ -42,9 +40,10 @@ typedef long ssize_t;
 static HEADER: &str = "#include <MagickWand/MagickWand.h>\n";
 
 //on windows path env always contain : like c:
-pub const PATH_SEPARATOR: &str = match cfg!(target_os = "windows") {
-    true => ";",
-    _ => ":",
+pub const PATH_SEPARATOR: &str = if cfg!(target_os = "windows") {
+    ";"
+} else {
+    ":"
 };
 
 #[derive(Debug)]
@@ -52,12 +51,8 @@ struct IgnoreMacros {
     macros_to_ignore: HashSet<String>,
 }
 
-impl IgnoreMacros {
-    fn from_iter<S, I>(macro_names: I) -> Self
-    where
-        S: Into<String>,
-        I: IntoIterator<Item = S>,
-    {
+impl<S: Into<String>> FromIterator<S> for IgnoreMacros {
+    fn from_iter<T: IntoIterator<Item = S>>(macro_names: T) -> Self {
         let mut macros_to_ignore = HashSet::new();
         for macro_name in macro_names {
             macros_to_ignore.insert(macro_name.into());
@@ -81,17 +76,12 @@ struct RemoveEnumVariantSuffixes {
     names_to_suffix: HashMap<String, String>,
 }
 
-impl RemoveEnumVariantSuffixes {
-    fn from_iter<S, I>(enum_suffix_pairs: I) -> Self
-    where
-        S: Into<String>,
-        I: IntoIterator<Item = (S, S)>,
-    {
+impl<S: Into<String>> FromIterator<(S, S)> for RemoveEnumVariantSuffixes {
+    fn from_iter<T: IntoIterator<Item = (S, S)>>(enum_suffix_pairs: T) -> Self {
         let mut names_to_suffix = HashMap::new();
         for (enum_name, variant_suffix) in enum_suffix_pairs {
             names_to_suffix.insert(enum_name.into(), variant_suffix.into());
         }
-
         Self { names_to_suffix }
     }
 }
@@ -108,6 +98,7 @@ impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffixes {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let check_cppflags = Command::new("MagickCore-config")
         .arg("--cppflags")
@@ -125,30 +116,30 @@ fn main() {
 
     let lib_dirs = find_image_magick_lib_dirs();
     for d in &lib_dirs {
-        if !d.exists() {
-            panic!(
-                "ImageMagick library directory does not exist: {}",
-                d.to_string_lossy()
-            );
-        }
+        assert!(
+            d.exists(),
+            "ImageMagick library directory does not exist: {}",
+            d.to_string_lossy()
+        );
         println!("cargo:rustc-link-search=native={}", d.to_string_lossy());
     }
+
     let include_dirs = find_image_magick_include_dirs();
     for d in &include_dirs {
-        if !d.exists() {
-            panic!(
-                "ImageMagick include directory does not exist: {}",
-                d.to_string_lossy()
-            );
-        }
+        assert!(
+            d.exists(),
+            "ImageMagick include directory does not exist: {}",
+            d.to_string_lossy()
+        );
         println!("cargo:include={}", d.to_string_lossy());
     }
+
     println!("cargo:rerun-if-env-changed=IMAGE_MAGICK_LIBS");
 
     let target = env::var("TARGET").unwrap();
     let libs_env = env::var("IMAGE_MAGICK_LIBS");
     let libs = match libs_env {
-        Ok(ref v) => v.split(PATH_SEPARATOR).map(|x| x.to_owned()).collect(),
+        Ok(ref v) => v.split(PATH_SEPARATOR).map(ToOwned::to_owned).collect(),
         Err(_) => {
             if target.contains("windows") {
                 vec![
@@ -164,7 +155,7 @@ fn main() {
     };
 
     let kind = determine_mode(&lib_dirs, libs.as_slice());
-    for lib in libs.into_iter() {
+    for lib in libs {
         println!("cargo:rustc-link-lib={kind}={lib}");
     }
 
@@ -271,7 +262,8 @@ fn main() {
         let mut builder = bindgen::Builder::default()
             .emit_builtins()
             .ctypes_prefix("libc")
-            .raw_line("extern crate libc;")
+            .raw_line("#![allow(clippy::all)]")
+            .raw_line("use libc;")
             .header(gen_h_path.to_str().unwrap())
             .size_t_is_usize(true)
             .parse_callbacks(Box::new(ignored_macros))
