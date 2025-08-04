@@ -80,11 +80,11 @@ impl MagickWand {
         }
     }
 
-    // opt-in platforms that have resource limits support
+    /// opt-in platforms that have resource limits support
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     pub fn set_resource_limit(resource: ResourceType, limit: u64) -> Result<()> {
         let result = unsafe {
-            bindings::SetMagickResourceLimit(resource, limit as bindings::MagickSizeType)
+            bindings::MagickSetResourceLimit(resource, limit as bindings::MagickSizeType)
         };
         match result {
             MagickTrue => Ok(()),
@@ -322,7 +322,7 @@ impl MagickWand {
         }
     }
 
-    // Replaces colors in the image from a color lookup table.
+    /// Replaces colors in the image from a color lookup table.
     pub fn clut_image(&self, clut_wand: &MagickWand, method: PixelInterpolateMethod) -> Result<()> {
         let result = unsafe { bindings::MagickClutImage(self.wand, clut_wand.wand, method) };
         match result {
@@ -358,15 +358,15 @@ impl MagickWand {
         }
     }
 
-    // Define two 'quantum_range' functions because the bindings::QuantumRange symbol
-    // is not available if hdri is disabled in the compiled ImageMagick libs
+    /// Define two 'quantum_range' functions because the bindings::QuantumRange symbol
+    /// is not available if hdri is disabled in the compiled ImageMagick libs
     #[cfg(not(feature = "disable-hdri"))]
     fn quantum_range(&self) -> Result<f64> {
         Ok(bindings::QuantumRange)
     }
 
-    // with disable-hdri enabled we define our own quantum_range
-    // values lifted directly from magick-type.h
+    /// with disable-hdri enabled we define our own quantum_range
+    /// values lifted directly from magick-type.h
     #[cfg(feature = "disable-hdri")]
     fn quantum_range(&self) -> Result<f64> {
         match bindings::MAGICKCORE_QUANTUM_DEPTH {
@@ -380,8 +380,8 @@ impl MagickWand {
         }
     }
 
-    // Level an image. Black and white points are multiplied with QuantumRange to
-    // decrease dependencies on the end user.
+    /// Level an image. Black and white points are multiplied with QuantumRange to
+    /// decrease dependencies on the end user.
     pub fn level_image(&self, black_point: f64, gamma: f64, white_point: f64) -> Result<()> {
         let quantum_range = self.quantum_range()?;
 
@@ -419,8 +419,8 @@ impl MagickWand {
         }
     }
 
-    //MagickNormalizeImage enhances the contrast of a color image by adjusting the pixels color
-    //to span the entire range of colors available
+    /// MagickNormalizeImage enhances the contrast of a color image by adjusting the pixels color
+    /// to span the entire range of colors available
     pub fn normalize_image(&self) -> Result<()> {
         let result = unsafe { bindings::MagickNormalizeImage(self.wand) };
         match result {
@@ -429,9 +429,9 @@ impl MagickWand {
         }
     }
 
-    //MagickOrderedDitherImage performs an ordered dither based on a number of pre-defined
-    //dithering threshold maps, but over multiple intensity levels, which can be different for
-    //different channels, according to the input arguments.
+    /// MagickOrderedDitherImage performs an ordered dither based on a number of pre-defined
+    /// dithering threshold maps, but over multiple intensity levels, which can be different for
+    /// different channels, according to the input arguments.
     pub fn ordered_dither_image(&self, threshold_map: &str) -> Result<()> {
         let c_threshold_map =
             CString::new(threshold_map).map_err(|_| "threshold_map string contains null byte")?;
