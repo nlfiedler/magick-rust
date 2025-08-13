@@ -20,9 +20,11 @@ use std::error::Error;
 use std::io::Read;
 use std::sync::Once;
 
+use crate::fixtures::{
+    ALL_FIXTURES, IMG_5745_JPG, IMG_5745_ROTL_JPG, RUST_GIF, RUST_PNG, RUST_SVG,
+};
 use magick_rust::MagickError;
-use magick_rust::{magick_wand_genesis, MagickWand, PixelWand};
-use crate::fixtures::{ALL_FIXTURES, IMG_5745_JPG, IMG_5745_ROTL_JPG, RUST_GIF, RUST_PNG, RUST_SVG};
+use magick_rust::{MagickWand, PixelWand, magick_wand_genesis};
 
 // Used to make sure MagickWand is initialized exactly once. Note that we
 // do not bother shutting down, we simply exit when the tests are done.

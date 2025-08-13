@@ -1,6 +1,6 @@
+use magick_rust::MagickWand;
 use std::fs::File;
 use std::path::PathBuf;
-use magick_rust::MagickWand;
 
 pub struct Fixture {
     filename: &'static str,
@@ -39,11 +39,21 @@ impl Fixture {
     }
 
     pub fn assert_width(&self, wand: &MagickWand) {
-        assert_eq!(self.width, wand.get_image_width(), "width mismatch in image {}", self.filename);
+        assert_eq!(
+            self.width,
+            wand.get_image_width(),
+            "width mismatch in image {}",
+            self.filename
+        );
     }
 
     pub fn assert_height(&self, wand: &MagickWand) {
-        assert_eq!(self.height, wand.get_image_height(), "height mismatch in image {}", self.filename);
+        assert_eq!(
+            self.height,
+            wand.get_image_height(),
+            "height mismatch in image {}",
+            self.filename
+        );
     }
 }
 
@@ -53,4 +63,10 @@ pub const RUST_PNG: Fixture = Fixture::new("rust.png", 240, 240);
 pub const RUST_GIF: Fixture = Fixture::new("rust.gif", 80, 76);
 pub const RUST_SVG: Fixture = Fixture::new("rust.svg", 144, 144);
 
-pub const ALL_FIXTURES: [Fixture; 5] = [IMG_5745_JPG, IMG_5745_ROTL_JPG, RUST_PNG, RUST_GIF, RUST_SVG];
+pub const ALL_FIXTURES: [Fixture; 5] = [
+    IMG_5745_JPG,
+    IMG_5745_ROTL_JPG,
+    RUST_PNG,
+    RUST_GIF,
+    RUST_SVG,
+];

@@ -29,9 +29,9 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
+use libc::size_t;
 use std::ffi::{CStr, CString};
 use std::slice::from_raw_parts;
-use libc::size_t;
 
 pub use crate::result::MagickError;
 use crate::result::Result;
@@ -58,7 +58,7 @@ pub fn magick_wand_genesis() {
 /// This function is safe to be called repeatedly.
 pub fn magick_wand_terminus() {
     unsafe {
-        if  bindings::IsMagickWandInstantiated() == bindings::MagickBooleanType::MagickTrue{
+        if bindings::IsMagickWandInstantiated() == bindings::MagickBooleanType::MagickTrue {
             bindings::MagickWandTerminus();
         }
     }
