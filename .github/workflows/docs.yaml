@@ -33,7 +33,7 @@ jobs:
           cargo doc --no-deps
           cp .github/static-files/index.html target/doc/
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./target/doc
 
@@ -49,6 +49,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
-
-
-
