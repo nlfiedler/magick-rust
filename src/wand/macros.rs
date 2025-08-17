@@ -39,6 +39,12 @@ macro_rules! wand_common {
                 $wand { wand }
             }
 
+            fn from_ptr(ptr: *mut crate::bindings::$wand) -> Self {
+                $wand {
+                    wand: ptr
+                }
+            }
+
             fn clear(&mut self) {
                 unsafe { crate::bindings::$clear_wand(self.wand) }
             }
