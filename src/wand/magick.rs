@@ -315,8 +315,8 @@ impl MagickWand {
             16 => Ok(65535.0f64),
             32 => Ok(4294967295.0f64),
             64 => Ok(18446744073709551615.0f64),
-            _ => Err(MagickError::from(
-                "Quantum depth must be one of 8, 16, 32 or 64",
+            _ => Err(MagickError(
+                "Quantum depth must be one of 8, 16, 32 or 64".to_string(),
             )),
         }
     }
@@ -545,7 +545,7 @@ impl MagickWand {
 
     pub fn get_image_artifacts(&self, pattern: &str) -> Result<Vec<String>> {
         let c_pattern = CString::new(pattern)
-            .map_err(|_| MagickError::from("artifact string contains null byte"))?;
+            .map_err(|_| MagickError("artifact string contains null byte".to_string()))?;
         let mut num_of_artifacts: size_t = 0;
 
         let c_values = unsafe {
