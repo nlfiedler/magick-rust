@@ -23,7 +23,7 @@ pub struct Image<'a> {
 }
 
 impl Image<'_> {
-    pub fn new(img: *mut bindings::Image) -> Self {
+    pub (crate) fn new(img: *mut bindings::Image) -> Self {
         // SAFETY: This is safe and also does not require an Image::drop() call as:
         //         The lifetime of Image is the same as the lifetime of wrapped bindings::Image.
         //         The bindings::Image is borrowed by the caller from MagickWand.
@@ -35,7 +35,7 @@ impl Image<'_> {
         }
     }
 
-    pub unsafe fn get_ptr(&self) -> *mut bindings::Image {
+    pub (crate) unsafe fn get_ptr(&self) -> *mut bindings::Image {
         self.image
     }
 }
