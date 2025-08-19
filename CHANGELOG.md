@@ -5,6 +5,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+### Changed
+- keithstrydom: Changed `Image::new()` from `unsafe` to safe. It cannot outlive its
+  wand, and the wand's C destroy, destroys the images too.
+- keithstrydom: Replace `SetMagickResourceLimit` call with `MagickSetResourceLimit`
+### Added
+- keithstrydom: Added a `MagickWand::from_ptr()` constructor for functions expecting
+  a `fn` implementation with that signature.
+- keithstrydom: Added four functions to replace `ptr` and `MagickBooleanType` based
+  error handling, to simplify the error handling in functions and to centralise
+  the logic for error handling.
+- keithstrydom: Added helper functions for common C-to-Rust conversions:
+  `c_char_to_string_vec()`, `c_char_into_string()`, `c_array_into_vec()`.
+
 ## [1.1.0] - 2025-07-26
 ### Changed
 - keithstrydom: set Rust edition to 2024, MSRV is now 1.85.
