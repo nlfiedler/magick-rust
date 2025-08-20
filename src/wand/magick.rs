@@ -1289,6 +1289,13 @@ impl MagickWand {
         )
     }
 
+    /// Enhances contrast of an image by stretching the range of intensity values.
+    pub fn contrast_stretch_image(&self, black_point: f64, white_point: f64) -> Result<()> {
+        self.result_from_boolean(unsafe {
+            bindings::MagickContrastStretchImage(self.wand, black_point, white_point)
+        })
+    }
+
     mutations!(
         /// Sets the image to the specified alpha level.
         MagickSetImageAlpha => set_image_alpha(alpha: f64)
