@@ -18,6 +18,7 @@ This file follows the convention described at
   the logic for error handling.
 - keithstrydom: Added helper functions for common C-to-Rust conversions:
   `c_char_to_string_vec()`, `c_char_into_string()`, `c_array_into_vec()`.
+- jordanknapp00: Added `contrast_stretch_image()` to wrap `MagickContrastStretchImage`
 
 ## [1.1.0] - 2025-07-26
 ### Changed
