@@ -19,7 +19,7 @@ macro_rules! wand_common {
         $clear_exc:ident, $get_exc_type:ident, $get_exc:ident
     ) => {
         pub struct $wand {
-            pub wand: *mut crate::bindings::$wand,
+            wand: *mut crate::bindings::$wand,
         }
 
         impl Default for $wand {
@@ -35,14 +35,14 @@ macro_rules! wand_common {
                 }
             }
 
-            pub fn new_from_wand(wand: *mut crate::bindings::$wand) -> Self {
-                $wand { wand }
-            }
-
-            fn from_ptr(ptr: *mut crate::bindings::$wand) -> Self {
+            pub (crate) fn from_ptr(ptr: *mut crate::bindings::$wand) -> Self {
                 $wand {
                     wand: ptr
                 }
+            }
+
+            pub (crate) fn as_ptr(&self) -> *mut crate::bindings::$wand {
+                self.wand
             }
 
             fn clear(&mut self) {
@@ -222,11 +222,11 @@ macro_rules! pixel_set_get {
         $(
             pub fn $get(&self) -> crate::PixelWand {
                 let pw = crate::PixelWand::new();
-                unsafe { crate::bindings::$c_get(self.wand, pw.wand) };
+                unsafe { crate::bindings::$c_get(self.wand, pw.as_ptr()) };
                 pw
             }
             pub fn $set(&mut self, pw: &crate::PixelWand) {
-                unsafe { crate::bindings::$c_set(self.wand, pw.wand) }
+                unsafe { crate::bindings::$c_set(self.wand, pw.as_ptr()) }
             }
         )*
         pub fn fmt_pixel_settings(&self, f: &mut ::std::fmt::Formatter, prefix: &str) -> ::std::fmt::Result {

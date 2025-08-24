@@ -73,7 +73,7 @@ impl MagickWand {
 
     pub fn new_image(&self, columns: usize, rows: usize, background: &PixelWand) -> Result<()> {
         self.result_from_boolean(unsafe {
-            bindings::MagickNewImage(self.wand, columns, rows, background.wand)
+            bindings::MagickNewImage(self.wand, columns, rows, background.as_ptr())
         })
     }
 
@@ -108,7 +108,7 @@ impl MagickWand {
         self.result_from_boolean(unsafe {
             bindings::MagickAnnotateImage(
                 self.wand,
-                drawing_wand.wand,
+                drawing_wand.as_ptr(),
                 x,
                 y,
                 angle,
@@ -489,7 +489,7 @@ impl MagickWand {
     /// filling any empty space with the background color of a given PixelWand
     pub fn rotate_image(&self, background: &PixelWand, degrees: f64) -> Result<()> {
         self.result_from_boolean(unsafe {
-            bindings::MagickRotateImage(self.wand, background.wand, degrees)
+            bindings::MagickRotateImage(self.wand, background.as_ptr(), degrees)
         })
     }
 
@@ -649,7 +649,7 @@ impl MagickWand {
     pub fn get_image_pixel_color(&self, x: isize, y: isize) -> Option<PixelWand> {
         let pw = PixelWand::new();
 
-        let result = unsafe { bindings::MagickGetImagePixelColor(self.wand, x, y, pw.wand) };
+        let result = unsafe { bindings::MagickGetImagePixelColor(self.wand, x, y, pw.as_ptr()) };
         self.result_from_boolean(result).map(|_| pw).ok()
     }
 
@@ -676,7 +676,7 @@ impl MagickWand {
                 .map(|ptrs| {
                     slice::from_raw_parts(ptrs, color_count)
                         .iter()
-                        .map(|raw_wand| PixelWand { wand: *raw_wand })
+                        .map(|wand_ptr| PixelWand::from_ptr(*wand_ptr))
                         .collect()
                 })
         }
@@ -698,14 +698,14 @@ impl MagickWand {
     /// Set the background color.
     pub fn set_background_color(&self, pixel_wand: &PixelWand) -> Result<()> {
         self.result_from_boolean(unsafe {
-            bindings::MagickSetBackgroundColor(self.wand, pixel_wand.wand)
+            bindings::MagickSetBackgroundColor(self.wand, pixel_wand.as_ptr())
         })
     }
 
     /// Set the image background color.
     pub fn set_image_background_color(&self, pixel_wand: &PixelWand) -> Result<()> {
         self.result_from_boolean(unsafe {
-            bindings::MagickSetImageBackgroundColor(self.wand, pixel_wand.wand)
+            bindings::MagickSetImageBackgroundColor(self.wand, pixel_wand.as_ptr())
         })
     }
 
@@ -982,7 +982,7 @@ impl MagickWand {
 
     /// Renders the drawing wand on the current image
     pub fn draw_image(&mut self, drawing_wand: &DrawingWand) -> Result<()> {
-        self.result_from_boolean(unsafe { bindings::MagickDrawImage(self.wand, drawing_wand.wand) })
+        self.result_from_boolean(unsafe { bindings::MagickDrawImage(self.wand, drawing_wand.as_ptr()) })
     }
 
     /// Removes skew from the image. Skew is an artifact that
@@ -1026,7 +1026,7 @@ impl MagickWand {
         compose: CompositeOperator,
     ) -> Result<()> {
         self.result_from_boolean(unsafe {
-            bindings::MagickBorderImage(self.wand, pixel_wand.wand, width, height, compose)
+            bindings::MagickBorderImage(self.wand, pixel_wand.as_ptr(), width, height, compose)
         })
     }
 

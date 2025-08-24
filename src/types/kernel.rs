@@ -244,7 +244,7 @@ impl KernelInfo {
         unsafe { bindings::UnityAddKernelInfo(self.kernel_info, scale) }
     }
 
-    pub unsafe fn get_ptr(&self) -> *mut bindings::KernelInfo {
+    pub (crate) unsafe fn get_ptr(&self) -> *mut bindings::KernelInfo {
         self.kernel_info
     }
 }
