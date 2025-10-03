@@ -262,6 +262,7 @@ fn main() {
         let mut builder = bindgen::Builder::default()
             .emit_builtins()
             .ctypes_prefix("libc")
+            .raw_line("#![allow(warnings)]")
             .raw_line("#![allow(clippy::all)]")
             .raw_line("use libc;")
             .header(gen_h_path.to_str().unwrap())
