@@ -6,7 +6,7 @@ A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/)
 
 Because this crate is generating bindings for a C/C++ library, there are several dependencies beyond simply having the latest Rust toolchain installed.
 
-* [Rust](https://www.rust-lang.org) stable
+* [Rust](https://www.rust-lang.org) `2024` edition
 * [ImageMagick](https://imagemagick.org) (version 7.1.1-26 or later)
     - Does _not_ work with ImageMagick **6.x** due to backward incompatible changes.
     - [FreeBSD](https://www.freebsd.org): `sudo pkg install ImageMagick7`
@@ -48,6 +48,10 @@ The API documentation is available at [github pages](https://nlfiedler.github.io
 
 MagickWand has some global state that needs to be initialized prior to using the library, but fortunately Rust makes handling this pretty easy by use of the `std::sync::Once` type. See the example code in the `examples` directory for the basic usage of the crate.
 
+## Supported Rust Versions
+
+The Rust edition is set to `2024` and hence version `1.85.0` is the minimum supported version.
+
 ## Contributing
 
 There are still many missing functions, so if you find there is something you would like to see added to this library, feel free to file an issue. Even better, fork the repo, and write the thin wrapper necessary to expose the MagickWand function. For getters and setters this is often very easy, just add a row to the table in `wand/magick.rs`, and it will work with no additional coding. Tests are optional, as this crate is basically a thin wrapper around code that is assumed to be thoroughly tested already. If you make a change that you want to contribute, please feel free to submit a pull request.
@@ -60,8 +64,6 @@ There are still many missing functions, so if you find there is something you wo
 cd docker
 docker compose build --pull
 docker compose run magick-rust
-cargo clean
-cargo build
 cargo test
 exit
 docker compose down
