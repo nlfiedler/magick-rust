@@ -5,11 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [1.2.0] - 2025-10-02
+## [2.0.0] - 2025-10-02
 ### Changed
 - keithstrydom: Changed `Image::new()` from `unsafe` to safe. It cannot outlive its
   wand, and the wand's C destroy, destroys the images too.
-- keithstrydom: Replace `SetMagickResourceLimit` call with `MagickSetResourceLimit`
+- **BREAKING CHANGES**
+    * keithstrydom: Replace `SetMagickResourceLimit` call with `MagickSetResourceLimit`
+    * keithstrydom: kernel `get_ptr()` to `pub (crate)`
+    * keithstrydom: remove all functions with pointers from the public API.
 ### Added
 - keithstrydom: Added a `MagickWand::from_ptr()` constructor for functions expecting
   a `fn` implementation with that signature.
