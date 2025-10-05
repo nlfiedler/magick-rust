@@ -18,8 +18,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
       - name: deps
-        uses: actions/checkout@v5
         run: |
           # sudo apt update && sudo apt install -y libmagickwand-dev
           curl https://imagemagick.org/archive/ImageMagick.tar.gz | tar xz
@@ -27,8 +27,8 @@ jobs:
           ./configure --with-magick-plus-plus=no --with-perl=no 
           make -j
           sudo make install
+      - uses: Swatinem/rust-cache@v2
       - name: build docs
-        uses: Swatinem/rust-cache@v2
         run: |
           cargo doc --no-deps
           cp .github/static-files/index.html target/doc/
