@@ -18,8 +18,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - name: deps
+        uses: actions/checkout@v5
         run: |
           # sudo apt update && sudo apt install -y libmagickwand-dev
           curl https://imagemagick.org/archive/ImageMagick.tar.gz | tar xz
@@ -27,13 +27,13 @@ jobs:
           ./configure --with-magick-plus-plus=no --with-perl=no 
           make -j
           sudo make install
-      - uses: Swatinem/rust-cache@v2
       - name: build docs
+        uses: Swatinem/rust-cache@v2
         run: |
           cargo doc --no-deps
           cp .github/static-files/index.html target/doc/
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./target/doc
 
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
