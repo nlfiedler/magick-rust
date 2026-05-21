@@ -56,6 +56,16 @@ pub fn magick_wand_genesis() {
 
 /// This function should be called when ImageMagick is no longer needed.
 /// This function is safe to be called repeatedly.
+///
+/// # Warning
+///
+/// All `MagickWand`, `DrawingWand`, and `PixelWand` values must be dropped
+/// **before** calling this function. Each wand's `Drop` impl calls
+/// `Destroy<Wand>` on the underlying pointer, and invoking those after
+/// `MagickWandTerminus` has torn down the global ImageMagick environment
+/// is undefined behavior (typically a crash on process exit). If a wand is
+/// still in scope, end the scope first or call `drop(wand)` explicitly
+/// before calling this function.
 pub fn magick_wand_terminus() {
     unsafe {
         if bindings::IsMagickWandInstantiated() == bindings::MagickBooleanType::MagickTrue {
