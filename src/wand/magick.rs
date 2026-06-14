@@ -719,6 +719,32 @@ impl MagickWand {
         .map(|_| (x_resolution, y_resolution))
     }
 
+    /// Returns the range of the image as a pair `(minima, maxima)`, in raw
+    /// quantum values (i.e. `0..=QuantumRange`). The range is computed over the
+    /// channels currently enabled by the image's channel mask; by default that
+    /// is every channel. To restrict the range to a single channel, see
+    /// [`MagickWand::get_image_channel_range`].
+    pub fn get_image_range(&self) -> Result<(f64, f64)> {
+        let mut minima = 0f64;
+        let mut maxima = 0f64;
+        self.result_from_boolean(unsafe {
+            bindings::MagickGetImageRange(self.wand, &mut minima, &mut maxima)
+        })
+        .map(|_| (minima, maxima))
+    }
+
+    /// Returns the range of a single channel as a pair `(minima, maxima)`, in
+    /// raw quantum values (i.e. `0..=QuantumRange`). This is the equivalent of
+    /// PHP Imagick's `getImageChannelRange`, which was removed from the C API in
+    /// ImageMagick 7: it is implemented by temporarily setting the image channel
+    /// mask, reading the range, then restoring the previous mask.
+    pub fn get_image_channel_range(&mut self, channel: ChannelType) -> Result<(f64, f64)> {
+        let previous = self.set_image_channel_mask(channel);
+        let range = self.get_image_range();
+        self.set_image_channel_mask(previous);
+        range
+    }
+
     /// Sets the image resolution
     pub fn set_image_resolution(&self, x_resolution: f64, y_resolution: f64) -> Result<()> {
         self.result_from_boolean(unsafe {

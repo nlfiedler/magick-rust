@@ -345,6 +345,41 @@ fn test_set_image_background_color() {
 }
 
 #[test]
+fn test_get_image_channel_range() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    // A solid pure-red image: the red channel is fully saturated everywhere,
+    // while green and blue are zero everywhere. This makes the per-channel
+    // selection unambiguous.
+    let mut wand = MagickWand::new();
+    let mut background = PixelWand::new();
+    background.set_color("red").unwrap();
+    wand.new_image(8, 8, &background).unwrap();
+
+    let red = wand
+        .get_image_channel_range(magick_rust::ChannelType::Red)
+        .unwrap();
+    let green = wand
+        .get_image_channel_range(magick_rust::ChannelType::Green)
+        .unwrap();
+    let blue = wand
+        .get_image_channel_range(magick_rust::ChannelType::Blue)
+        .unwrap();
+
+    // Solid color, so minima == maxima within each channel.
+    assert_eq!(red.0, red.1);
+    assert!(red.1 > 0.0, "red channel should be saturated");
+    assert_eq!((0.0, 0.0), green);
+    assert_eq!((0.0, 0.0), blue);
+
+    // The mask must be restored afterwards: an unrestricted range spans every
+    // channel, so its maxima matches the fully-saturated red channel.
+    let all = wand.get_image_range().unwrap();
+    assert_eq!(red.1, all.1);
+}
+
+#[test]
 fn test_set_background_color() {
     START.call_once(|| {
         magick_wand_genesis();

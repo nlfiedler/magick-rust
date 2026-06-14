@@ -5,6 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- nlfiedler: Added `get_image_range()` wrapping `MagickGetImageRange`, and
+  `get_image_channel_range()` which restricts the range to a single channel via
+  the image channel mask (the ImageMagick 7 equivalent of PHP Imagick's
+  `getImageChannelRange`).
+
 ## [2.0.0] - 2025-10-02
 ### Changed
 - keithstrydom: Changed `Image::new()` from `unsafe` to safe. It cannot outlive its
