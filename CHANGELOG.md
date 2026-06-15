@@ -17,6 +17,10 @@ This file follows the convention described at
   `set_image_virtual_pixel_method()` wrapping the `MagickGet/SetImageVirtualPixelMethod`
   functions (the `-virtual-pixel` command line setting), and a `trim-blur-crop`
   example replicating the "trim by a blurred copy" cropping technique.
+- nlfiedler: Added `get_resource_limit()` and `get_resource()` wrapping
+  `MagickGetResourceLimit` and `MagickGetResource`, completing the resource
+  management API alongside the existing `set_resource_limit()` (e.g. for limiting
+  the thread count via `ResourceType::Thread`).
 ### Changed
 - nlfiedler: Documented that `trim_image()`'s `fuzz` argument is in raw quantum
   units (`0..=QuantumRange`), not a fraction; e.g. `-fuzz 15%` is `0.15 * QuantumRange`.

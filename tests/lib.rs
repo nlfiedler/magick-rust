@@ -380,6 +380,33 @@ fn test_get_image_channel_range() {
 }
 
 #[test]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+fn test_resource_limit_round_trip() {
+    use magick_rust::ResourceType;
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    // Use the Memory resource for a deterministic round trip: unlike Thread
+    // (which ImageMagick clamps to the OpenMP-compiled maximum), the memory
+    // limit is stored verbatim. Save and restore it so other tests are
+    // unaffected, since resource limits are process-global.
+    let original = MagickWand::get_resource_limit(ResourceType::Memory);
+    MagickWand::set_resource_limit(ResourceType::Memory, 256 * 1024 * 1024).unwrap();
+    assert_eq!(
+        256 * 1024 * 1024,
+        MagickWand::get_resource_limit(ResourceType::Memory)
+    );
+    MagickWand::set_resource_limit(ResourceType::Memory, original).unwrap();
+    assert_eq!(
+        original,
+        MagickWand::get_resource_limit(ResourceType::Memory)
+    );
+
+    // The thread limit (the original request in issue #79) is at least one.
+    assert!(MagickWand::get_resource_limit(ResourceType::Thread) >= 1);
+}
+
+#[test]
 fn test_floodfill_paint_image() {
     START.call_once(|| {
         magick_wand_genesis();

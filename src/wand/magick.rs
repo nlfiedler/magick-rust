@@ -88,6 +88,18 @@ impl MagickWand {
         )
     }
 
+    /// Returns the current limit for the given resource (e.g. the maximum number
+    /// of threads when `resource` is `ResourceType::Thread`), as previously set
+    /// by [`MagickWand::set_resource_limit`] or the ImageMagick defaults.
+    pub fn get_resource_limit(resource: ResourceType) -> u64 {
+        unsafe { bindings::MagickGetResourceLimit(resource) as u64 }
+    }
+
+    /// Returns the amount of the given resource currently in use.
+    pub fn get_resource(resource: ResourceType) -> u64 {
+        unsafe { bindings::MagickGetResource(resource) as u64 }
+    }
+
     pub fn set_option(&mut self, key: &str, value: &str) -> Result<()> {
         let c_key = CString::new(key).map_err(|_| "key string contains null byte")?;
         let c_value = CString::new(value).map_err(|_| "value string contains null byte")?;
