@@ -27,5 +27,7 @@ default = ["disable-hdri"]
 # Workaround for bindgen bug when ImageMagick is compiled with disable-hdri
 disable-hdri = []
 
-[lints.clippy]
-missing_safety_doc = { level = "allow" }
+# Even Better TOML extension's validation struggles with nested table syntax, so
+# flatten the lints table to help until a better fix comes along.
+[lints.clippy.missing_safety_doc]
+level = "allow"
