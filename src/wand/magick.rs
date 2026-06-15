@@ -1056,6 +1056,49 @@ impl MagickWand {
         })
     }
 
+    /// Flood-fill the image starting at the pixel `(x, y)`, replacing every
+    /// connected neighbouring pixel that matches the target with `fill`.
+    ///
+    /// This is the building block for "remove the background" operations such as
+    /// the ImageMagick command line
+    /// `-fill none -fuzz 75% -draw "alpha 0,0 floodfill"`: read the image, give
+    /// it an alpha channel, then flood-fill from a corner with a transparent
+    /// `fill` color.
+    ///
+    /// * `fill`: the color painted into the matched region (e.g. `"none"` for
+    ///   transparency).
+    /// * `fuzz`: how far a pixel's color may differ from the target and still be
+    ///   considered a match, in raw quantum units (`0..=QuantumRange`). For a
+    ///   percentage, multiply: e.g. 75% on a Q16 build is `0.75 * 65535.0`.
+    /// * `border_color`: the target color to flood. With `invert == false`, the
+    ///   region of connected pixels matching `border_color` (within `fuzz`),
+    ///   starting from `(x, y)`, is painted with `fill`. With `invert == true`,
+    ///   the connected region of pixels that do *not* match `border_color` is
+    ///   painted instead.
+    /// * `x`, `y`: the seed pixel where the fill begins.
+    /// * `invert`: invert the sense of the match, as described above.
+    pub fn floodfill_paint_image(
+        &self,
+        fill: &PixelWand,
+        fuzz: f64,
+        border_color: &PixelWand,
+        x: isize,
+        y: isize,
+        invert: bool,
+    ) -> Result<()> {
+        self.result_from_boolean(unsafe {
+            bindings::MagickFloodfillPaintImage(
+                self.wand,
+                fill.as_ptr(),
+                fuzz,
+                border_color.as_ptr(),
+                x,
+                y,
+                if invert { MagickTrue } else { MagickFalse },
+            )
+        })
+    }
+
     /// Simulate an image shadow
     pub fn shadow_image(&self, alpha: f64, sigma: f64, x: isize, y: isize) -> Result<()> {
         self.result_from_boolean(unsafe {

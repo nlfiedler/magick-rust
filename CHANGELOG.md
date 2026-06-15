@@ -11,6 +11,8 @@ This file follows the convention described at
   `get_image_channel_range()` which restricts the range to a single channel via
   the image channel mask (the ImageMagick 7 equivalent of PHP Imagick's
   `getImageChannelRange`).
+- nlfiedler: Added `floodfill_paint_image()` wrapping `MagickFloodfillPaintImage`,
+  a safe API for flood-fill operations such as removing an image background.
 
 ## [2.0.0] - 2025-10-02
 ### Changed
