@@ -56,3 +56,4 @@ pub use crate::bindings::ResourceType;
 pub use crate::bindings::StatisticType;
 pub use crate::bindings::StretchType;
 pub use crate::bindings::StyleType;
+pub use crate::bindings::VirtualPixelMethod;

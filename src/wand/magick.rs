@@ -37,7 +37,7 @@ use crate::{
     CompressionType, DisposeType, DitherMethod, EndianType, FilterType, GravityType, Image,
     ImageType, InterlaceType, KernelInfo, LayerMethod, MagickEvaluateOperator, MagickFunction,
     MetricType, MorphologyMethod, OrientationType, PixelInterpolateMethod, PixelMask,
-    RenderingIntent, ResolutionType, StatisticType,
+    RenderingIntent, ResolutionType, StatisticType, VirtualPixelMethod,
 };
 
 wand_common!(
@@ -493,9 +493,32 @@ impl MagickWand {
         })
     }
 
-    /// Trim the image removing the backround color from the edges.
+    /// Trim the image removing the background color from the edges.
+    ///
+    /// `fuzz` is the color-matching tolerance in raw quantum units
+    /// (`0..=QuantumRange`), *not* a fraction or percentage. To express the
+    /// ImageMagick command line's `-fuzz 15%`, multiply: e.g. on a Q16 build use
+    /// `0.15 * 65535.0`. Passing a small value such as `0.15` is effectively a
+    /// zero-tolerance trim and will not remove a noisy border.
     pub fn trim_image(&self, fuzz: f64) -> Result<()> {
         self.result_from_boolean(unsafe { bindings::MagickTrimImage(self.wand, fuzz) })
+    }
+
+    /// Returns the virtual pixel method used when accessing pixels outside the
+    /// image (for example by `blur_image` near the edges).
+    pub fn get_image_virtual_pixel_method(&self) -> VirtualPixelMethod {
+        unsafe { bindings::MagickGetImageVirtualPixelMethod(self.wand) }
+    }
+
+    /// Sets the virtual pixel method used when accessing pixels outside the
+    /// image, returning the previous method. This is the equivalent of the
+    /// command line `-virtual-pixel` setting, e.g. `VirtualPixelMethod::Edge`
+    /// for `-virtual-pixel edge`.
+    pub fn set_image_virtual_pixel_method(
+        &mut self,
+        method: VirtualPixelMethod,
+    ) -> VirtualPixelMethod {
+        unsafe { bindings::MagickSetImageVirtualPixelMethod(self.wand, method) }
     }
 
     /// Retrieve the width of the image.

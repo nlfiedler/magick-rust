@@ -13,6 +13,13 @@ This file follows the convention described at
   `getImageChannelRange`).
 - nlfiedler: Added `floodfill_paint_image()` wrapping `MagickFloodfillPaintImage`,
   a safe API for flood-fill operations such as removing an image background.
+- nlfiedler: Added `get_image_virtual_pixel_method()` and
+  `set_image_virtual_pixel_method()` wrapping the `MagickGet/SetImageVirtualPixelMethod`
+  functions (the `-virtual-pixel` command line setting), and a `trim-blur-crop`
+  example replicating the "trim by a blurred copy" cropping technique.
+### Changed
+- nlfiedler: Documented that `trim_image()`'s `fuzz` argument is in raw quantum
+  units (`0..=QuantumRange`), not a fraction; e.g. `-fuzz 15%` is `0.15 * QuantumRange`.
 
 ## [2.0.0] - 2025-10-02
 ### Changed
