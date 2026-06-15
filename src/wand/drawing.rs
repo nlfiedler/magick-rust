@@ -22,7 +22,7 @@ use crate::result::MagickError;
 use crate::result::Result;
 use crate::{
     AlignType, ClipPathUnits, DecorationType, DirectionType, FillRule, GravityType, LineCap,
-    LineJoin, StretchType, StyleType,
+    LineJoin, PaintMethod, StretchType, StyleType,
 };
 
 wand_common!(
@@ -66,6 +66,101 @@ impl DrawingWand {
                 lower_right_y,
             );
         }
+    }
+
+    /// Draw a rectangle with rounded corners, where `rx` and `ry` are the corner
+    /// radii in the x and y directions.
+    pub fn draw_round_rectangle(
+        &mut self,
+        upper_left_x: f64,
+        upper_left_y: f64,
+        lower_right_x: f64,
+        lower_right_y: f64,
+        rx: f64,
+        ry: f64,
+    ) {
+        unsafe {
+            bindings::DrawRoundRectangle(
+                self.wand,
+                upper_left_x,
+                upper_left_y,
+                lower_right_x,
+                lower_right_y,
+                rx,
+                ry,
+            );
+        }
+    }
+
+    /// Draw a line from `(sx, sy)` to `(ex, ey)` using the current stroke color
+    /// and width.
+    pub fn draw_line(&mut self, sx: f64, sy: f64, ex: f64, ey: f64) {
+        unsafe {
+            bindings::DrawLine(self.wand, sx, sy, ex, ey);
+        }
+    }
+
+    /// Draw a single point at `(x, y)` using the current fill color.
+    pub fn draw_point(&mut self, x: f64, y: f64) {
+        unsafe {
+            bindings::DrawPoint(self.wand, x, y);
+        }
+    }
+
+    /// Draw an arc within the bounding rectangle `(sx, sy)`-`(ex, ey)`, sweeping
+    /// from `start_degrees` to `end_degrees`.
+    pub fn draw_arc(&mut self, sx: f64, sy: f64, ex: f64, ey: f64, start_degrees: f64, end_degrees: f64) {
+        unsafe {
+            bindings::DrawArc(self.wand, sx, sy, ex, ey, start_degrees, end_degrees);
+        }
+    }
+
+    /// Draw an ellipse centered at `(ox, oy)` with radii `rx` and `ry`, sweeping
+    /// from `start_degrees` to `end_degrees` (use 0 and 360 for a full ellipse).
+    pub fn draw_ellipse(&mut self, ox: f64, oy: f64, rx: f64, ry: f64, start_degrees: f64, end_degrees: f64) {
+        unsafe {
+            bindings::DrawEllipse(self.wand, ox, oy, rx, ry, start_degrees, end_degrees);
+        }
+    }
+
+    /// Draw a closed polygon connecting the given `(x, y)` coordinates.
+    pub fn draw_polygon(&mut self, coordinates: &[(f64, f64)]) {
+        let points = Self::to_point_info(coordinates);
+        unsafe {
+            bindings::DrawPolygon(self.wand, points.len(), points.as_ptr());
+        }
+    }
+
+    /// Draw an open series of line segments connecting the given `(x, y)`
+    /// coordinates.
+    pub fn draw_polyline(&mut self, coordinates: &[(f64, f64)]) {
+        let points = Self::to_point_info(coordinates);
+        unsafe {
+            bindings::DrawPolyline(self.wand, points.len(), points.as_ptr());
+        }
+    }
+
+    /// Draw a Bezier curve through the given `(x, y)` control points.
+    pub fn draw_bezier(&mut self, coordinates: &[(f64, f64)]) {
+        let points = Self::to_point_info(coordinates);
+        unsafe {
+            bindings::DrawBezier(self.wand, points.len(), points.as_ptr());
+        }
+    }
+
+    /// Paint at `(x, y)` using the current fill color and the given paint method
+    /// (for example flood-filling a region).
+    pub fn draw_color(&mut self, x: f64, y: f64, paint_method: PaintMethod) {
+        unsafe {
+            bindings::DrawColor(self.wand, x, y, paint_method);
+        }
+    }
+
+    fn to_point_info(coordinates: &[(f64, f64)]) -> Vec<bindings::PointInfo> {
+        coordinates
+            .iter()
+            .map(|&(x, y)| bindings::PointInfo { x, y })
+            .collect()
     }
 
     string_set_get!(

@@ -21,6 +21,10 @@ This file follows the convention described at
   `MagickGetResourceLimit` and `MagickGetResource`, completing the resource
   management API alongside the existing `set_resource_limit()` (e.g. for limiting
   the thread count via `ResourceType::Thread`).
+- nlfiedler: Added `DrawingWand` primitives `draw_round_rectangle()`, `draw_line()`,
+  `draw_point()`, `draw_arc()`, `draw_ellipse()`, `draw_polygon()`, `draw_polyline()`,
+  `draw_bezier()`, and `draw_color()` (exporting `PaintMethod`), plus a `draw-shapes`
+  example demonstrating the drawing API.
 ### Changed
 - nlfiedler: Documented that `trim_image()`'s `fuzz` argument is in raw quantum
   units (`0..=QuantumRange`), not a fraction; e.g. `-fuzz 15%` is `0.15 * QuantumRange`.

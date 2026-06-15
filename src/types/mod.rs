@@ -48,6 +48,7 @@ pub use crate::bindings::MagickFunction;
 pub use crate::bindings::MetricType;
 pub use crate::bindings::MorphologyMethod;
 pub use crate::bindings::OrientationType;
+pub use crate::bindings::PaintMethod;
 pub use crate::bindings::PixelInterpolateMethod;
 pub use crate::bindings::PixelMask;
 pub use crate::bindings::RenderingIntent;

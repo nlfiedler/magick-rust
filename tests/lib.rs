@@ -407,6 +407,32 @@ fn test_resource_limit_round_trip() {
 }
 
 #[test]
+fn test_drawing_primitives() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let mut wand = MagickWand::new();
+    let mut white = PixelWand::new();
+    white.set_color("white").unwrap();
+    wand.new_image(100, 100, &white).unwrap();
+
+    // Fill a rounded rectangle over the center of the image with red.
+    let mut draw = magick_rust::DrawingWand::new();
+    let mut red = PixelWand::new();
+    red.set_color("red").unwrap();
+    draw.set_fill_color(&red);
+    draw.draw_round_rectangle(20.0, 20.0, 80.0, 80.0, 10.0, 10.0);
+    wand.draw_image(&draw).unwrap();
+
+    // The center is now red...
+    let center = wand.get_image_pixel_color(50, 50).unwrap();
+    assert!(center.get_red() > 0.5 && center.get_green() < 0.5 && center.get_blue() < 0.5);
+    // ...while a corner, outside the rounded rectangle, remains white.
+    let corner = wand.get_image_pixel_color(2, 2).unwrap();
+    assert!(corner.get_red() > 0.9 && corner.get_green() > 0.9 && corner.get_blue() > 0.9);
+}
+
+#[test]
 fn test_floodfill_paint_image() {
     START.call_once(|| {
         magick_wand_genesis();
