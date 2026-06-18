@@ -469,6 +469,41 @@ fn test_floodfill_paint_image() {
 }
 
 #[test]
+fn test_transparent_paint_image() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    // A white image with a red square in the middle. Painting white as
+    // transparent is the "-transparent white" operation; unlike a floodfill it
+    // is not connectivity-bound, so every white pixel disappears while the red
+    // foreground stays opaque.
+    let mut wand = MagickWand::new();
+    let mut white = PixelWand::new();
+    white.set_color("white").unwrap();
+    wand.new_image(10, 10, &white).unwrap();
+    wand.set_image_alpha_channel(magick_rust::AlphaChannelOption::Activate)
+        .unwrap();
+
+    let mut red = PixelWand::new();
+    red.set_color("red").unwrap();
+    let mut draw = magick_rust::DrawingWand::new();
+    draw.set_fill_color(&red);
+    draw.draw_rectangle(3.0, 3.0, 6.0, 6.0);
+    wand.draw_image(&draw).unwrap();
+
+    // alpha == 0.0 makes the matched (white) pixels fully transparent.
+    wand.transparent_paint_image(&white, 0.0, 0.0, false).unwrap();
+
+    // Every white pixel is now transparent...
+    let corner = wand.get_image_pixel_color(0, 0).unwrap();
+    assert_eq!(0.0, corner.get_alpha());
+    // ...while the red foreground square remains fully opaque.
+    let center = wand.get_image_pixel_color(4, 4).unwrap();
+    assert_eq!(1.0, center.get_alpha());
+    assert!(center.get_red() > 0.5 && center.get_green() < 0.5 && center.get_blue() < 0.5);
+}
+
+#[test]
 fn test_set_background_color() {
     START.call_once(|| {
         magick_wand_genesis();

@@ -7,6 +7,9 @@ This file follows the convention described at
 
 ## [Unreleased]
 ### Added
+- nlfiedler: Added `transparent_paint_image()` wrapping `MagickTransparentPaintImage`,
+  a safe API for the `-transparent <color>` operation (e.g. making the white areas
+  of an image transparent), resolving issue #54.
 - nlfiedler: Added `get_image_range()` wrapping `MagickGetImageRange`, and
   `get_image_channel_range()` which restricts the range to a single channel via
   the image channel mask (the ImageMagick 7 equivalent of PHP Imagick's

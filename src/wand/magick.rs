@@ -1134,6 +1134,41 @@ impl MagickWand {
         })
     }
 
+    /// Change any pixel that matches `target` (within `fuzz`) to the given
+    /// `alpha` transparency. This is the wand-level equivalent of the command
+    /// line `-transparent <color>` and avoids dropping down to the core
+    /// `TransparentPaintImage` API.
+    ///
+    /// To make a color disappear, give the image an alpha channel (e.g.
+    /// `set_image_alpha_channel(AlphaChannelOption::OpaqueAlphaChannel)`), then
+    /// paint that color with `alpha == 0.0`.
+    ///
+    /// * `target`: the color to match.
+    /// * `alpha`: the transparency to apply to matched pixels, where `1.0` is
+    ///   fully opaque and `0.0` is fully transparent.
+    /// * `fuzz`: how far a pixel's color may differ from `target` and still be
+    ///   considered a match, in raw quantum units (`0..=QuantumRange`). For a
+    ///   percentage, multiply: e.g. 10% on a Q16 build is `0.10 * 65535.0`.
+    /// * `invert`: when `true`, paint the pixels that do *not* match `target`
+    ///   instead.
+    pub fn transparent_paint_image(
+        &self,
+        target: &PixelWand,
+        alpha: f64,
+        fuzz: f64,
+        invert: bool,
+    ) -> Result<()> {
+        self.result_from_boolean(unsafe {
+            bindings::MagickTransparentPaintImage(
+                self.wand,
+                target.as_ptr(),
+                alpha,
+                fuzz,
+                if invert { MagickTrue } else { MagickFalse },
+            )
+        })
+    }
+
     /// Simulate an image shadow
     pub fn shadow_image(&self, alpha: f64, sigma: f64, x: isize, y: isize) -> Result<()> {
         self.result_from_boolean(unsafe {
