@@ -494,12 +494,14 @@ fn test_transparent_paint_image() {
     // alpha == 0.0 makes the matched (white) pixels fully transparent.
     wand.transparent_paint_image(&white, 0.0, 0.0, false).unwrap();
 
-    // Every white pixel is now transparent...
+    // Every white pixel is now transparent. The alpha comes back from
+    // ImageMagick's quantum->normalized-float conversion, so it may be a tiny
+    // denormal rather than exactly 0.0; compare within a tolerance.
     let corner = wand.get_image_pixel_color(0, 0).unwrap();
-    assert_eq!(0.0, corner.get_alpha());
+    assert!(corner.get_alpha() < 1e-6);
     // ...while the red foreground square remains fully opaque.
     let center = wand.get_image_pixel_color(4, 4).unwrap();
-    assert_eq!(1.0, center.get_alpha());
+    assert!(center.get_alpha() > 1.0 - 1e-6);
     assert!(center.get_red() > 0.5 && center.get_green() < 0.5 && center.get_blue() < 0.5);
 }
 
