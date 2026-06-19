@@ -656,3 +656,98 @@ fn test_import_export_pixels_roundtrip() {
             .all(|(a, b)| a == b)
     );
 }
+
+#[test]
+fn test_image_list_frame_access() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    // rust.gif is a two-frame animation: frame 0 is the full 156x150 canvas,
+    // frame 1 is an optimized 80x76 sub-frame.
+    let wand = MagickWand::new();
+    RUST_GIF.read_image(&wand);
+
+    let images = wand.images();
+    assert_eq!(2, images.count());
+    assert!(!images.is_empty());
+
+    let first = images.first().expect("first frame");
+    assert_eq!(
+        (156, 150),
+        (first.get_image_width(), first.get_image_height())
+    );
+
+    let last = images.last().expect("last frame");
+    assert_eq!((80, 76), (last.get_image_width(), last.get_image_height()));
+
+    // Two frame handles can be held at once and each still reports its own
+    // frame's dimensions: every getter re-pins the iterator before reading.
+    assert_eq!(156, first.get_image_width());
+    assert_eq!(80, last.get_image_width());
+    assert_eq!(156, first.get_image_width());
+
+    // Out-of-bounds access yields None.
+    assert!(images.get(2).is_none());
+
+    // for_each visits every frame in order.
+    let mut seen = Vec::new();
+    images.for_each(|index, frame| seen.push((index, frame.get_image_width())));
+    assert_eq!(vec![(0, 156), (1, 80)], seen);
+}
+
+#[test]
+fn test_image_list_coalesce_and_draw() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let mut wand = MagickWand::new();
+    RUST_GIF.read_image(&wand);
+
+    // Coalescing expands every frame to the full canvas, so both frames become
+    // 156x150 and can be edited uniformly.
+    let mut coalesced = wand.coalesce().unwrap();
+    {
+        let images = coalesced.images();
+        images.for_each(|_, frame| {
+            assert_eq!(
+                (156, 150),
+                (frame.get_image_width(), frame.get_image_height())
+            );
+        });
+    }
+
+    // Paint a red square onto every frame via mutable frame borrows.
+    let mut red = PixelWand::new();
+    red.set_color("red").unwrap();
+    let mut draw = magick_rust::DrawingWand::new();
+    draw.set_fill_color(&red);
+    draw.draw_rectangle(10.0, 10.0, 40.0, 40.0);
+
+    coalesced
+        .images_mut()
+        .try_for_each(|_, mut frame| frame.draw_image(&draw))
+        .unwrap();
+
+    // The square is present on each frame independently.
+    let images = coalesced.images();
+    images.for_each(|_, frame| {
+        let pixel = frame.get_image_pixel_color(25, 25).unwrap();
+        assert!(pixel.get_red() > 0.5 && pixel.get_green() < 0.5 && pixel.get_blue() < 0.5);
+    });
+}
+
+#[test]
+fn test_image_list_remove() {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
+    let mut wand = MagickWand::new();
+    RUST_GIF.read_image(&wand);
+
+    assert_eq!(2, wand.images().count());
+    wand.images_mut().remove(0).unwrap();
+    assert_eq!(1, wand.images().count());
+
+    // Removing past the end is an error rather than a panic.
+    assert!(wand.images_mut().remove(5).is_err());
+}

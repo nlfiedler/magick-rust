@@ -35,9 +35,9 @@ use crate::bindings::MagickBooleanType;
 use crate::{
     AlphaChannelOption, AutoThresholdMethod, ChannelType, ColorspaceType, CompositeOperator,
     CompressionType, DisposeType, DitherMethod, EndianType, FilterType, GravityType, Image,
-    ImageType, InterlaceType, KernelInfo, LayerMethod, MagickEvaluateOperator, MagickFunction,
-    MetricType, MorphologyMethod, OrientationType, PixelInterpolateMethod, PixelMask,
-    RenderingIntent, ResolutionType, StatisticType, VirtualPixelMethod,
+    ImageType, Images, ImagesMut, InterlaceType, KernelInfo, LayerMethod, MagickEvaluateOperator,
+    MagickFunction, MetricType, MorphologyMethod, OrientationType, PixelInterpolateMethod,
+    PixelMask, RenderingIntent, ResolutionType, StatisticType, VirtualPixelMethod,
 };
 
 wand_common!(
@@ -1226,6 +1226,35 @@ impl MagickWand {
         }, "unable to import pixels")
     }
 
+    /// Borrow the wand's image list for read-only frame access.
+    ///
+    /// This is the ergonomic way to work with multi-image wands (such as the
+    /// frames of an animated GIF): the returned [`Images`] view resets the
+    /// iterator and hands out frame borrows that automatically position the
+    /// iterator before each access. See [`Self::images_mut`] for mutable access.
+    pub fn images(&self) -> Images<'_> {
+        Images::new(self)
+    }
+
+    /// Borrow the wand's image list for mutable frame access.
+    ///
+    /// Because ImageMagick exposes a single internal iterator, only one frame
+    /// may be borrowed mutably at a time; this is enforced at compile time.
+    pub fn images_mut(&mut self) -> ImagesMut<'_> {
+        ImagesMut::new(self)
+    }
+
+    /// Reset the wand iterator so that the next call to [`Self::next_image`]
+    /// returns the first image. This is most useful before iterating an image
+    /// list with `next_image`; it leaves the wand positioned *before* the first
+    /// image rather than *on* it (see [`Self::set_first_iterator`] for that).
+    /// See <https://imagemagick.org/api/magick-wand.php#MagickResetIterator> for more information.
+    pub fn reset_iterator(&self) {
+        unsafe {
+            bindings::MagickResetIterator(self.wand);
+        }
+    }
+
     /// Set the wand iterator to the first image.
     /// See <https://imagemagick.org/api/magick-wand.php#MagickSetFirstIterator> for more information.
     pub fn set_first_iterator(&self) {
@@ -1234,11 +1263,54 @@ impl MagickWand {
         }
     }
 
+    /// Set the wand iterator to the last image.
+    /// See <https://imagemagick.org/api/magick-wand.php#MagickSetLastIterator> for more information.
+    pub fn set_last_iterator(&self) {
+        unsafe {
+            bindings::MagickSetLastIterator(self.wand);
+        }
+    }
+
     /// Set the next image in the wand as the current image.
+    ///
+    /// Returns `true` while the iterator advanced onto a valid image, and
+    /// `false` once it has moved past the last image.
     /// See <https://imagemagick.org/api/magick-image.php#MagickNextImage> for more information.
     pub fn next_image(&self) -> bool {
         let res = unsafe { bindings::MagickNextImage(self.wand) };
         res == MagickTrue
+    }
+
+    /// Set the previous image in the wand as the current image.
+    ///
+    /// Returns `true` while the iterator stepped back onto a valid image, and
+    /// `false` once it has moved before the first image.
+    /// See <https://imagemagick.org/api/magick-image.php#MagickPreviousImage> for more information.
+    pub fn previous_image(&self) -> bool {
+        let res = unsafe { bindings::MagickPreviousImage(self.wand) };
+        res == MagickTrue
+    }
+
+    /// Returns `true` if the wand has more images when traversing the list in
+    /// the forward direction.
+    /// See <https://imagemagick.org/api/magick-image.php#MagickHasNextImage> for more information.
+    pub fn has_next_image(&self) -> bool {
+        let res = unsafe { bindings::MagickHasNextImage(self.wand) };
+        res == MagickTrue
+    }
+
+    /// Returns `true` if the wand has more images when traversing the list in
+    /// the reverse direction.
+    /// See <https://imagemagick.org/api/magick-image.php#MagickHasPreviousImage> for more information.
+    pub fn has_previous_image(&self) -> bool {
+        let res = unsafe { bindings::MagickHasPreviousImage(self.wand) };
+        res == MagickTrue
+    }
+
+    /// Remove the current image from the image list.
+    /// See <https://imagemagick.org/api/magick-image.php#MagickRemoveImage> for more information.
+    pub fn remove_image(&mut self) -> Result<()> {
+        self.result_from_boolean(unsafe { bindings::MagickRemoveImage(self.wand) })
     }
 
     /// Automatically performs threshold method to reduce grayscale data

@@ -7,6 +7,13 @@ This file follows the convention described at
 
 ## [Unreleased]
 ### Added
+- nlfiedler: Added an ergonomic image-list (frame) API for multi-image wands such
+  as animated GIFs, resolving issue #30: `MagickWand::images()` / `images_mut()`
+  return `Images` / `ImagesMut` views that hand out `ImageRef` / `ImageMut` frame
+  handles which automatically pin the wand's internal iterator, plus the
+  underlying primitives `reset_iterator()`, `set_last_iterator()`,
+  `previous_image()`, `has_next_image()`, `has_previous_image()`, and
+  `remove_image()`, and a `gif-frames` example.
 - nlfiedler: Added `transparent_paint_image()` wrapping `MagickTransparentPaintImage`,
   a safe API for the `-transparent <color>` operation (e.g. making the white areas
   of an image transparent), resolving issue #54.

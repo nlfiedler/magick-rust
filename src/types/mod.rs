@@ -19,7 +19,7 @@ mod image;
 mod kernel;
 
 pub use self::geometry_info::GeometryInfo;
-pub use self::image::Image;
+pub use self::image::{Image, ImageMut, ImageRef, Images, ImagesMut};
 pub use self::kernel::{KernelBuilder, KernelInfo};
 pub use crate::bindings::AlignType;
 pub use crate::bindings::AlphaChannelOption;
