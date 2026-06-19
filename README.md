@@ -1,6 +1,6 @@
 # magick-rust
 
-A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. Many of the functions in the MagickWand API are still missing, but over time more will be added. Pull requests are welcome, as are bug reports, and requests for examples.
+A somewhat safe Rust interface to the [ImageMagick](http://www.imagemagick.org/) system, in particular, the MagickWand library. Many of the functions in the MagickWand API are still missing, but over time more will be added. Pull requests are welcome, as are feature requests, bug reports, and requests for examples.
 
 ## Dependencies
 
