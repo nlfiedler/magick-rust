@@ -100,6 +100,22 @@ impl bindgen::callbacks::ParseCallbacks for RemoveEnumVariantSuffixes {
 
 #[allow(clippy::too_many_lines)]
 fn main() {
+    // docs.rs builds in a sandbox that has neither the ImageMagick libraries
+    // nor the headers, and offers no way to install them, so the normal
+    // bindgen path below cannot run there. Documentation only needs the
+    // bindings to *compile* (it never links the native library), so when
+    // building on docs.rs we copy the checked-in, pre-generated bindings into
+    // OUT_DIR and skip all native-library discovery and linking.
+    if env::var("DOCS_RS").is_ok() {
+        let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+        let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+        let prebuilt = manifest_dir.join("docsrs_bindings.rs");
+        println!("cargo:rerun-if-changed={}", prebuilt.to_string_lossy());
+        std::fs::copy(&prebuilt, out_dir.join("bindings.rs"))
+            .expect("could not copy pre-generated docs.rs bindings into OUT_DIR");
+        return;
+    }
+
     let check_cppflags = Command::new("MagickCore-config")
         .arg("--cppflags")
         .output()

@@ -29,3 +29,10 @@ disable-hdri = []
 
 [lints.clippy]
 missing_safety_doc = { level = "allow" }
+
+# docs.rs cannot install ImageMagick, so build.rs falls back to the checked-in
+# pre-generated bindings (docsrs_bindings.rs) when the DOCS_RS env var is set.
+[package.metadata.docs.rs]
+# The docs build never links the native library, so target the docs.rs default
+# host explicitly and document with the default features.
+default-target = "x86_64-unknown-linux-gnu"
