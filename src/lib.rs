@@ -74,6 +74,7 @@ pub fn magick_wand_terminus() {
     }
 }
 
+/// Return the list of font names matching the given pattern.
 pub fn magick_query_fonts(pattern: &str) -> Result<Vec<String>> {
     let mut number_fonts: size_t = 0;
     let c_string = CString::new(pattern).map_err(|_| "could not convert to cstring")?;

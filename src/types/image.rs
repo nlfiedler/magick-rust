@@ -20,13 +20,17 @@ use crate::bindings;
 use crate::result::{MagickError, Result};
 use crate::wand::MagickWand;
 
+/// A borrowed handle to a single image owned by a [`MagickWand`].
+///
+/// The handle borrows the wand's underlying image and is only valid for the
+/// wand's lifetime; it does not own or free the image.
 pub struct Image<'a> {
     image: *mut bindings::Image,
     phantom_data: PhantomData<&'a bindings::Image>,
 }
 
 impl Image<'_> {
-    pub (crate) fn new(img: *mut bindings::Image) -> Self {
+    pub(crate) fn new(img: *mut bindings::Image) -> Self {
         // SAFETY: This is safe and also does not require an Image::drop() call as:
         //         The lifetime of Image is the same as the lifetime of wrapped bindings::Image.
         //         The bindings::Image is borrowed by the caller from MagickWand.
@@ -38,7 +42,7 @@ impl Image<'_> {
         }
     }
 
-    pub (crate) unsafe fn get_ptr(&self) -> *mut bindings::Image {
+    pub(crate) unsafe fn get_ptr(&self) -> *mut bindings::Image {
         self.image
     }
 }

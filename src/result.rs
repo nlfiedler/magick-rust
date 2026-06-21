@@ -17,6 +17,7 @@ use std::fmt::{Debug, Display, Formatter};
 
 pub type Result<T> = std::result::Result<T, MagickError>;
 
+/// The crate's error type, wrapping an error message string.
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
 pub struct MagickError(pub String);
 

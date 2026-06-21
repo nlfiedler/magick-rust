@@ -71,6 +71,7 @@ impl MagickWand {
         )
     }
 
+    /// Add a blank image canvas of the given dimensions and background color.
     pub fn new_image(&self, columns: usize, rows: usize, background: &PixelWand) -> Result<()> {
         self.result_from_boolean(unsafe {
             bindings::MagickNewImage(self.wand, columns, rows, background.as_ptr())
@@ -100,6 +101,7 @@ impl MagickWand {
         unsafe { bindings::MagickGetResource(resource) as u64 }
     }
 
+    /// Associate one option name/value pair with the wand.
     pub fn set_option(&mut self, key: &str, value: &str) -> Result<()> {
         let c_key = CString::new(key).map_err(|_| "key string contains null byte")?;
         let c_value = CString::new(value).map_err(|_| "value string contains null byte")?;
@@ -108,6 +110,8 @@ impl MagickWand {
         })
     }
 
+    /// Annotate the image with text drawn using the given drawing wand, at
+    /// position `(x, y)` and rotated by `angle` degrees.
     pub fn annotate_image(
         &mut self,
         drawing_wand: &DrawingWand,
@@ -134,6 +138,8 @@ impl MagickWand {
         self.result_from_boolean(unsafe { bindings::MagickAddImage(self.wand, other_wand.wand) })
     }
 
+    /// Append all images in the wand into a single new wand, stacking them
+    /// vertically when `stack` is `true` or horizontally when `false`.
     pub fn append_all(&mut self, stack: bool) -> Result<MagickWand> {
         unsafe { bindings::MagickResetIterator(self.wand) };
         let wand_ptr = unsafe { bindings::MagickAppendImages(self.wand, stack.into()) };
@@ -144,11 +150,15 @@ impl MagickWand {
         )
     }
 
+    /// Set the image label property to the given string.
     pub fn label_image(&self, label: &str) -> Result<()> {
         let c_label = CString::new(label).map_err(|_| "label string contains null byte")?;
         self.result_from_boolean(unsafe { bindings::MagickLabelImage(self.wand, c_label.as_ptr()) })
     }
 
+    /// Write all images in the wand to the named file. When `adjoin` is `true`
+    /// and the format supports it, all images are written into a single file;
+    /// otherwise each image is written to a separately numbered file.
     pub fn write_images(&self, path: &str, adjoin: bool) -> Result<()> {
         let c_name = CString::new(path).map_err(|_| "path string contains null byte")?;
         self.result_from_boolean(unsafe {
@@ -230,7 +240,8 @@ impl MagickWand {
             bindings::MagickCompareImages(self.wand, reference.wand, metric, &mut distortion)
         };
 
-        let wand = Self::result_from_ptr_with_error_message(wand_ptr, MagickWand::from_ptr, "").ok();
+        let wand =
+            Self::result_from_ptr_with_error_message(wand_ptr, MagickWand::from_ptr, "").ok();
         (distortion, wand)
     }
 
@@ -290,12 +301,15 @@ impl MagickWand {
         })
     }
 
+    /// Replaces colors in the image using a Hald color lookup table (a Hald CLUT image).
     pub fn hald_clut_image(&self, clut_wand: &MagickWand) -> Result<()> {
         self.result_from_boolean(unsafe {
             bindings::MagickHaldClutImage(self.wand, clut_wand.wand)
         })
     }
 
+    /// Evaluate the given expression for each pixel, returning a new wand with
+    /// the result. Wraps ImageMagick's `MagickFxImage`.
     pub fn fx(&mut self, expression: &str) -> Result<MagickWand> {
         let c_expression =
             CString::new(expression).map_err(|_| "expression string contains null byte")?;
@@ -307,6 +321,8 @@ impl MagickWand {
         )
     }
 
+    /// Sets the size of the wand, used to read images larger than the canvas or
+    /// to size formats (e.g. PostScript) that have no inherent dimensions.
     pub fn set_size(&self, columns: usize, rows: usize) -> Result<()> {
         self.result_from_boolean(unsafe { bindings::MagickSetSize(self.wand, columns, rows) })
     }
@@ -420,6 +436,9 @@ impl MagickWand {
         })
     }
 
+    /// Add or remove a named ICC, IPTC, or generic profile from the image.
+    /// Passing `None` (or an empty profile) for `profile` removes the named
+    /// profile.
     pub fn profile_image<'a, T: Into<Option<&'a [u8]>>>(
         &self,
         name: &str,
@@ -441,26 +460,37 @@ impl MagickWand {
         self.result_from_boolean(result)
     }
 
+    /// Strip the image of all profiles and comments.
     pub fn strip_image(&self) -> Result<()> {
         self.result_from_boolean(unsafe { bindings::MagickStripImage(self.wand) })
     }
 
+    /// Flip the image vertically (mirror about the horizontal axis).
     pub fn flip_image(&self) -> Result<()> {
         self.result_from_boolean(unsafe { bindings::MagickFlipImage(self.wand) })
     }
 
+    /// Negate the colors in the image, producing its photographic negative.
     pub fn negate_image(&self) -> Result<()> {
         self.result_from_boolean(unsafe { bindings::MagickNegateImage(self.wand, MagickTrue) })
     }
 
+    /// Flop the image horizontally (mirror about the vertical axis).
     pub fn flop_image(&self) -> Result<()> {
         self.result_from_boolean(unsafe { bindings::MagickFlopImage(self.wand) })
     }
 
+    /// Blur the image by convolving it with a Gaussian operator of the given
+    /// `radius` and standard deviation (`sigma`), both in pixels. For reasonable
+    /// results the radius should be larger than sigma; use a radius of 0 to let
+    /// ImageMagick select a suitable radius.
     pub fn blur_image(&self, radius: f64, sigma: f64) -> Result<()> {
         self.result_from_boolean(unsafe { bindings::MagickBlurImage(self.wand, radius, sigma) })
     }
 
+    /// Blur the image with a Gaussian operator of the given `radius` and
+    /// standard deviation (`sigma`), both in pixels. Use a radius of 0 to let
+    /// ImageMagick select a suitable radius.
     pub fn gaussian_blur_image(&self, radius: f64, sigma: f64) -> Result<()> {
         self.result_from_boolean(unsafe {
             bindings::MagickGaussianBlurImage(self.wand, radius, sigma)
@@ -578,6 +608,7 @@ impl MagickWand {
         )
     }
 
+    /// Returns the values of all image artifacts whose names match the given pattern.
     pub fn get_image_artifacts(&self, pattern: &str) -> Result<Vec<String>> {
         let c_pattern = CString::new(pattern)
             .map_err(|_| MagickError("artifact string contains null byte".to_string()))?;
@@ -659,6 +690,7 @@ impl MagickWand {
         )
     }
 
+    /// Returns the values of all image properties whose names match the given pattern.
     pub fn get_image_properties(&self, pattern: &str) -> Result<Vec<String>> {
         let c_pattern = CString::new(pattern)
             .map_err(|_| MagickError("artifact string contains null byte".to_string()))?;
@@ -668,7 +700,9 @@ impl MagickWand {
             bindings::MagickGetImageProperties(self.wand, c_pattern.as_ptr(), &mut num_of_artifacts)
         };
 
-        self.result_from_ptr(c_values, |c_values| Self::c_char_to_string_vec(c_values, num_of_artifacts))
+        self.result_from_ptr(c_values, |c_values| {
+            Self::c_char_to_string_vec(c_values, num_of_artifacts)
+        })
     }
 
     /// Set the named image property.
@@ -692,7 +726,7 @@ impl MagickWand {
     ///
     /// samplingFactors: An array of floats representing the sampling factor for each color component (in RGB order).
     pub fn set_sampling_factors(&self, samplingFactors: &[f64]) -> Result<()> {
-        self.result_from_boolean( unsafe {
+        self.result_from_boolean(unsafe {
             bindings::MagickSetSamplingFactors(
                 self.wand,
                 samplingFactors.len(),
@@ -794,7 +828,10 @@ impl MagickWand {
         })
     }
 
-    /// Returns the image resolution as a pair (horizontal resolution, vertical resolution)
+    /// Applies a special effect to the image, similar to the effect achieved in
+    /// a photo darkroom by sepia toning. The `threshold` controls the extent of
+    /// the tone darkening and is given as a fraction of the quantum range
+    /// (a value around 0.8, i.e. 80%, is typical).
     pub fn sepia_tone_image(&self, threshold: f64) -> Result<()> {
         self.result_from_boolean(unsafe {
             bindings::MagickSepiaToneImage(self.wand, threshold * self.quantum_range()?)
@@ -834,6 +871,9 @@ impl MagickWand {
         }
     }
 
+    /// Extracts pixel data from the image as a vector of `f64` values defined by
+    /// `map`. Like [`export_image_pixels`](Self::export_image_pixels) but with
+    /// floating-point (`DoublePixel`) storage.
     pub fn export_image_pixels_double(
         &self,
         x: isize,
@@ -1043,7 +1083,9 @@ impl MagickWand {
 
     /// Renders the drawing wand on the current image
     pub fn draw_image(&mut self, drawing_wand: &DrawingWand) -> Result<()> {
-        self.result_from_boolean(unsafe { bindings::MagickDrawImage(self.wand, drawing_wand.as_ptr()) })
+        self.result_from_boolean(unsafe {
+            bindings::MagickDrawImage(self.wand, drawing_wand.as_ptr())
+        })
     }
 
     /// Removes skew from the image. Skew is an artifact that
@@ -1202,6 +1244,9 @@ impl MagickWand {
         })
     }
 
+    /// Accepts `f64` pixel data and stores it in the image at the given
+    /// location. Like [`import_image_pixels`](Self::import_image_pixels) but with
+    /// floating-point (`DoublePixel`) storage.
     pub fn import_image_pixels_double(
         &mut self,
         x: isize,
@@ -1212,18 +1257,21 @@ impl MagickWand {
         map: &str,
     ) -> Result<()> {
         let pixel_map = CString::new(map).expect("map string contains null byte");
-        Self::result_from_boolean_with_error_message( unsafe {
-            bindings::MagickImportImagePixels(
-                self.wand,
-                x,
-                y,
-                columns,
-                rows,
-                pixel_map.as_ptr(),
-                bindings::StorageType::DoublePixel,
-                pixels.as_ptr() as *const c_void,
-            )
-        }, "unable to import pixels")
+        Self::result_from_boolean_with_error_message(
+            unsafe {
+                bindings::MagickImportImagePixels(
+                    self.wand,
+                    x,
+                    y,
+                    columns,
+                    rows,
+                    pixel_map.as_ptr(),
+                    bindings::StorageType::DoublePixel,
+                    pixels.as_ptr() as *const c_void,
+                )
+            },
+            "unable to import pixels",
+        )
     }
 
     /// Borrow the wand's image list for read-only frame access.

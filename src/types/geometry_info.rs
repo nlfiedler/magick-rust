@@ -15,10 +15,13 @@
  */
 use crate::bindings;
 
+/// A set of up to five numeric parameters (rho, sigma, xi, psi, chi) used by
+/// ImageMagick geometry and kernel operations.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct GeometryInfo(bindings::GeometryInfo);
 
 impl GeometryInfo {
+    /// Create a new [`GeometryInfo`] with all parameters set to zero.
     pub fn new() -> GeometryInfo {
         let inner = bindings::GeometryInfo {
             rho: 0.0,
@@ -31,18 +34,23 @@ impl GeometryInfo {
         Self(inner)
     }
 
+    /// Set the `rho` parameter.
     pub fn set_rho(&mut self, rho: f64) {
         self.0.rho = rho;
     }
+    /// Set the `sigma` parameter.
     pub fn set_sigma(&mut self, sigma: f64) {
         self.0.sigma = sigma;
     }
+    /// Set the `xi` parameter.
     pub fn set_xi(&mut self, xi: f64) {
         self.0.xi = xi;
     }
+    /// Set the `psi` parameter.
     pub fn set_psi(&mut self, psi: f64) {
         self.0.psi = psi;
     }
+    /// Set the `chi` parameter.
     pub fn set_chi(&mut self, chi: f64) {
         self.0.chi = chi;
     }

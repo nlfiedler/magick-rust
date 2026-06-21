@@ -18,6 +18,10 @@ macro_rules! wand_common {
         $new_wand:ident, $clear_wand:ident, $is_wand:ident, $clone:ident, $destroy:ident,
         $clear_exc:ident, $get_exc_type:ident, $get_exc:ident
     ) => {
+        #[doc = concat!(
+                    "A safe wrapper around an ImageMagick `", stringify!($wand), "`.\n\n",
+                    "The wand owns the underlying ImageMagick handle and destroys it when dropped."
+                )]
         pub struct $wand {
             wand: *mut crate::bindings::$wand,
         }
@@ -29,19 +33,18 @@ macro_rules! wand_common {
         }
 
         impl $wand {
+            #[doc = concat!("Creates a new, empty `", stringify!($wand), "`.")]
             pub fn new() -> Self {
                 $wand {
                     wand: unsafe { crate::bindings::$new_wand() },
                 }
             }
 
-            pub (crate) fn from_ptr(ptr: *mut crate::bindings::$wand) -> Self {
-                $wand {
-                    wand: ptr
-                }
+            pub(crate) fn from_ptr(ptr: *mut crate::bindings::$wand) -> Self {
+                $wand { wand: ptr }
             }
 
-            pub (crate) fn as_ptr(&self) -> *mut crate::bindings::$wand {
+            pub(crate) fn as_ptr(&self) -> *mut crate::bindings::$wand {
                 self.wand
             }
 
@@ -49,6 +52,7 @@ macro_rules! wand_common {
                 unsafe { crate::bindings::$clear_wand(self.wand) }
             }
 
+            /// Clears any exception currently recorded on the wand.
             pub fn clear_exception(&mut self) -> Result<()> {
                 match unsafe { crate::bindings::$clear_exc(self.wand) } {
                     crate::bindings::MagickBooleanType::MagickTrue => Ok(()),
@@ -58,10 +62,13 @@ macro_rules! wand_common {
                 }
             }
 
+            /// Returns the severity of the most recent exception on the wand.
             pub fn get_exception_type(&self) -> crate::bindings::ExceptionType {
                 unsafe { crate::bindings::$get_exc_type(self.wand) }
             }
 
+            /// Returns the most recent exception on the wand as a `(message,
+            /// severity)` pair, or an error if no exception message is available.
             pub fn get_exception(&self) -> Result<(String, crate::bindings::ExceptionType)> {
                 let mut severity: crate::bindings::ExceptionType =
                     crate::bindings::ExceptionType::UndefinedException;
@@ -80,6 +87,7 @@ macro_rules! wand_common {
                 }
             }
 
+            /// Returns `Ok(())` if this is a valid wand of the expected type.
             pub fn is_wand(&self) -> Result<()> {
                 match unsafe { crate::bindings::$is_wand(self.wand) } {
                     crate::bindings::MagickBooleanType::MagickTrue => Ok(()),
@@ -119,6 +127,7 @@ macro_rules! wand_common {
 macro_rules! get {
     ($($get:ident, $c_get:ident, $typ:ty )*) => {
         $(
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_get), "` function.")]
             pub fn $get(&self) -> $typ {
                 unsafe { crate::bindings::$c_get(self.wand).into() }
             }
@@ -129,9 +138,11 @@ macro_rules! get {
 macro_rules! set_get {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident, $typ:ty )*) => {
         $(
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_get), "` function.")]
             pub fn $get(&self) -> $typ {
                 unsafe { crate::bindings::$c_get(self.wand).into() }
             }
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_set), "` function.")]
             pub fn $set(&mut self, v: $typ) -> Result<()> {
                 match unsafe { crate::bindings::$c_set(self.wand, v.into()) } {
                     crate::bindings::MagickBooleanType::MagickTrue => Ok(()),
@@ -149,9 +160,11 @@ macro_rules! set_get {
 macro_rules! set_get_unchecked {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident, $typ:ty )*) => {
         $(
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_get), "` function.")]
             pub fn $get(&self) -> $typ {
                 unsafe { crate::bindings::$c_get(self.wand).into() }
             }
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_set), "` function.")]
             pub fn $set(&mut self, v: $typ) {
                 unsafe { crate::bindings::$c_set(self.wand, v.into()) }
             }
@@ -165,6 +178,7 @@ macro_rules! set_get_unchecked {
 
 macro_rules! string_get {
     ($get:ident, $c_get:ident) => {
+        #[doc = concat!("Wraps ImageMagick's `", stringify!($c_get), "` function.")]
         pub fn $get(&self) -> Result<String> {
             let ptr = unsafe { crate::bindings::$c_get(self.wand) };
             if ptr.is_null() {
@@ -185,6 +199,7 @@ macro_rules! string_set_get {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident)*) => {
         $(
             string_get!($get, $c_get);
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_set), "` function.")]
             pub fn $set(&mut self, s: &str) -> Result<()> {
                 let c_string = std::ffi::CString::new(s).map_err(|_| "could not convert to cstring")?;
                 match unsafe { crate::bindings::$c_set(self.wand, c_string.as_ptr()) } {
@@ -204,6 +219,7 @@ macro_rules! string_set_get_unchecked {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident )*) => {
         $(
             string_get!($get, $c_get);
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_set), "` function.")]
             pub fn $set(&mut self, s: &str) -> Result<()> {
                 let c_string = ::std::ffi::CString::new(s).map_err(|_| "could not convert to cstring")?;
                 unsafe { crate::bindings::$c_set(self.wand, c_string.as_ptr()) };
@@ -220,11 +236,13 @@ macro_rules! string_set_get_unchecked {
 macro_rules! pixel_set_get {
     ($($get:ident, $set:ident, $c_get:ident, $c_set:ident )*) => {
         $(
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_get), "` function.")]
             pub fn $get(&self) -> crate::PixelWand {
                 let pw = crate::PixelWand::new();
                 unsafe { crate::bindings::$c_get(self.wand, pw.as_ptr()) };
                 pw
             }
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_set), "` function.")]
             pub fn $set(&mut self, pw: &crate::PixelWand) {
                 unsafe { crate::bindings::$c_set(self.wand, pw.as_ptr()) }
             }
@@ -245,15 +263,19 @@ macro_rules! color_set_get {
         $c_get:ident, $c_get_quantum:ident, $c_set:ident, $c_set_quantum:ident
     )*) => {
         $(
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_get), "` function.")]
             pub fn $get(&self) -> f64 {
                 unsafe { crate::bindings::$c_get(self.wand) }
             }
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_get_quantum), "` function.")]
             pub fn $get_quantum(&self) -> bindings::Quantum {
                 unsafe { crate::bindings::$c_get_quantum(self.wand) }
             }
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_set), "` function.")]
             pub fn $set(&mut self, v: f64) {
                 unsafe { crate::bindings::$c_set(self.wand, v) }
             }
+            #[doc = concat!("Wraps ImageMagick's `", stringify!($c_set_quantum), "` function.")]
             pub fn $set_quantum(&mut self, v: bindings::Quantum) {
                 unsafe { crate::bindings::$c_set_quantum(self.wand, v) }
             }

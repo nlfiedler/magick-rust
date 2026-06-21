@@ -38,18 +38,23 @@ wand_common!(
 );
 
 impl DrawingWand {
+    /// Draw the given `text` at `(x, y)` using the current font and fill color.
     pub fn draw_annotation(&mut self, x: f64, y: f64, text: &str) -> Result<()> {
         let c_string = CString::new(text).map_err(|_| "could not convert to cstring")?;
         unsafe { bindings::DrawAnnotation(self.wand, x, y, c_string.as_ptr() as *const _) };
         Ok(())
     }
 
+    /// Draw a circle centered at `(ox, oy)` with `(px, py)` a point on its
+    /// perimeter.
     pub fn draw_circle(&mut self, ox: f64, oy: f64, px: f64, py: f64) {
         unsafe {
             bindings::DrawCircle(self.wand, ox, oy, px, py);
         }
     }
 
+    /// Draw a rectangle from the upper-left corner `(upper_left_x, upper_left_y)`
+    /// to the lower-right corner `(lower_right_x, lower_right_y)`.
     pub fn draw_rectangle(
         &mut self,
         upper_left_x: f64,
@@ -109,7 +114,15 @@ impl DrawingWand {
 
     /// Draw an arc within the bounding rectangle `(sx, sy)`-`(ex, ey)`, sweeping
     /// from `start_degrees` to `end_degrees`.
-    pub fn draw_arc(&mut self, sx: f64, sy: f64, ex: f64, ey: f64, start_degrees: f64, end_degrees: f64) {
+    pub fn draw_arc(
+        &mut self,
+        sx: f64,
+        sy: f64,
+        ex: f64,
+        ey: f64,
+        start_degrees: f64,
+        end_degrees: f64,
+    ) {
         unsafe {
             bindings::DrawArc(self.wand, sx, sy, ex, ey, start_degrees, end_degrees);
         }
@@ -117,7 +130,15 @@ impl DrawingWand {
 
     /// Draw an ellipse centered at `(ox, oy)` with radii `rx` and `ry`, sweeping
     /// from `start_degrees` to `end_degrees` (use 0 and 360 for a full ellipse).
-    pub fn draw_ellipse(&mut self, ox: f64, oy: f64, rx: f64, ry: f64, start_degrees: f64, end_degrees: f64) {
+    pub fn draw_ellipse(
+        &mut self,
+        ox: f64,
+        oy: f64,
+        rx: f64,
+        ry: f64,
+        start_degrees: f64,
+        end_degrees: f64,
+    ) {
         unsafe {
             bindings::DrawEllipse(self.wand, ox, oy, rx, ry, start_degrees, end_degrees);
         }

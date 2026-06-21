@@ -492,7 +492,8 @@ fn test_transparent_paint_image() {
     wand.draw_image(&draw).unwrap();
 
     // alpha == 0.0 makes the matched (white) pixels fully transparent.
-    wand.transparent_paint_image(&white, 0.0, 0.0, false).unwrap();
+    wand.transparent_paint_image(&white, 0.0, 0.0, false)
+        .unwrap();
 
     // Every white pixel is now transparent. The alpha comes back from
     // ImageMagick's quantum->normalized-float conversion, so it may be a tiny

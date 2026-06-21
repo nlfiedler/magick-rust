@@ -9,9 +9,7 @@
 // *before* reading the PDF, since that is what controls how Ghostscript
 // rasterizes the vector pages into pixels.
 //
-use magick_rust::{
-    AlphaChannelOption, MagickError, MagickWand, PixelWand, magick_wand_genesis,
-};
+use magick_rust::{AlphaChannelOption, MagickError, MagickWand, PixelWand, magick_wand_genesis};
 use std::sync::Once;
 
 static START: Once = Once::new();

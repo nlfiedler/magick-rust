@@ -22,10 +22,14 @@ use crate::result::MagickError;
 use super::MagickTrue;
 use crate::result::Result;
 
+/// A color expressed in the hue, saturation, and lightness color space.
 #[derive(Default, Debug)]
 pub struct HSL {
+    /// Hue component.
     pub hue: f64,
+    /// Saturation component.
     pub saturation: f64,
+    /// Lightness component.
     pub lightness: f64,
 }
 
@@ -42,11 +46,14 @@ wand_common!(
 );
 
 impl PixelWand {
+    /// Return true if the distance between this pixel's color and the other's is
+    /// within the given `fuzz` factor.
     pub fn is_similar(&self, other: &PixelWand, fuzz: f64) -> bool {
         let result = unsafe { bindings::IsPixelWandSimilar(self.wand, other.wand, fuzz) };
         result == MagickTrue
     }
 
+    /// Return the pixel's color as hue, saturation, and lightness values.
     pub fn get_hsl(&self) -> HSL {
         let mut hsl = HSL::default();
         unsafe {
@@ -60,12 +67,15 @@ impl PixelWand {
         hsl
     }
 
+    /// Set the pixel's color from hue, saturation, and lightness values.
     pub fn set_hsl(&self, hsl: &HSL) {
         unsafe {
             bindings::PixelSetHSL(self.wand, hsl.hue, hsl.saturation, hsl.lightness);
         }
     }
 
+    /// Format the wand's settings for debugging, indenting each line with the
+    /// given `prefix`.
     pub fn fmt_w_prefix(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
         let mut prf = prefix.to_string();
         prf.push_str("    ");
@@ -77,6 +87,7 @@ impl PixelWand {
         writeln!(f, "{prefix}}}")
     }
 
+    /// Set the pixel's color from a color string such as `"#ff0000"` or `"red"`.
     pub fn set_color(&mut self, s: &str) -> Result<()> {
         let c_string = CString::new(s).map_err(|_| "could not convert to cstring")?;
         match unsafe { bindings::PixelSetColor(self.wand, c_string.as_ptr()) } {

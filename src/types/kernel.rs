@@ -98,6 +98,7 @@ impl KernelBuilder {
         self
     }
 
+    /// Build a user-defined [`KernelInfo`] from the configured size and values.
     pub fn build(&self) -> Result<KernelInfo> {
         let size = self
             .size
@@ -154,6 +155,7 @@ impl KernelBuilder {
         self
     }
 
+    /// Build a built-in [`KernelInfo`] from the configured info type and geometry.
     pub fn build_builtin(&self) -> Result<KernelInfo> {
         let info_type = self
             .info_type
@@ -177,6 +179,10 @@ impl KernelBuilder {
     }
 }
 
+/// A convolution or morphology kernel, wrapping ImageMagick's `KernelInfo`.
+///
+/// Construct one via [`KernelBuilder`]. The underlying kernel is freed when this
+/// value is dropped.
 pub struct KernelInfo {
     kernel_info: *mut bindings::KernelInfo,
 }
@@ -244,7 +250,7 @@ impl KernelInfo {
         unsafe { bindings::UnityAddKernelInfo(self.kernel_info, scale) }
     }
 
-    pub (crate) unsafe fn get_ptr(&self) -> *mut bindings::KernelInfo {
+    pub(crate) unsafe fn get_ptr(&self) -> *mut bindings::KernelInfo {
         self.kernel_info
     }
 }
