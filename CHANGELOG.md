@@ -5,6 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This file follows the convention described at
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [2.1.1] - 2026-06-21
+### Added
+- Filled in missing API documentation for basically everything.
+### Changed
+- Add generated `bindings.rs` to be used only for the docs.rs documentation
+  builds. When the `DOCS_RS` envar is set, `build.rs` will not look for
+  ImageMagick and instead copy the pre-built bindings to the `OUT_DIR` path.
+
 ## [2.1.0] - 2026-06-18
 ### Added
 - nlfiedler: Added an ergonomic image-list (frame) API for multi-image wands such
