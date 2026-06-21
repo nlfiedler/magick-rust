@@ -21,6 +21,7 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+// When updating the ImageMagick version, also rebuild the docsrs_bindings.rs file.
 const MIN_VERSION: &str = "7.1.1";
 const MAX_VERSION: &str = "7.2";
 

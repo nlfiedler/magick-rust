@@ -42,7 +42,9 @@ At the moment, building on Windows requires building from source. See [INSTALL.m
 
 ## Documentation
 
-The API documentation is available at [github pages](https://nlfiedler.github.io/magick-rust) since the docs.rs system has a hard time building anything that requires an external library that is not wrapped in a "sys" style library. See [issue 57](https://github.com/nlfiedler/magick-rust/issues/57) for the "create a sys crate request."
+The API documentation is available at [docs.rs](https://docs.rs/magick_rust/latest/magick_rust/) as usual.
+
+Building the API documentation on docs.rs is made possible by including a pre-built `docsrs_bindings.rs` file which `build.rs` will use instead of looking for the ImageMagick library and attempting to generate the bindings. This is triggered by the presence of the `DOCS_RS` environment variable which is set as part of the docs.rs build process. The pre-built bindings were produced in the Docker container defined in `docker/` and then run through `rustfmt` since that seems to speed up parsing. This file should be rebuilt whenever the version of ImageMagick is updated in `build.rs`.
 
 ## Examples
 
